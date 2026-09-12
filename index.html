@@ -5,98 +5,36 @@
 <title>SDC FITNESS</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<style>
-*{font-family:Inter,sans-serif}
-body{background:#050508;color:#fff}
-.glass{background:rgba(18,20,32,0.85);border:1px solid rgba(100,150,255,0.15);backdrop-filter:blur(20px)}
-.neon{box-shadow:0 0 30px rgba(75,130,255,0.4),0 0 60px rgba(75,130,255,0.15);border:1px solid rgba(120,170,255,0.6)}
-.neon-text{text-shadow:0 0 20px rgba(100,160,255,0.9),0 0 40px rgba(60,120,255,0.6)}
-.btn-blue{background:linear-gradient(135deg,#4f8bff,#2a5bff);color:#fff;font-weight:900;box-shadow:0 0 20px rgba(80,140,255,0.5)}
-.diamond{transform:rotate(45deg);border:1.5px solid rgba(120,170,255,0.8);box-shadow:0 0 25px rgba(80,140,255,0.6), inset 0 0 20px rgba(80,140,255,0.2)}
-.page{animation:f.4s ease}@keyframes f{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>*{font-family:Inter,sans-serif}body{background:#050508;color:#fff}.glass{background:rgba(18,20,32,0.85);border:1px solid rgba(100,150,255,0.15);backdrop-filter:blur(20px)}.btn-blue{background:linear-gradient(135deg,#4f8bff,#2a5bff);color:#fff;font-weight:900}.diamond{transform:rotate(45deg);border:1.5px solid rgba(120,170,255,0.8);box-shadow:0 0 25px rgba(80,140,255,0.6)}</style>
 </head>
 <body class="pb-36">
 
-<div id="login" class="min-h-screen flex items-center justify-center p-6 bg-[#050508]">
-<div class="w-full max-w-[380px] text-center">
-<div class="relative w-[140px] h-[140px] mx-auto flex items-center justify-center">
-<div class="diamond absolute inset-[12px] rounded-[4px]"></div>
-<div class="absolute w-2 h-2 bg-white rounded-full top-0 left-1/2 -translate-x-1/2 shadow-[0_0_15px_#8fb3ff]"></div>
-<div class="absolute w-1.5 h-1.5 bg-white rounded-full right-0 top-1/2 -translate-y-1/2 shadow-[0_0_15px_#8fb3ff]"></div>
-<span style="font-family:'Playfair Display'" class="text-[52px] font-bold text-white neon-text tracking-[0.15em]">SDC</span>
-</div>
-<p class="mt-7 text-[11px] tracking-[0.6em] text-[#8fb3ff] font-bold neon-text">FITNESS</p>
-<p class="text-[9px] tracking-[0.3em] text-zinc-600 mt-2">PERSONAL TRAINING</p>
-
-<div class="glass rounded-[28px] p-7 mt-10 text-left">
-<p class="text-[10px] tracking-[0.3em] font-black text-[#7aa2ff]">CLIENTE</p>
-<select id="sel" class="w-full mt-3 bg-[#0a0c16] rounded-2xl px-5 py-4 text-[14px] font-bold outline-none border border-[#2a4a8a]/40 text-white">
-<option>Marcus Vance</option><option>Sloane Sterling</option><option>Dante Moretti</option><option>Elena Rostova</option><option>Julian Kincaid</option><option>Camilla Thorne</option><option>Trevor Sterling</option><option>Amara Osei</option>
-</select>
-<p class="text-[10px] tracking-[0.3em] font-black text-[#7aa2ff] mt-6">PASSWORD</p>
-<input id="pw" type="password" placeholder="••••••••" class="w-full mt-3 bg-[#0a0c16] rounded-2xl px-5 py-4 outline-none border border-[#2a4a8a]/40 text-white">
-<button onclick="login()" class="w-full mt-7 btn-blue rounded-full py-4 text-[13px] tracking-widest">ENTRA →</button>
-</div>
-</div>
-</div>
-
-<div id="app" class="hidden">
+<div id="app">
 <div class="sticky top-0 z-20 bg-[#050508]/80 backdrop-blur-xl border-b border-[#1e2f5a]/30 px-6 py-4 flex justify-between items-center">
-<div class="flex items-center gap-3">
-<div class="relative w-9 h-9 flex items-center justify-center"><div class="diamond absolute inset-0 rounded-[3px] border-[#6a9aff]"></div><span class="text-[12px] font-black text-white neon-text relative">SDC</span></div>
-<div><p id="hName" class="font-black text-[13px]"></p><p class="text-[10px] text-[#7aa2ff] tracking-widest">ELITE CLIENT</p></div>
-</div>
-<div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#4f8bff] to-[#2a5bff] flex items-center justify-center font-black text-[11px]">MV</div>
+<div class="flex items-center gap-3"><div class="relative w-9 h-9 flex items-center justify-center"><div class="diamond absolute inset-0 rounded-[3px]"></div><span class="text-[12px] font-black relative">SDC</span></div><div><p id="hName" class="font-black text-[13px]">SDC Studio</p><p class="text-[10px] text-[#7aa2ff]">ELITE CLIENT</p></div></div>
+<select id="sel" onchange="changeClient()" class="bg-[#0a0c16] border border-[#2a4a8a]/40 rounded-full px-3 py-1 text-[11px]"><option>Marcus Vance</option><option>Sloane Sterling</option><option>Dante Moretti</option><option>Amara Osei</option></select>
 </div>
 
-<div id="p-dash" class="page p-5">
-<h1 class="text-[26px] font-black">Panoramica Studio</h1>
-<button onclick="openM('client')" class="mt-4 btn-blue rounded-full px-5 py-2.5 text-[12px]">+ Nuovo Cliente</button>
-<div class="grid grid-cols-2 gap-3 mt-6">
-<div class="glass rounded-[22px] p-5"><p class="text-[9px] tracking-widest text-[#7aa2ff] font-black">SESSIONI</p><p class="text-[26px] font-black mt-1">8</p></div>
-<div class="glass rounded-[22px] p-5 neon"><p class="text-[9px] tracking-widest text-[#7aa2ff] font-black">FATTURATO</p><p class="text-[20px] font-black mt-1 text-[#8fb3ff]">10.200€</p></div>
-</div>
-<div id="dashList" class="mt-6 space-y-2"></div>
-</div>
+<div id="p-dash" class="p-5"><h1 class="text-[24px] font-black">Panoramica</h1><button onclick="openM('client')" class="mt-3 btn-blue rounded-full px-5 py-2 text-[12px]">+ Nuovo Cliente</button><div id="dashList" class="mt-5 space-y-2"></div></div>
+<div id="p-prog" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black">Progressi</h2><button onclick="openM('weight')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Peso</button></div><div class="mt-4 bg-white rounded-[28px] p-5"><canvas id="chart" height="150"></canvas></div></div>
+<div id="p-scheda" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black">Scheda</h2><button onclick="openM('ex')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Esercizio</button></div><div id="exList" class="mt-5 space-y-3"></div></div>
+<div id="p-pag" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black">Pagamenti</h2><button onclick="openM('pay')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Incasso</button></div><div id="payList" class="mt-5 space-y-2"></div></div>
+<div id="p-appt" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black">Appuntamenti</h2><button onclick="openM('appt')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Nuovo</button></div><div id="apptList" class="mt-5 space-y-3"></div></div>
 
-<div id="p-prog" class="page hidden p-5">
-<div class="flex justify-between items-center"><h2 class="font-black">Progressi</h2><button onclick="openM('weight')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Peso</button></div>
-<div class="mt-4 bg-white text-black rounded-[28px] p-6"><canvas id="chart" height="160"></canvas></div>
-<div id="mList" class="mt-4 space-y-2"></div>
-</div>
-
-<div id="p-scheda" class="page hidden p-5">
-<div class="flex justify-between"><h2 class="font-black text-[18px]">Scheda Attiva</h2><button onclick="openM('ex')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Esercizio</button></div>
-<div id="exList" class="mt-5 space-y-3"></div>
-</div>
-
-<div id="p-pag" class="page hidden p-5">
-<div class="flex justify-between"><h2 class="font-black">Pagamenti</h2><button onclick="openM('pay')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Incasso</button></div>
-<div id="payList" class="mt-5 space-y-2"></div>
-</div>
-
-<div id="p-appt" class="page hidden p-5">
-<div class="flex justify-between"><h2 class="font-black">Appuntamenti</h2><button onclick="openM('appt')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Nuovo</button></div>
-<div id="apptList" class="mt-5 space-y-3"></div>
-</div>
-
-<div class="fixed bottom-5 left-4 right-4 bg-[#0f1320]/95 backdrop-blur-[30px] border border-[#2a4a8a]/30 rounded-[24px] flex justify-around py-3.5 shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-<button onclick="go('dash')" id="b-dash" class="text-[#5a7ac0] text-[11px] font-black">DASH</button>
-<button onclick="go('prog')" id="b-prog" class="text-[#8fb3ff] neon-text text-[11px] font-black">PROGR</button>
-<button onclick="go('scheda')" id="b-scheda" class="text-[#5a7ac0] text-[11px] font-black">SCHEDA</button>
-<button onclick="go('pag')" id="b-pag" class="text-[#5a7ac0] text-[11px] font-black">PAG</button>
-<button onclick="go('appt')" id="b-appt" class="text-[#5a7ac0] text-[11px] font-black">AI</button>
+<div class="fixed bottom-5 left-4 right-4 bg-[#0f1320]/95 border border-[#2a4a8a]/30 rounded-[24px] flex justify-around py-3.5">
+<button onclick="go('dash')" class="text-[#8fb3ff] font-black text-[11px]">DASH</button>
+<button onclick="go('prog')" class="text-[#5a7ac0] font-black text-[11px]">PROGR</button>
+<button onclick="go('scheda')" class="text-[#5a7ac0] font-black text-[11px]">SCHEDA</button>
+<button onclick="go('pag')" class="text-[#5a7ac0] font-black text-[11px]">PAG</button>
+<button onclick="go('appt')" class="text-[#5a7ac0] font-black text-[11px]">AI</button>
 </div>
 </div>
 
-<div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur flex items-end justify-center p-4"><div class="glass w-full max-w-[380px] rounded-[28px] p-6 border border-[#3a6aff]/30"><p id="mT" class="font-black"></p><div id="mB" class="mt-4"></div><div class="flex gap-2 mt-6"><button onclick="closeM()" class="flex-1 glass rounded-full py-3 text-[12px]">Annulla</button><button id="mS" class="flex-1 btn-blue rounded-full py-3 text-[12px]">Salva</button></div></div></div>
+<div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-end justify-center p-4"><div class="glass w-full max-w-[380px] rounded-[28px] p-6"><p id="mT" class="font-black"></p><div id="mB" class="mt-4"></div><div class="flex gap-2 mt-6"><button onclick="closeM()" class="flex-1 glass rounded-full py-3 text-[12px]">Annulla</button><button id="mS" class="flex-1 btn-blue rounded-full py-3 text-[12px]">Salva</button></div></div></div>
 
 <script>
-let cur=0,data=JSON.parse(localStorage.getItem('sdc_blue')||'{"w":{"0":[{"d":"12 Giu","w":86},{"d":"11 Set","w":83.8}]},"ex":{"0":[["Burpee","4","10","60s"],["Pull-up","3","8","90s"]]},"pay":[["Amara Osei","1400€","11/09"]],"ap":[["Marcus","07:00-08:00","Strength"]]}'),ch=null,mt=null;
-function save(){localStorage.setItem('sdc_blue',JSON.stringify(data));render();}
-function login(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('hName').textContent=document.getElementById('sel').value;cur=document.getElementById('sel').selectedIndex;render();go('prog');}
-function render(){let w=data.w[cur]||data.w["0"]||[];if(ch)ch.destroy();if(w.length)ch=new Chart(document.getElementById('chart'),{type:'line',data:{labels:w.map(x=>x.d),datasets:[{data:w.map(x=>x.w),borderColor:'#2a5bff',backgroundColor:'rgba(80,120,255,0.15)',tension:0.4,fill:true,borderWidth:3,pointRadius:4,pointBackgroundColor:'#8fb3ff'}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
-document.getElementById('exList').innerHTML=(data.ex[cur]||[]).map((e,i)=>`<div class="glass rounded-[20px] p-4 flex justify-between"><div><p class="font-bold text-[14px]">${e[0]}</p><p class="text-[11px] text-[#7aa2ff]">${e[1]}x${e[2]} • ${e[3]}</p></div><button onclick="data.ex['${cur}'].splice(${i},1);save()" class="text-zinc-500">✕</button></div>`).join('')||'<p class="text-center text-zinc-600 py-10 text-[12px]">Nessun esercizio. Aggiungi +</p>';
-document.getElementById('payList').innerHTML=data.pay.map((p,i)=>`<div class="glass rounded-[18px] p-
+let cur=0,data=JSON.parse(localStorage.getItem('sdc_blue_final')||'{"w":{"0":[{"d":"12 Giu","w":86},{"d":"11 Set","w":83.8}]},"ex":{"0":[["Burpee","4","10","60s"]]},"pay":[["Amara Osei","1400€","11/09"]],"ap":[["Marcus","07:00","Strength"]]}'),ch=null,mt=null;
+function save(){localStorage.setItem('sdc_blue_final',JSON.stringify(data));render();}
+function changeClient(){cur=document.getElementById('sel').selectedIndex;render();}
+function render(){let w=data.w[cur]||data.w["0"]||[];try{if(ch)ch.destroy();if(w.length&&document.getElementById('chart
