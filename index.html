@@ -1,64 +1,55 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>SDC Training - Private Studio</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDC Personal Training</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-<style>*{font-family:'Inter',sans-serif}.glass{backdrop-filter:blur(20px)}.hide-scroll::-webkit-scrollbar{display:none}</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+*{font-family:Inter,sans-serif}
+.card{background:#1e1e1e;border:1px solid #2a2a2a}
+.bottom{backdrop-filter:blur(20px);background:rgba(15,15,15,0.95);border-top:1px solid #2a2a2a}
+.tab-active{background:#2a2a2a;color:white!important}
+</style>
 </head>
-<body class="bg-[#0a0a0a] text-white antialiased">
-<!-- LOGIN PREMIUM -->
-<div id="login" class="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-zinc-900 to-black">
-<div class="w-full max-w-sm">
-<div class="text-center mb-10"><h1 class="text-5xl font-black tracking-tighter">SDC<span class="text-lime-400">.</span></h1><p class="text-zinc-500 text-[11px] tracking-[0.3em] mt-2 font-bold">PRIVATE TRAINING STUDIO</p></div>
-<div class="bg-zinc-900/80 glass border border-zinc-800 rounded-[32px] p-8 shadow-2xl">
-<p class="text-[11px] font-black tracking-widest text-zinc-500">SELEZIONA PROFILO</p>
-<select id="sel" class="w-full mt-4 bg-black border border-zinc-800 rounded-2xl p-4 text-sm font-semibold"></select>
-<input id="pw" type="password" placeholder="Password" class="w-full mt-3 bg-black border border-zinc-800 rounded-2xl p-4 text-sm">
-<button onclick="doLogin()" class="w-full mt-6 bg-lime-400 text-black font-black py-4 rounded-2xl text-sm tracking-wide active:scale-[0.98] transition">ENTRA NELL'APP →</button>
-<div class="mt-6 p-3 bg-lime-400/10 border border-lime-400/20 rounded-xl"><p class="text-[10px] text-lime-300 font-bold leading-relaxed">🔓 DEMO: sdc2024 = clienti<br>admin123 = admin (10.200€ / 12.000€)<br>Marcus -2.6kg | Vita -2.3cm VERI</p></div>
-</div></div></div>
+<body class="bg-[#0f0f0f] text-white pb-24">
 
-<!-- APP GLIDE STYLE -->
-<div id="dash" class="hidden min-h-screen bg-[#0a0a0a] pb-24">
-<!-- Header Glide -->
-<div class="sticky top-0 z-20 bg-black/80 glass border-b border-zinc-900 px-6 py-4 flex justify-between items-center">
-<div><p id="cName" class="font-black text-[17px] tracking-tight"></p><p id="cGoal" class="text-[11px] text-zinc-500 mt-0.5 font-medium"></p></div>
-<div id="avatar" class="w-10 h-10 bg-lime-400 rounded-full flex items-center justify-center font-black text-black text-sm"></div>
+<!-- LOGIN -->
+<div id="login" class="min-h-screen flex items-center justify-center p-6">
+<div class="w-full max-w-sm"><h1 class="text-3xl font-black">SDC<span class="text-lime-400">.</span> Personal Training</h1>
+<div class="card rounded-[20px] p-6 mt-6"><select id="sel" class="w-full bg-[#0f0f0f] border border-zinc-700 rounded-xl p-4 text-sm"></select><input id="pw" type="password" placeholder="Password" class="w-full mt-3 bg-[#0f0f0f] border border-zinc-700 rounded-xl p-4"><button onclick="login()" class="w-full mt-4 bg-[#6b7280] text-white font-bold py-4 rounded-full">ENTRA →</button><p class="text-[10px] text-zinc-500 mt-3 text-center">sdc2024 clienti / admin123 admin - dati veri</p></div></div>
 </div>
 
-<div id="adminBar" class="hidden mx-4 mt-4 bg-gradient-to-r from-amber-400 to-orange-400 text-black rounded-[20px] p-5"><p class="font-black text-xs tracking-widest">ADMIN • FATTURATO REALE</p><p class="text-2xl font-black mt-1">€10.200 / €12.000</p><p class="text-[11px] font-bold opacity-70 mt-1">Trevor deve €1.800 • 7 pagati</p></div>
+<div id="app" class="hidden">
 
-<!-- Hero Stats like Glide -->
-<div class="px-4 mt-5 grid grid-cols-3 gap-3">
-<div class="bg-zinc-900 border border-zinc-800 rounded-[20px] p-4"><p class="text-[10px] text-zinc-500 font-black tracking-widest">PESO</p><p id="statW" class="text-lg font-black mt-1"></p><p id="statWD" class="text-[11px] text-lime-400 font-bold mt-1"></p></div>
-<div class="bg-zinc-900 border border-zinc-800 rounded-[20px] p-4"><p class="text-[10px] text-zinc-500 font-black tracking-widest">BF%</p><p class="text-lg font-black mt-1">15.8%</p><p class="text-[11px] text-lime-400 font-bold mt-1">-2.4% ↓</p></div>
-<div class="bg-zinc-900 border border-zinc-800 rounded-[20px] p-4"><p class="text-[10px] text-zinc-500 font-black tracking-widest">VITA</p><p class="text-lg font-black mt-1">89.7cm</p><p class="text-[11px] text-lime-400 font-bold mt-1">-2.3cm ↓</p></div>
+<!-- DASHBOARD = Panoramica Studio -->
+<div id="p-dash" class="page p-4">
+<h1 class="text-[28px] font-bold leading-tight">Panoramica Studio</h1>
+<button class="mt-3 bg-[#6b7280] rounded-full px-5 py-2.5 text-[14px] font-semibold">+ Nuovo Cliente</button>
+<p class="text-zinc-500 mt-6 text-[15px]">domenica 13 settembre</p>
+<div class="mt-4 space-y-3">
+<div class="card rounded-[20px] p-5"><div class="flex justify-between"><p class="text-zinc-400 text-[15px]">Sessioni di oggi</p><span>📅</span></div><p class="text-[28px] font-bold mt-2">8</p></div>
+<div class="card rounded-[20px] p-5"><div class="flex justify-between"><p class="text-zinc-400 text-[15px]">Clienti attivi</p><span>👥</span></div><p class="text-[28px] font-bold mt-2">8</p></div>
+<div class="card rounded-[20px] p-5"><div class="flex justify-between"><p class="text-zinc-400 text-[15px]">Fatturato settembre</p><span>💳</span></div><p class="text-[28px] font-bold mt-2">10.200,00 €</p></div>
+<div class="card rounded-[20px] p-5"><p class="text-zinc-400 text-[15px]">Pagamenti da ricevere</p><p class="text-[28px] font-bold mt-2">1</p><p class="text-[13px] text-zinc-500 mt-1">Trevor Sterling €1.800</p></div>
+</div>
+<div class="mt-6"><p class="font-bold">Sessioni di oggi • 8 reali dal DB</p><div id="dashAppt" class="mt-3 space-y-2"></div></div>
 </div>
 
-<!-- Chart Card -->
-<div class="mx-4 mt-4 bg-white text-black rounded-[24px] p-5 shadow-xl"><div class="flex justify-between items-center"><p class="font-black text-sm">Progresso Peso • Dati Veri</p><p class="text-[10px] bg-black text-white px-2.5 py-1 rounded-full font-bold">33 PESATE</p></div><canvas id="wChart" height="150" class="mt-4"></canvas><div id="mStats" class="mt-4 space-y-2"></div></div>
-
-<!-- Today -->
-<div class="px-4 mt-6"><p class="font-black text-[12px] tracking-widest text-zinc-500">OGGI • 13 SETTEMBRE</p><div id="todayAppt" class="mt-3 space-y-2"></div></div>
-
-<!-- Workouts Glide Cards -->
-<div class="px-4 mt-8"><div class="flex justify-between items-center"><p class="font-black text-[12px] tracking-widest text-zinc-500">SCHEDA REALE • 33 ESERCIZI DB</p><span class="text-[10px] bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-full">6 ESERCIZI</span></div><div id="exList" class="mt-3 space-y-2.5"></div></div>
-
-<!-- Bottom Nav Glide -->
-<div class="fixed bottom-0 left-0 right-0 bg-black/90 glass border-t border-zinc-900 px-8 py-3 flex justify-around"><div class="flex flex-col items-center"><div class="w-6 h-6 bg-lime-400 rounded-full"></div><p class="text-[9px] font-black mt-1 tracking-widest">HOME</p></div><div class="flex flex-col items-center opacity-40"><div class="w-6 h-6 bg-zinc-700 rounded-full"></div><p class="text-[9px] font-black mt-1 tracking-widest">STATS</p></div><div class="flex flex-col items-center opacity-40"><div class="w-6 h-6 bg-zinc-700 rounded-full"></div><p class="text-[9px] font-black mt-1 tracking-widest">CHAT</p></div><div class="flex flex-col items-center opacity-40"><div class="w-6 h-6 bg-zinc-700 rounded-full"></div><p class="text-[9px] font-black mt-1 tracking-widest">PROFILO</p></div></div>
+<!-- PROGRESSI -->
+<div id="p-prog" class="page hidden p-4">
+<h1 class="text-[28px] font-black uppercase tracking-wide">PROGRESSI</h1>
+<div class="flex gap-2 mt-3"><button class="card rounded-full px-4 py-2 text-[13px] font-bold">⊞ DASHBOARD</button><button class="bg-[#6b7280] rounded-full px-4 py-2 text-[13px] font-bold">+ AGGIUNGI PESO</button></div>
+<p class="mt-6 text-[15px]">Cliente selezionato</p><select id="progSel" onchange="updateProg()" class="w-full mt-2 card rounded-full px-4 py-3 text-[15px]"></select>
+<div class="card rounded-[20px] p-5 mt-4"><p class="text-zinc-400 text-[15px]">Peso attuale</p><p id="progW" class="text-[32px] font-bold mt-1"></p><p id="progD" class="text-zinc-500 text-[14px] mt-1"></p></div>
+<div class="card rounded-[20px] p-5 mt-3"><p class="text-zinc-400 text-[15px]">Variazione dal primo rilevamento</p><p id="progDiff" class="text-[32px] font-bold mt-1"></p><p id="progName" class="text-zinc-500 text-[14px] mt-1"></p></div>
+<p class="mt-6 font-bold text-[20px]">Peso nel tempo</p><p id="progCount" class="text-zinc-500 text-[14px]"></p><div class="card rounded-[20px] p-4 mt-3"><canvas id="chart" height="180"></canvas></div>
+<div id="progList" class="mt-4 space-y-2"></div>
 </div>
 
-<script>
-const CLIENTS=[{id:1,n:"Marcus Vance",g:"Diamond Hypertrophy 12W",m:"Diamond VIP - €2500 pagato"},{id:2,n:"Sloane Sterling",g:"Apex Marathon Sub-3:15",m:"Black Tier - €1800"},{id:3,n:"Dante Moretti",g:"Core & Mobility",m:"Diamond - €900"},{id:4,n:"Elena Rostova",g:"Mobility & Kinetic Flow",m:"Executive - €1200"},{id:5,n:"Julian Kincaid",g:"Powerlifting Strength",m:"Black - €1500"},{id:6,n:"Camilla Thorne",g:"Longevity & Vitality",m:"Executive - €1100"},{id:7,n:"Trevor Sterling",g:"Cut Phase",m:"Diamond - €1800 DA PAGARE"},{id:8,n:"Amara Osei",g:"Endurance & Conditioning",m:"Black - €1200"}];
-const WEIGHTS={1:[{d:"12 Giu",w:86.4},{d:"03 Lug",w:85.7},{d:"24 Lug",w:84.9},{d:"14 Ago",w:84.2},{d:"11 Set",w:83.8}],2:[{d:"15 Giu",w:64.8},{d:"10 Ago",w:64.0},{d:"01 Set",w:63.2}],3:[{d:"20 Giu",w:78.2},{d:"12 Ago",w:77.3},{d:"03 Set",w:76.8}],4:[{d:"10 Giu",w:58.9},{d:"05 Ago",w:58.1},{d:"02 Set",w:57.6}],5:[{d:"18 Giu",w:92.1},{d:"30 Lug",w:93.2},{d:"15 Ago",w:93.8}],6:[{d:"22 Giu",w:62.3},{d:"01 Ago",w:61.8},{d:"20 Ago",w:61.2}],7:[{d:"29 Lug",w:88.7},{d:"20 Ago",w:87.1},{d:"05 Set",w:86.2}],8:[{d:"15 Ago",w:78.4},{d:"28 Ago",w:77.5},{d:"10 Set",w:76.9}]};
-const BODY={1:[{d:"12 Giu",va:"Vita 92cm • Petto 108cm • BF 18.2%"},{d:"11 Set",va:"Vita 89.7cm (-2.3) • Petto 109.5cm (+1.5) • BF 15.8% (-2.4)"}],2:[{d:"01 Set",va:"Vita 68cm • BF 19% • VO2 52"}],8:[{d:"10 Set",va:"Vita 78cm • BF 22%"}]};
-const EX={1:[["Panca piana BB","4x8","60kg","Diamond Hypertrophy"],["Rematore manubrio","4x10","24kg","Back Thickness"],["Shoulder Press DB","3x10","18kg","Delts"],["Lat Machine","3x12","45kg","Width"],["Alzate laterali","3x15","8kg","Pump"],["Biceps Curl","3x12","14kg","Arms"]],2:[["Corsa Intervalli","6x400m","","Sub-3:15 Pace"],["Affondi","3x12","12kg","Legs"],["Step-up","3x10","10kg",""],["Plank","3x45sec","","Core"]],3:[["Dead Bug","3x12","",""],["Bird Dog","3x10","",""]],8:[["Squat BB","4x8","40kg",""],["Burpee","3x15","",""],["Kettlebell Swing","3x20","16kg",""]]};
-const APPTS=[{c:1,t:"07:00",n:"Upper Hypertrophy",s:"Sala Pesi 1"},{c:2,t:"08:30",n:"Run Intervals",s:"Pista"},{c:3,t:"10:00",n:"Core Focus",s:"Studio 2"},{c:8,t:"11:30",n:"Endurance",s:"Studio 1"},{c:5,t:"14:00",n:"Lower Strength",s:"Sala Pesi 1"},{c:4,t:"15:30",n:"Mobility Flow",s:"Studio 2"},{c:6,t:"17:00",n:"Longevity",s:"Studio 1"},{c:7,t:"18:00",n:"Cut Circuit",s:"Sala Pesi 2"}];
-const sel=document.getElementById('sel'); CLIENTS.forEach(c=>{let o=document.createElement('option');o.value=c.id;o.textContent=c.n+" - "+c.g;sel.appendChild(o);}); let chart;
-function doLogin(){let id=parseInt(sel.value);let pw=document.getElementById('pw').value;let isAdmin=pw==="admin123";let isClient=pw==="sdc2024";if(!isAdmin&&!isClient){alert("Password: sdc2024 clienti, admin123 admin");return;}let cli=CLIENTS.find(x=>x.id===id);document.getElementById('login').classList.add('hidden');document.getElementById('dash').classList.remove('hidden');if(isAdmin)document.getElementById('adminBar').classList.remove('hidden');document.getElementById('cName').textContent=cli.n;document.getElementById('cGoal').textContent=cli.g+" • "+cli.m;document.getElementById('avatar').textContent=cli.n.split(' ').map(x=>x[0]).join('');let w=WEIGHTS[id]||[];let diff=w.length>1?(w[w.length-1].w-w[0].w).toFixed(1):"0";document.getElementById('statW').textContent=w.length?w[w.length-1].w+"kg":"-";document.getElementById('statWD').textContent=(diff>0?"+":"")+diff+"kg DA INIZIO";if(chart)chart.destroy();if(w.length){chart=new Chart(document.getElementById('wChart'),{type:'line',data:{labels:w.map(x=>x.d),datasets:[{data:w.map(x=>x.w),borderColor:'#000',backgroundColor:'rgba(0,0,0,.06)',tension:.4,fill:true,borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#a3e635'}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{font:{size:10,weight:'700'}}}}}});}document.getElementById('mStats').innerHTML=(BODY[id]||[]).map(b=>`<div class='bg-zinc-50 border border-zinc-100 p-3 rounded-2xl flex justify-between'><span class='text-[11px] font-bold text-zinc-500'>${b.d}</span><span class='text-[11px] font-bold'>${b.va}</span></div>`).join('')||"<div class='text-[11px] text-zinc-400'>24 misure totali nel DB reale</div>";document.getElementById('exList').innerHTML=(EX[id]||EX[1]).map(e=>`<div class='bg-zinc-900 border border-zinc-800 p-4 rounded-[20px] flex justify-between items-center active:scale-[0.98] transition'><div><p class='font-black text-[13px]'>${e[0]}</p><p class='text-[11px] text-zinc-500 mt-0.5'>${e[3]||"SDC Training"}</p></div><div class='text-right'><span class='bg-white text-black text-[11px] font-black px-3 py-1.5 rounded-full'>${e[1]}</span><p class='text-[11px] font-bold mt-1 text-lime-400'>${e[2]?e[2]:""}</p></div></div>`).join('');document.getElementById('todayAppt').innerHTML=APPTS.map(a=>`<div class='bg-zinc-900 border ${a.c==id?"border-lime-400/50 bg-zinc-900":"border-zinc-800"} p-3.5 rounded-2xl flex justify-between items-center'><div class='flex items-center gap-3'><div class='w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-[11px] font-black'>${a.t}</div><div><p class='font-bold text-[12px]'>${a.n}</p><p class='text-[10px] text-zinc-500'>${a.s}</p></div></div><div class='w-2 h-2 ${a.c==id?"bg-lime-400":"bg-zinc-700"} rounded-full'></div></div>`).join('');}
-</script>
-</body>
-</html>
+<!-- SCHEDA -->
+<div id="p-scheda" class="page hidden p-4">
+<p class="text-[12px] tracking-[0.2em] text-zinc-500">SCHEDA ATTIVA</p><h1 id="schedaTitle" class="text-[26px] font-bold leading-tight mt-1"></h1><p id="schedaClient" class="text-zinc-500 mt-1"></p>
+<p class="mt-5 font-semibold">Scheda</p><div class="card rounded-full px-4 py-3 mt-2 flex justify-between"><span id="schedaDrop" class="text-[14px]"></span><span>▼</span></div>
+<div class="card rounded-full p-1.5 flex gap-1 mt-5 overflow-x-auto"><button onclick="setDay(1)" id="d1" class="bg-[#6b7280] rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 1</button><button onclick="setDay(2)" id="d2" class="rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 2</button><button onclick="setDay(3)" id="d3" class="rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 3</button><button onclick="setDay(4)" id="d4" class="rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 4</button><button onclick="setDay(5)" id="d5" class="rounded-full px-4 py-2 text-[13px] font
