@@ -1,197 +1,138 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SDC Personal Training</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
-<style>
-*{font-family:Inter,sans-serif; -webkit-tap-highlight-color:transparent}
-body{background:#0a0a0a}
-.card{background:#1e1e1e;border:1px solid #2a2a2a}
-.bottom-bar{background:rgba(18,18,18,0.98);backdrop-filter:blur(20px);border-top:1px solid #2a2a2a}
-.tab-active{color:#a3e635!important}
-.tab-active div{background:#a3e635!important;color:#000!important}
-select option{background:#000;color:#fff}
-</style>
+<style>*{font-family:Inter,sans-serif}body{background:#0a0a0a}.card{background:#1e1e1e;border:1px solid #2a2a2a}.bottom-bar{background:#121212;border-top:1px solid #2a2a2a}.tab-active{color:#a3e635!important}.tab-active div{background:#a3e635!important;color:#000!important}</style>
 </head>
 <body class="text-white pb-28">
 
-<!-- LOGIN -->
 <div id="login" class="min-h-screen flex items-center justify-center p-6 bg-black">
-  <div class="w-full max-w-[360px]">
-    <h1 class="text-[36px] font-black tracking-tighter leading-none">SDC<span class="text-lime-400">.</span> Personal<br>Training</h1>
-    <div class="card rounded-[24px] p-6 mt-8">
-      <p class="text-[10px] font-black tracking-[0.3em] text-zinc-500">CLIENTE</p>
-      <select id="clientSelect" class="w-full mt-2 bg-black border border-zinc-700 rounded-2xl px-4 py-4 text-[14px] font-bold text-white outline-none"></select>
-      <p class="text-[10px] font-black tracking-[0.3em] text-zinc-500 mt-5">PASSWORD</p>
-      <input id="passInput" type="password" placeholder="••••••••" class="w-full mt-2 bg-black border border-zinc-700 rounded-2xl px-4 py-4 text-[14px] text-white outline-none">
-      <button onclick="doLogin()" class="w-full mt-6 bg-[#5a6478] active:bg-lime-400 active:text-black text-white font-black py-4 rounded-full transition">ENTRA →</button>
-      <p class="text-[11px] text-zinc-500 mt-4 text-center">sdc2024 per clienti / admin123 per admin<br>8 clienti reali • 10.200€ fatturato</p>
-    </div>
-  </div>
+<div class="w-full max-w-[360px]">
+<h1 class="text-[36px] font-black leading-none">SDC<span style="color:#a3e635">.</span> Personal<br>Training</h1>
+<div class="card rounded-[24px] p-6 mt-8">
+<p class="text-[10px] font-black tracking-[0.3em] text-zinc-500">CLIENTE</p>
+<select id="clientSelect" style="color:white;background:#000" class="w-full mt-2 border border-zinc-700 rounded-2xl px-4 py-4 text-[14px] font-bold outline-none">
+<option value="1">Marcus Vance</option>
+<option value="2">Sloane Sterling</option>
+<option value="3">Dante Moretti</option>
+<option value="4">Elena Rostova</option>
+<option value="5">Julian Kincaid</option>
+<option value="6">Camilla Thorne</option>
+<option value="7">Trevor Sterling - €1.800 DA PAGARE</option>
+<option value="8">Amara Osei</option>
+</select>
+<p class="text-[10px] font-black tracking-[0.3em] text-zinc-500 mt-5">PASSWORD</p>
+<input id="passInput" type="password" placeholder="Password" style="color:white;background:#000" class="w-full mt-2 border border-zinc-700 rounded-2xl px-4 py-4 text-[14px] outline-none">
+<button onclick="doLogin()" class="w-full mt-6 bg-[#6b7280] hover:bg-lime-400 hover:text-black text-white font-black py-4 rounded-full">ENTRA →</button>
+<p class="text-[11px] text-zinc-500 mt-4 text-center">sdc2024 clienti / admin123 admin</p>
+</div>
+</div>
 </div>
 
-<!-- APP -->
 <div id="app" class="hidden">
+<div class="sticky top-0 z-30 bg-black/90 backdrop-blur border-b border-zinc-900 px-5 py-4 flex justify-between items-center">
+<div><p id="hName" class="font-black"></p><p id="hSub" class="text-[11px] text-zinc-500"></p></div>
+<div id="hAv" class="w-10 h-10 bg-lime-400 rounded-full flex items-center justify-center text-black font-black text-sm"></div>
+</div>
 
-  <!-- HEADER -->
-  <div class="sticky top-0 z-30 bg-black/90 backdrop-blur-xl border-b border-zinc-900 px-5 py-4 flex justify-between items-center">
-    <div><p id="headerName" class="font-black text-[16px]"></p><p id="headerSub" class="text-[11px] text-zinc-500 mt-0.5"></p></div>
-    <div id="headerAvatar" class="w-10 h-10 bg-lime-400 rounded-full flex items-center justify-center text-black font-black text-[13px]"></div>
-  </div>
+<div id="page-dash" class="page p-4">
+<h1 class="text-[28px] font-bold">Panoramica Studio</h1>
+<div class="mt-4 space-y-3">
+<div class="card rounded-[20px] p-5"><p class="text-zinc-400 text-[13px]">Sessioni di oggi</p><p class="text-[30px] font-bold">8</p></div>
+<div class="card rounded-[20px] p-5"><p class="text-zinc-400 text-[13px]">Clienti attivi</p><p class="text-[30px] font-bold">8</p></div>
+<div class="card rounded-[20px] p-5"><p class="text-zinc-400 text-[13px]">Fatturato settembre</p><p class="text-[28px] font-bold">10.200,00 €</p></div>
+<div class="card rounded-[20px] p-5"><p class="text-zinc-400">Da incassare</p><p class="text-[20px] font-bold text-red-400 mt-1">Trevor Sterling €1.800</p></div>
+</div>
+</div>
 
-  <!-- 1. DASHBOARD -->
-  <div id="page-dash" class="page p-4">
-    <h1 class="text-[28px] font-bold leading-tight">Panoramica Studio</h1>
-    <button class="mt-3 bg-[#6b7280] rounded-full px-5 py-2.5 text-[13px] font-semibold">+ Nuovo Cliente</button>
-    <p id="todayDate" class="text-zinc-500 mt-6 text-[14px]"></p>
-    <div class="mt-4 space-y-3">
-      <div class="card rounded-[20px] p-5 flex justify-between items-center"><div><p class="text-zinc-400 text-[13px]">Sessioni di oggi</p><p class="text-[30px] font-bold mt-1">8</p></div><span class="text-2xl">📅</span></div>
-      <div class="card rounded-[20px] p-5 flex justify-between items-center"><div><p class="text-zinc-400 text-[13px]">Clienti attivi</p><p class="text-[30px] font-bold mt-1">8</p></div><span class="text-2xl">👥</span></div>
-      <div class="card rounded-[20px] p-5 flex justify-between items-center"><div><p class="text-zinc-400 text-[13px]">Fatturato settembre</p><p class="text-[26px] font-bold mt-1">10.200,00 €</p></div><span class="text-2xl">💳</span></div>
-      <div class="card rounded-[20px] p-5"><p class="text-zinc-400 text-[13px]">Pagamenti da ricevere</p><p class="text-[30px] font-bold mt-1">1</p><p class="text-[12px] text-red-400 font-bold mt-1">Trevor Sterling • €1.800</p></div>
-    </div>
-    <p class="mt-8 font-bold">Sessioni di oggi • 8 reali</p>
-    <div id="dashList" class="mt-3 space-y-2"></div>
-  </div>
+<div id="page-prog" class="page hidden">
+<div class="p-4 grid grid-cols-3 gap-2">
+<div class="card rounded-[18px] p-4"><p class="text-[9px] font-black text-zinc-500">PESO</p><p id="statW" class="font-black text-[18px] mt-2"></p><p id="statWD" class="text-[10px] text-lime-400 font-bold mt-1"></p></div>
+<div class="card rounded-[18px] p-4"><p class="text-[9px] font-black text-zinc-500">BF%</p><p class="font-black text-[18px] mt-2">15.8%</p><p class="text-[10px] text-lime-400 font-bold">-2.4% ↓</p></div>
+<div class="card rounded-[18px] p-4"><p class="text-[9px] font-black text-zinc-500">VITA</p><p class="font-black text-[18px] mt-2">89.7cm</p><p class="text-[10px] text-lime-400 font-bold">-2.3cm ↓</p></div>
+</div>
+<div class="mx-4 bg-white text-black rounded-[24px] p-5"><p class="font-black text-[14px]">Peso nel tempo - dati veri</p><canvas id="chart" height="170" class="mt-4"></canvas><div id="wList" class="mt-4 space-y-2"></div></div>
+</div>
 
-  <!-- 2. PROGRESSI -->
-  <div id="page-prog" class="page hidden">
-    <div class="p-4 grid grid-cols-3 gap-2">
-      <div class="card rounded-[18px] p-4"><p class="text-[9px] font-black tracking-widest text-zinc-500">PESO</p><p id="statWeight" class="font-black text-[18px] mt-2"></p><p id="statWeightDiff" class="text-[10px] font-bold text-lime-400 mt-1"></p></div>
-      <div class="card rounded-[18px] p-4"><p class="text-[9px] font-black tracking-widest text-zinc-500">BF%</p><p class="font-black text-[18px] mt-2">15.8%</p><p class="text-[10px] font-bold text-lime-400 mt-1">-2.4% ↓</p></div>
-      <div class="card rounded-[18px] p-4"><p class="text-[9px] font-black tracking-widest text-zinc-500">VITA</p><p class="font-black text-[18px] mt-2">89.7cm</p><p class="text-[10px] font-bold text-lime-400 mt-1">-2.3cm ↓</p></div>
-    </div>
-    <div class="mx-4 bg-white text-black rounded-[24px] p-5">
-      <div class="flex justify-between items-center"><p class="font-black text-[14px]">Peso nel tempo</p><span class="text-[10px] bg-black text-white px-3 py-1 rounded-full font-bold">DATI REALI</span></div>
-      <canvas id="weightChart" height="170" class="mt-4"></canvas>
-      <div id="weightList" class="mt-5 space-y-2"></div>
-    </div>
-    <div class="p-4 mt-2">
-      <p class="text-[10px] font-black tracking-widest text-zinc-500">CAMBIA CLIENTE</p>
-      <select id="progClientSelect" onchange="changeProgClient()" class="w-full mt-2 card rounded-2xl px-4 py-3 text-white font-bold"></select>
-    </div>
-  </div>
+<div id="page-scheda" class="page hidden p-4">
+<p class="text-[10px] font-black tracking-widest text-zinc-500">SCHEDA ATTIVA</p>
+<h1 class="text-[22px] font-bold mt-1">Decathlon Hybrid Peak</h1>
+<p id="sClient" class="text-zinc-500 text-[13px]"></p>
+<div class="flex gap-2 mt-4 overflow-auto">
+<button onclick="setDay(1)" id="d1" class="bg-[#6b7280] text-white rounded-full px-5 py-2.5 text-[12px] font-bold">Giorno 1</button>
+<button onclick="setDay(2)" id="d2" class="bg-zinc-800 text-zinc-400 rounded-full px-5 py-2.5 text-[12px] font-bold">Giorno 2</button>
+<button onclick="setDay(3)" id="d3" class="bg-zinc-800 text-zinc-400 rounded-full px-5 py-2.5 text-[12px] font-bold">Giorno 3</button>
+<button onclick="setDay(4)" id="d4" class="bg-zinc-800 text-zinc-400 rounded-full px-5 py-2.5 text-[12px] font-bold">Giorno 4</button>
+<button onclick="setDay(5)" id="d5" class="bg-zinc-800 text-zinc-400 rounded-full px-5 py-2.5 text-[12px] font-bold">Giorno 5</button>
+</div>
+<div id="exList" class="mt-5 space-y-3"></div>
+</div>
 
-  <!-- 3. SCHEDA -->
-  <div id="page-scheda" class="page hidden p-4">
-    <p class="text-[10px] tracking-[0.2em] text-zinc-500 font-black">SCHEDA ATTIVA</p>
-    <h1 id="schedaTitle" class="text-[22px] font-black mt-1 leading-tight">Decathlon Hybrid Peak</h1>
-    <p id="schedaSub" class="text-zinc-500 text-[13px] mt-1"></p>
-    <div class="flex gap-2 mt-5 overflow-x-auto pb-2">
-      <button onclick="setDay(1)" id="btnDay1" class="bg-[#6b7280] text-white rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap">Giorno 1</button>
-      <button onclick="setDay(2)" id="btnDay2" class="rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap bg-zinc-800 text-zinc-400">Giorno 2</button>
-      <button onclick="setDay(3)" id="btnDay3" class="rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap bg-zinc-800 text-zinc-400">Giorno 3</button>
-      <button onclick="setDay(4)" id="btnDay4" class="rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap bg-zinc-800 text-zinc-400">Giorno 4</button>
-      <button onclick="setDay(5)" id="btnDay5" class="rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap bg-zinc-800 text-zinc-400">Giorno 5</button>
-    </div>
-    <div id="exerciseList" class="mt-5 space-y-3"></div>
-  </div>
+<div id="page-pag" class="page hidden p-4">
+<h1 class="text-[28px] font-bold">Pagamenti</h1>
+<div class="card rounded-[20px] overflow-hidden mt-5">
+<div class="grid grid-cols-3 p-4 text-zinc-500 text-[12px] font-bold border-b border-zinc-800"><span>Cliente</span><span>Importo</span><span>Stato</span></div>
+<div id="payList"></div>
+</div>
+</div>
 
-  <!-- 4. PAGAMENTI -->
-  <div id="page-pag" class="page hidden p-4">
-    <h1 class="text-[28px] font-bold">Pagamenti</h1>
-    <button class="mt-3 bg-[#6b7280] rounded-full px-5 py-2.5 text-[13px] font-semibold">+ Nuovo pagamento</button>
-    <p class="text-zinc-500 mt-4 text-[13px] leading-5">Incassi registrati e importi ancora da ricevere, sempre in euro.</p>
-    <div class="card rounded-[20px] overflow-hidden mt-5">
-      <div class="grid grid-cols-3 p-4 text-zinc-500 text-[12px] font-bold border-b border-zinc-800"><span>Cliente</span><span>Importo</span><span>Data</span></div>
-      <div id="payList"></div>
-    </div>
-  </div>
+<div id="page-appt" class="page hidden p-4">
+<h1 class="text-[28px] font-bold">Appuntamenti</h1>
+<div id="apptList" class="mt-5 space-y-3"></div>
+</div>
 
-  <!-- 5. APPUNTAMENTI / AI -->
-  <div id="page-appt" class="page hidden p-4">
-    <h1 class="text-[28px] font-bold">Appuntamenti</h1>
-    <button class="mt-3 bg-[#6b7280] rounded-full px-5 py-2.5 text-[13px] font-semibold">+ Nuovo appuntamento</button>
-    <div class="flex items-center justify-between mt-6"><button class="w-9 h-9 card rounded-full flex items-center justify-center">‹</button><p class="font-bold">Settembre 2026</p><button class="w-9 h-9 card rounded-full flex items-center justify-center">›</button></div>
-    <button class="w-full mt-4 card rounded-full py-3 font-bold text-[14px]">Oggi</button>
-    <div class="card rounded-[20px] p-4 mt-5">
-      <div class="flex justify-between"><p class="font-bold text-[16px] leading-tight">Sabato 13<br>Settembre</p><p class="text-zinc-500 text-[13px] text-right">8<br>appuntamenti</p></div>
-      <div id="apptList" class="mt-4 space-y-3"></div>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV - COME GLIDE -->
-  <div class="bottom-bar fixed bottom-0 left-0 right-0 flex justify-around items-center pt-3 pb-7 px-1 rounded-t-[26px] z-40">
-    <button onclick="switchTab('dash')" id="nav-dash" class="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-full text-zinc-500"><div class="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-[15px]">⊞</div><span class="text-[9px] font-black tracking-widest">DASHB...</span></button>
-    <button onclick="switchTab('prog')" id="nav-prog" class="tab-active flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-full"><div class="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-[15px]">↗</div><span class="text-[9px] font-black tracking-widest">PROGR...</span></button>
-    <button onclick="switchTab('scheda')" id="nav-scheda" class="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-full text-zinc-500"><div class="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-[15px]">◊</div><span class="text-[9px] font-black tracking-widest">SCHEDA</span></button>
-    <button onclick="switchTab('pag')" id="nav-pag" class="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-full text-zinc-500"><div class="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-[15px]">▭</div><span class="text-[9px] font-black tracking-widest">PAGAM...</span></button>
-    <button onclick="switchTab('appt')" id="nav-appt" class="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-full text-zinc-500"><div class="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-[12px]">💬</div><span class="text-[9px] font-black tracking-widest">AI</span></button>
-  </div>
+<div class="bottom-bar fixed bottom-0 left-0 right-0 flex justify-around pt-3 pb-7 rounded-t-[24px]">
+<button onclick="go('dash')" id="b-dash" class="flex flex-col items-center gap-1 px-3 text-zinc-500"><div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center">⊞</div><span class="text-[9px] font-black">DASHB...</span></button>
+<button onclick="go('prog')" id="b-prog" class="tab-active flex flex-col items-center gap-1 px-3"><div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center">↗</div><span class="text-[9px] font-black">PROGR...</span></button>
+<button onclick="go('scheda')" id="b-scheda" class="flex flex-col items-center gap-1 px-3 text-zinc-500"><div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center">◊</div><span class="text-[9px] font-black">SCHEDA</span></button>
+<button onclick="go('pag')" id="b-pag" class="flex flex-col items-center gap-1 px-3 text-zinc-500"><div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center">▭</div><span class="text-[9px] font-black">PAGAM...</span></button>
+<button onclick="go('appt')" id="b-appt" class="flex flex-col items-center gap-1 px-3 text-zinc-500"><div class="w-7 h-7 bg-white text-black rounded-full flex items-center justify-center">💬</div><span class="text-[9px] font-black">AI</span></button>
+</div>
 </div>
 
 <script>
-// DATI REALI
-const CLIENTS=[
-{id:1,n:"Marcus Vance",sub:"Diamond Hypertrophy • €2.500 PAGATO ✅"},
-{id:2,n:"Sloane Sterling",sub:"Marathon Sub-3:15 • €1.800 PAGATO ✅"},
-{id:3,n:"Dante Moretti",sub:"Core & Mobility • €900 PAGATO ✅"},
-{id:4,n:"Elena Rostova",sub:"Mobility Flow • €1.200 PAGATO ✅"},
-{id:5,n:"Julian Kincaid",sub:"Powerlifting • €1.500 PAGATO ✅"},
-{id:6,n:"Camilla Thorne",sub:"Longevity • €1.100 PAGATO ✅"},
-{id:7,n:"Trevor Sterling",sub:"Cut Phase • €1.800 DA PAGARE ❌"},
-{id:8,n:"Amara Osei",sub:"Decathlon Hybrid • €1.400 PAGATO ✅"}
-];
-const WEIGHTS={1:[{d:"12 Giu",w:86.4},{d:"03 Lug",w:85.7},{d:"24 Lug",w:84.9},{d:"14 Ago",w:84.2},{d:"11 Set",w:83.8}],2:[{d:"15 Giu",w:64.8},{d:"01 Set",w:63.2}],3:[{d:"20 Giu",w:78.2},{d:"03 Set",w:76.8}],4:[{d:"10 Giu",w:58.9},{d:"02 Set",w:57.6}],5:[{d:"18 Giu",w:92.1},{d:"15 Ago",w:93.8}],6:[{d:"22 Giu",w:62.3},{d:"20 Ago",w:61.2}],7:[{d:"29 Lug",w:88.7},{d:"05 Set",w:86.2}],8:[{d:"15 Ago",w:78.4},{d:"28 Ago",w:77.5},{d:"12 Set",w:76.9}]};
-const EXS={1:[["Burpee","4","10","60s"],["Pull-up assistita","3","8","90s"],["Panca piana","4","8","60kg"],["Rematore","4","10","24kg"]],8:[["Burpee","4","10","60s"],["Pull-up assistita","3","8","90s"],["Squat Goblet","4","8","24kg"]],7:[["Burpee","4","15","45s"],["Battle Rope","3","30s","-"]],2:[["Intervalli 400m","6","400m","90s"]]};
-const APPTS=[{n:"Marcus Vance",t:"07:00 - 08:00",s:"Private Strength"},{n:"Elena Rostova",t:"08:30 - 09:15",s:"Mobility & Recovery"},{n:"Julian Kincaid",t:"10:00 - 11:00",s:"Lower Strength"},{n:"Amara Osei",t:"11:30 - 12:30",s:"Decathlon Hybrid Peak"},{n:"Dante Moretti",t:"14:00 - 15:00",s:"Core Focus"},{n:"Sloane Sterling",t:"15:30 - 16:30",s:"Run Intervals"},{n:"Camilla Thorne",t:"17:00 - 18:00",s:"Longevity Protocol"},{n:"Trevor Sterling",t:"18:30 - 19:30",s:"Cut Circuit"}];
-const PAYS=[{n:"Amara Osei",a:"1.400,00 €",d:"11/09/2026"},{n:"Trevor Sterling",a:"1.800,00 €",d:"10/09/2026"},{n:"Camilla Thorne",a:"1.200,00 €",d:"08/09/2026"},{n:"Julian Kincaid",a:"1.400,00 €",d:"06/09/2026"},{n:"Elena Rostova",a:"1.200,00 €",d:"05/09/2026"},{n:"Dante Moretti",a:"900,00 €",d:"03/09/2026"},{n:"Sloane Sterling",a:"1.800,00 €",d:"01/09/2026"},{n:"Marcus Vance",a:"2.500,00 €",d:"30/08/2026"}];
+const CLIENTS={1:"Marcus Vance",2:"Sloane Sterling",3:"Dante Moretti",4:"Elena Rostova",5:"Julian Kincaid",6:"Camilla Thorne",7:"Trevor Sterling",8:"Amara Osei"};
+const WEIGHTS={1:[{d:"12 Giu",w:86.4},{d:"03 Lug",w:85.7},{d:"11 Set",w:83.8}],8:[{d:"15 Ago",w:78.4},{d:"12 Set",w:76.9}]};
+const EXS={1:[["Burpee","4","10","60s"],["Pull-up assistita","3","8","90s"],["Panca piana","4","8","60kg"]],8:[["Burpee","4","10","60s"],["Squat Goblet","4","8","24kg"]]};
+const PAYS=[["Marcus Vance","€2.500","PAGATO ✅"],["Sloane Sterling","€1.800","PAGATO ✅"],["Trevor Sterling","€1.800","DA PAGARE ❌"],["Amara Osei","€1.400","PAGATO ✅"]];
+const APPTS=[["Marcus Vance","07:00 - 08:00","Private Strength"],["Elena Rostova","08:30 - 09:15","Mobility"],["Julian Kincaid","10:00 - 11:00","Lower Strength"],["Amara Osei","11:30 - 12:30","Hybrid Peak"],["Dante Moretti","14:00 - 15:00","Core"],["Sloane Sterling","15:30 - 16:30","Run"],["Camilla Thorne","17:00 - 18:00","Longevity"],["Trevor Sterling","18:30 - 19:30","Cut"]];
 
-let currentId=1, currentDay=1, chart=null;
-
-// INIT SELECTS
-const sel=document.getElementById('clientSelect');
-const progSel=document.getElementById('progClientSelect');
-CLIENTS.forEach(c=>{let o=document.createElement('option');o.value=c.id;o.textContent=c.n;sel.appendChild(o);let o2=document.createElement('option');o2.value=c.id;o2.textContent=c.n;progSel.appendChild(o2);});
-document.getElementById('todayDate').textContent="domenica 13 settembre • "+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+let cur=1, chart=null;
 
 function doLogin(){
-  const pw=document.getElementById('passInput').value;
-  if(pw!=="sdc2024" && pw!=="admin123"){alert("Password: sdc2024 per clienti, admin123 per admin");return;}
-  currentId=parseInt(sel.value)||1;
+  let pw=document.getElementById('passInput').value;
+  if(pw!=="sdc2024" && pw!=="admin123"){alert("Password: sdc2024");return;}
+  cur=parseInt(document.getElementById('clientSelect').value);
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  renderAll();
-  switchTab('prog');
-}
-
-function renderAll(){
-  const c=CLIENTS.find(x=>x.id===currentId);
-  document.getElementById('headerName').textContent=c.n;
-  document.getElementById('headerSub').textContent=c.sub;
-  document.getElementById('headerAvatar').textContent=c.n.split(' ').map(w=>w[0]).join('');
-  document.getElementById('schedaSub').textContent=c.n+" • Decathlon Hybrid Peak";
-  progSel.value=currentId;
-
-  // PESO
-  const w=WEIGHTS[currentId]||WEIGHTS[1];
-  document.getElementById('statWeight').textContent=w[w.length-1].w+"kg";
-  document.getElementById('statWeightDiff').textContent=(w[w.length-1].w-w[0].w).toFixed(1)+"kg DA INIZIO";
+  document.getElementById('hName').textContent=CLIENTS[cur];
+  document.getElementById('hSub').textContent=cur==7?"€1.800 DA INCASSARE":"€2.500 PAGATO";
+  document.getElementById('hAv').textContent=CLIENTS[cur].split(' ').map(s=>s[0]).join('');
+  document.getElementById('sClient').textContent=CLIENTS[cur];
+  let w=WEIGHTS[cur]||WEIGHTS[1];
+  document.getElementById('statW').textContent=w[w.length-1].w+"kg";
+  document.getElementById('statWD').textContent=(w[w.length-1].w-w[0].w).toFixed(1)+"kg";
   if(chart)chart.destroy();
-  chart=new Chart(document.getElementById('weightChart'),{type:'line',data:{labels:w.map(x=>x.d),datasets:[{data:w.map(x=>x.w),borderColor:'#000',backgroundColor:'rgba(0,0,0,0.06)',tension:0.4,fill:true,borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#a3e635',pointBorderColor:'#000'}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{font:{size:11,weight:'700'}}}}}});
-  document.getElementById('weightList').innerHTML=w.map(x=>`<div class="bg-[#f6f6f6] border border-zinc-100 rounded-xl px-3 py-2.5 flex justify-between"><span class="text-[11px] font-bold text-zinc-500">${x.d}</span><span class="text-[12px] font-black">${x.w} kg</span></div>`).join('');
-
-  // SCHEDA
-  renderExercises();
-
-  // DASH + APPT + PAG
-  document.getElementById('dashList').innerHTML=APPTS.slice(0,4).map(a=>`<div class="card rounded-[16px] p-4 flex justify-between items-center"><div><p class="font-bold text-[13px]">${a.n}</p><p class="text-[11px] text-zinc-500 mt-0.5">${a.t} • ${a.s}</p></div><span class="bg-green-900/50 text-green-400 text-[10px] px-3 py-1 rounded-full border border-green-800 font-bold">Fatto</span></div>`).join('');
-  document.getElementById('apptList').innerHTML=APPTS.map(a=>`<div class="card rounded-[16px] p-4 flex justify-between items-center"><div><p class="font-bold text-[13px]">${a.n}</p><p class="text-[11px] text-zinc-500 mt-0.5">${a.t} • ${a.s}</p></div><span class="bg-green-900/50 text-green-400 text-[10px] px-3 py-1 rounded-full border border-green-800 font-bold">Fatto</span></div>`).join('');
-  document.getElementById('payList').innerHTML=PAYS.map(p=>`<div class="grid grid-cols-3 p-4 text-[13px] border-b border-zinc-800/50"><span class="font-medium">${p.n}</span><span>${p.a}</span><span class="text-zinc-400">${p.d}</span></div>`).join('');
+  chart=new Chart(document.getElementById('chart'),{type:'line',data:{labels:w.map(x=>x.d),datasets:[{data:w.map(x=>x.w),borderColor:'#000',backgroundColor:'rgba(0,0,0,0.06)',tension:0.4,fill:true,borderWidth:2.5,pointBackgroundColor:'#a3e635'}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
+  document.getElementById('wList').innerHTML=w.map(x=>`<div class="bg-zinc-100 rounded-xl p-3 flex justify-between text-[12px] font-bold"><span>${x.d}</span><span>${x.w}kg</span></div>`).join('');
+  document.getElementById('exList').innerHTML=(EXS[cur]||EXS[1]).map(e=>`<div class="card rounded-[20px] p-5"><p class="font-bold text-[18px]">${e[0]}</p><div class="grid grid-cols-3 mt-3"><div><p class="text-[10px] text-zinc-500 font-black">SERIE</p><p class="font-bold mt-1">${e[1]}</p></div><div><p class="text-[10px] text-zinc-500 font-black">RIP</p><p class="font-bold mt-1">${e[2]}</p></div><div><p class="text-[10px] text-zinc-500 font-black">PESO</p><p class="font-bold mt-1 text-lime-400">${e[3]}</p></div></div></div>`).join('');
+  document.getElementById('payList').innerHTML=PAYS.map(p=>`<div class="grid grid-cols-3 p-4 text-[13px] border-b border-zinc-800/50"><span>${p[0]}</span><span>${p[1]}</span><span class="${p[2].includes('PAGATO')?'text-lime-400':'text-red-400'} text-[11px] font-black">${p[2]}</span></div>`).join('');
+  document.getElementById('apptList').innerHTML=APPTS.map(a=>`<div class="card rounded-[16px] p-4 flex justify-between"><div><p class="font-bold text-[13px]">${a[0]}</p><p class="text-[11px] text-zinc-500">${a[1]} • ${a[2]}</p></div><span class="bg-green-900/50 text-green-400 text-[10px] px-3 py-1 rounded-full h-fit">Fatto</span></div>`).join('');
+  go('prog');
 }
-
-function renderExercises(){
-  const list=EXS[currentId]||EXS[1];
-  document.getElementById('exerciseList').innerHTML=list.map(e=>`<div class="card rounded-[20px] p-5"><p class="font-bold text-[18px]">${e[0]}</p><div class="grid grid-cols-3 mt-4 gap-3"><div><p class="text-[10px] tracking-widest text-zinc-500 font-black">SERIE</p><p class="text-[16px] font-bold mt-1">${e[1]}</p></div><div><p class="text-[10px] tracking-widest text-zinc-500 font-black">RIP</p><p class="text-[16px] font-bold mt-1">${e[2]}</p></div><div><p class="text-[10px] tracking-widest text-zinc-500 font-black">PESO</p><div class="mt-1 bg-white rounded-full h-8 w-20"></div></div></div><div class="mt-3"><p class="text-[10px] tracking-widest text-zinc-500 font-black">RECUPERO</p><p class="text-[14px] font-bold mt-1">${e[3]}</p></div></div>`).join('');
+function go(t){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('page-'+t).classList.remove('hidden');
+  document.querySelectorAll('[id^=b-]').forEach(b=>b.classList.remove('tab-active'));
+  document.getElementById('b-'+t).classList.add('tab-active');
 }
-
-function changeProgClient(){currentId=parseInt(progSel.value);renderAll();}
-function setDay(d){currentDay=d;for(let i=1;i<=5;i++){const b=document.getElementById('btnDay'+i);b.className=i===d?'bg-[#6b7280] text-white rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap':'rounded-full px-5 py-2.5 text-[12px] font-bold whitespace-nowrap bg-zinc-800 text-zinc-400';}}
-function switchTab(t){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById('page-'+t).classList.remove('hidden');document.querySelectorAll('[id^=nav-]').forEach(n=>n.classList.remove('tab-active'));document.getElementById('nav-'+t).classList.add('tab-active');}
+function setDay(d){
+  for(let i=1;i<=5;i++)document.getElementById('d'+i).className=i==d?'bg-[#6b7280] text-white rounded-full px-5 py-2.5 text-[12px] font-bold':'bg-zinc-800 text-zinc-400 rounded-full px-5 py-2.5 text-[12px] font-bold';
+}
 </script>
 </body>
 </html>
