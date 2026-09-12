@@ -1,55 +1,43 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>SDC Personal Training</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-*{font-family:Inter,sans-serif}
+*{font-family:Inter,sans-serif; -webkit-tap-highlight-color:transparent}
+body{background:#0a0a0a}
 .card{background:#1e1e1e;border:1px solid #2a2a2a}
-.bottom{backdrop-filter:blur(20px);background:rgba(15,15,15,0.95);border-top:1px solid #2a2a2a}
-.tab-active{background:#2a2a2a;color:white!important}
+.bottom-bar{background:rgba(18,18,18,0.98);backdrop-filter:blur(20px);border-top:1px solid #2a2a2a}
+.tab-active{color:#a3e635!important}
+.tab-active div{background:#a3e635!important;color:#000!important}
+select option{background:#000;color:#fff}
 </style>
 </head>
-<body class="bg-[#0f0f0f] text-white pb-24">
+<body class="text-white pb-28">
 
 <!-- LOGIN -->
-<div id="login" class="min-h-screen flex items-center justify-center p-6">
-<div class="w-full max-w-sm"><h1 class="text-3xl font-black">SDC<span class="text-lime-400">.</span> Personal Training</h1>
-<div class="card rounded-[20px] p-6 mt-6"><select id="sel" class="w-full bg-[#0f0f0f] border border-zinc-700 rounded-xl p-4 text-sm"></select><input id="pw" type="password" placeholder="Password" class="w-full mt-3 bg-[#0f0f0f] border border-zinc-700 rounded-xl p-4"><button onclick="login()" class="w-full mt-4 bg-[#6b7280] text-white font-bold py-4 rounded-full">ENTRA →</button><p class="text-[10px] text-zinc-500 mt-3 text-center">sdc2024 clienti / admin123 admin - dati veri</p></div></div>
+<div id="login" class="min-h-screen flex items-center justify-center p-6 bg-black">
+  <div class="w-full max-w-[360px]">
+    <h1 class="text-[36px] font-black tracking-tighter leading-none">SDC<span class="text-lime-400">.</span> Personal<br>Training</h1>
+    <div class="card rounded-[24px] p-6 mt-8">
+      <p class="text-[10px] font-black tracking-[0.3em] text-zinc-500">CLIENTE</p>
+      <select id="clientSelect" class="w-full mt-2 bg-black border border-zinc-700 rounded-2xl px-4 py-4 text-[14px] font-bold text-white outline-none"></select>
+      <p class="text-[10px] font-black tracking-[0.3em] text-zinc-500 mt-5">PASSWORD</p>
+      <input id="passInput" type="password" placeholder="••••••••" class="w-full mt-2 bg-black border border-zinc-700 rounded-2xl px-4 py-4 text-[14px] text-white outline-none">
+      <button onclick="doLogin()" class="w-full mt-6 bg-[#5a6478] active:bg-lime-400 active:text-black text-white font-black py-4 rounded-full transition">ENTRA →</button>
+      <p class="text-[11px] text-zinc-500 mt-4 text-center">sdc2024 per clienti / admin123 per admin<br>8 clienti reali • 10.200€ fatturato</p>
+    </div>
+  </div>
 </div>
 
+<!-- APP -->
 <div id="app" class="hidden">
 
-<!-- DASHBOARD = Panoramica Studio -->
-<div id="p-dash" class="page p-4">
-<h1 class="text-[28px] font-bold leading-tight">Panoramica Studio</h1>
-<button class="mt-3 bg-[#6b7280] rounded-full px-5 py-2.5 text-[14px] font-semibold">+ Nuovo Cliente</button>
-<p class="text-zinc-500 mt-6 text-[15px]">domenica 13 settembre</p>
-<div class="mt-4 space-y-3">
-<div class="card rounded-[20px] p-5"><div class="flex justify-between"><p class="text-zinc-400 text-[15px]">Sessioni di oggi</p><span>📅</span></div><p class="text-[28px] font-bold mt-2">8</p></div>
-<div class="card rounded-[20px] p-5"><div class="flex justify-between"><p class="text-zinc-400 text-[15px]">Clienti attivi</p><span>👥</span></div><p class="text-[28px] font-bold mt-2">8</p></div>
-<div class="card rounded-[20px] p-5"><div class="flex justify-between"><p class="text-zinc-400 text-[15px]">Fatturato settembre</p><span>💳</span></div><p class="text-[28px] font-bold mt-2">10.200,00 €</p></div>
-<div class="card rounded-[20px] p-5"><p class="text-zinc-400 text-[15px]">Pagamenti da ricevere</p><p class="text-[28px] font-bold mt-2">1</p><p class="text-[13px] text-zinc-500 mt-1">Trevor Sterling €1.800</p></div>
-</div>
-<div class="mt-6"><p class="font-bold">Sessioni di oggi • 8 reali dal DB</p><div id="dashAppt" class="mt-3 space-y-2"></div></div>
-</div>
-
-<!-- PROGRESSI -->
-<div id="p-prog" class="page hidden p-4">
-<h1 class="text-[28px] font-black uppercase tracking-wide">PROGRESSI</h1>
-<div class="flex gap-2 mt-3"><button class="card rounded-full px-4 py-2 text-[13px] font-bold">⊞ DASHBOARD</button><button class="bg-[#6b7280] rounded-full px-4 py-2 text-[13px] font-bold">+ AGGIUNGI PESO</button></div>
-<p class="mt-6 text-[15px]">Cliente selezionato</p><select id="progSel" onchange="updateProg()" class="w-full mt-2 card rounded-full px-4 py-3 text-[15px]"></select>
-<div class="card rounded-[20px] p-5 mt-4"><p class="text-zinc-400 text-[15px]">Peso attuale</p><p id="progW" class="text-[32px] font-bold mt-1"></p><p id="progD" class="text-zinc-500 text-[14px] mt-1"></p></div>
-<div class="card rounded-[20px] p-5 mt-3"><p class="text-zinc-400 text-[15px]">Variazione dal primo rilevamento</p><p id="progDiff" class="text-[32px] font-bold mt-1"></p><p id="progName" class="text-zinc-500 text-[14px] mt-1"></p></div>
-<p class="mt-6 font-bold text-[20px]">Peso nel tempo</p><p id="progCount" class="text-zinc-500 text-[14px]"></p><div class="card rounded-[20px] p-4 mt-3"><canvas id="chart" height="180"></canvas></div>
-<div id="progList" class="mt-4 space-y-2"></div>
-</div>
-
-<!-- SCHEDA -->
-<div id="p-scheda" class="page hidden p-4">
-<p class="text-[12px] tracking-[0.2em] text-zinc-500">SCHEDA ATTIVA</p><h1 id="schedaTitle" class="text-[26px] font-bold leading-tight mt-1"></h1><p id="schedaClient" class="text-zinc-500 mt-1"></p>
-<p class="mt-5 font-semibold">Scheda</p><div class="card rounded-full px-4 py-3 mt-2 flex justify-between"><span id="schedaDrop" class="text-[14px]"></span><span>▼</span></div>
-<div class="card rounded-full p-1.5 flex gap-1 mt-5 overflow-x-auto"><button onclick="setDay(1)" id="d1" class="bg-[#6b7280] rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 1</button><button onclick="setDay(2)" id="d2" class="rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 2</button><button onclick="setDay(3)" id="d3" class="rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 3</button><button onclick="setDay(4)" id="d4" class="rounded-full px-4 py-2 text-[13px] font-bold whitespace-nowrap">Giorno 4</button><button onclick="setDay(5)" id="d5" class="rounded-full px-4 py-2 text-[13px] font
+  <!-- HEADER -->
+  <div class="sticky top-0 z-30 bg-black/90 backdrop-blur-xl border-b border-zinc-900 px-5 py-4 flex justify-between items-center">
+    <div><p id="headerName" class="font-black text-[16px]"></p><p id="headerSub" class="text-[11px] text-zinc-500 mt-0.5"></p></div>
+    <div id="headerAvatar" class="w-10 h-10 bg-lime-400 rounded-full flex
