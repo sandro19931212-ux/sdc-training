@@ -116,8 +116,8 @@ label{display:block;margin:0 0 7px;font-size:11px;letter-spacing:1.4px;text-tran
       </div>
 
       <div id="adminUsernameWrap" class="hidden">
-        <label>Email trainer</label>
-        <input id="adminUsername" class="field" type="email" autocomplete="username" placeholder="Email trainer">
+        <label>Username trainer</label>
+        <input id="adminUsername" class="field" type="text" autocomplete="username" placeholder="Username trainer">
       </div>
 
       <div id="clientEmailWrap" class="hidden">
@@ -336,7 +336,7 @@ async function persist(){
 /* Authentication
    Cambia SOLO questa email prima del primo utilizzo se vuoi un'altra email trainer.
    La password viene impostata in Firebase Authentication, non nel codice. */
-const TRAINER_EMAIL='sdc.trainer@gmail.com';
+const TRAINER_USERNAME='SDCTrainer';
 
 async function login(){
   clearLoginError();
@@ -350,8 +350,9 @@ async function login(){
 
   let email='';
   if(role==='admin'){
-    email=document.getElementById('adminUsername').value.trim().toLowerCase();
-    if(!email){loginError('Inserisci l’email del trainer.');return;}
+    email=document.getElementById('adminUsername').value.trim();
+    if(!email){loginError('Inserisci lo username del trainer.');return;}
+    if(email!=='SDCTrainer'){loginError('Username trainer non corretto.');return;}
   }else{
     email=document.getElementById('loginClientEmail').value.trim().toLowerCase();
     if(!email){loginError('Inserisci l’email del cliente.');return;}
