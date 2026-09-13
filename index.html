@@ -1,44 +1,35 @@
-<!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>SDC LIVE - Premium</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-<style>
-*{font-family:Inter,sans-serif}
-body{background:#050508;color:#fff;overflow-x:hidden}
-.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(90,146,255,0.15) 0%,rgba(42,91,255,0.08) 30%,transparent 70%);pointer-events:none;z-index:0}
-.bg-glow2{position:fixed;bottom:-200px;right:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(122,162,255,0.12) 0%,transparent 70%);pointer-events:none;z-index:0}
-.glass{background:linear-gradient(135deg,rgba(21,24,43,0.9),rgba(15,18,32,0.9));backdrop-filter:blur(20px);border:1px solid rgba(122,162,255,0.15);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05)}
-.glass-hover:hover{border-color:rgba(90,146,255,0.4);transform:translateY(-2px);box-shadow:0 12px 40px rgba(90,146,255,0.15);transition:all 0.3s}
-.btn-premium{background:linear-gradient(135deg,#6a9eff 0%,#3a6bff 50%,#2a5bff 100%);box-shadow:0 4px 20px rgba(42,91,255,0.4),inset 0 1px 0 rgba(255,255,255,0.2);font-weight:800;letter-spacing:0.5px;transition:all 0.3s}
-.btn-premium:active{transform:scale(0.98)}
-.btn-premium:hover{box-shadow:0 6px 30px rgba(42,91,255,0.6);transform:translateY(-1px)}
-.logo-diamond{width:110px;height:110px;border:2px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,rgba(122,162,255,0.1),rgba(42,91,255,0.05));box-shadow:0 0 40px rgba(122,162,255,0.2),inset 0 1px 0 rgba(255,255,255,0.1);animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(-5px)}}
-.input-premium{background:#0a0c16;border:1px solid rgba(255,255,255,0.08);transition:all 0.3s}
-.input-premium:focus{border-color:#5a92ff;box-shadow:0 0 0 3px rgba(90,146,255,0.1);outline:none}
-.nav-bar{background:rgba(10,12,22,0.9);backdrop-filter:blur(20px);border-top:1px solid rgba(42,91,255,0.2)}
-.nav-active{color:#6a9eff!important;filter:drop-shadow(0 0 8px rgba(90,146,255,0.5))}
-.card-ex{position:relative;overflow:hidden}
-.card-ex::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#5a92ff,transparent);opacity:0.5}
-.badge{font-size:9px;letter-spacing:1px;font-weight:800}
-</style>
-</head><body class="pb-28 relative">
-<div class="bg-glow"></div><div class="bg-glow2"></div>
-<div id="login" class="min-h-screen flex items-center justify-center p-6 relative z-10">
-<div class="w-full max-w-[400px] text-center">
-<div class="flex justify-center mb-8"><div class="logo-diamond"><span style="transform:rotate(-45deg);font-weight:900;font-size:32px;letter-spacing:2px">SDC</span></div></div>
-<h1 class="text-3xl font-black tracking-tight">SDC TRAINING</h1><p class="text-[11px] tracking-[4px] text-zinc-500 mt-1 font-semibold">PREMIUM COACHING</p>
-<div class="glass rounded-[28px] p-6 mt-8 text-left">
-<div class="mb-5"><p class="text-[10px] tracking-widest text-zinc-500 font-bold mb-2">SELEZIONA CLIENTE</p><select id="sel" class="w-full input-premium rounded-2xl p-4 text-sm font-semibold"></select></div>
-<div class="mb-2"><p class="text-[10px] tracking-widest text-zinc-500 font-bold mb-2">PASSWORD</p><input id="pw" type="password" placeholder="••••••••" class="w-full input-premium rounded-2xl p-4 text-sm"></div>
-<p class="text-[10px] text-zinc-600 mt-3 px-1">Trainer: <b class="text-zinc-400">sdc2024</b> • Cliente: <b class="text-zinc-400">cliente123</b></p>
-<button onclick="entra()" class="w-full mt-6 btn-premium rounded-full py-4 text-sm">ENTRA NELL'APP →</button>
-<p id="conn" class="text-[10px] text-center mt-4 text-yellow-400 tracking-widest font-bold">○ CONNESSIONE...</p>
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SDC PREMIUM</title><script src="https://cdn.tailwindcss.com"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap" rel="stylesheet"><style>*{font-family:Inter,sans-serif}body{background:#050508;color:#fff}.glass{background:rgba(21,24,43,0.9);border:1px solid rgba(122,162,255,0.15);backdrop-filter:blur(20px)}.btn{background:linear-gradient(135deg,#6a9eff,#2a5bff);box-shadow:0 4px 20px rgba(42,91,255,0.4);font-weight:800}.logo{width:110px;height:110px;border:2px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:12px;box-shadow:0 0 30px rgba(122,162,255,0.3)}</style></head><body class="pb-28">
+<div id="login" class="min-h-screen flex items-center justify-center p-6"><div class="w-full max-w-[400px] text-center">
+<div class="flex justify-center mb-6"><div class="logo"><span style="transform:rotate(-45deg);font-weight:900;font-size:32px">SDC</span></div></div>
+<h1 class="text-3xl font-black">SDC TRAINING</h1><p class="text-[11px] tracking-[4px] text-zinc-500 font-bold">PREMIUM COACHING</p>
+<div class="glass rounded-[28px] p-6 mt-6 text-left">
+<p class="text-[10px] text-zinc-500 font-bold mb-2">SELEZIONA CLIENTE</p>
+<select id="sel" class="w-full bg-[#0a0c16] border border-white/10 rounded-2xl p-4 text-sm font-bold">
+<option value="0">Marcus Vance</option>
+<option value="1">Amara Osei</option>
+<option value="2">Dante Moretti</option>
+<option value="3">Sofia Ricci</option>
+<option value="4">Luca Bianchi</option>
+</select>
+<p class="text-[10px] text-zinc-500 font-bold mb-2 mt-4">PASSWORD</p>
+<input id="pw" type="password" placeholder="••••" class="w-full bg-[#0a0c16] border border-white/10 rounded-2xl p-4 text-sm">
+<p class="text-[10px] text-zinc-600 mt-3">Trainer: sdc2024 | Cliente: cliente123</p>
+<button onclick="entra()" class="w-full mt-5 btn rounded-full py-4 text-sm">ENTRA →</button>
+<p id="conn" class="text-[10px] text-center mt-3 text-emerald-400 font-bold">● PRONTO - ONLINE</p>
+</div></div></div>
+<div id="app" class="hidden"><div class="p-5 border-b border-white/10 flex justify-between items-center glass sticky top-0"><div class="flex gap-3 items-center"><div style="width:38px;height:38px;border:1.5px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:8px"><span style="transform:rotate(-45deg);font-weight:900;font-size:11px">SDC</span></div><div><b id="hName">-</b><p id="roleBadge" class="text-[9px]"></p></div></div><button onclick="location.reload()" class="text-[11px] bg-[#15182b] px-4 py-2 rounded-full">Esci</button></div>
+<div id="page-scheda" class="p-5"><div class="flex justify-between"><h2 class="font-black text-xl">Scheda</h2><button id="btnAddEx" onclick="addEx()" class="btn rounded-full px-5 py-2.5 text-xs">+ Esercizio</button></div><div id="exList" class="mt-5"></div></div>
+<div id="page-appuntamenti" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black text-xl">📅 Appuntamenti</h2><button id="btnAddAp" onclick="addAp()" class="btn rounded-full px-4 py-2 text-xs">+ Nuovo</button></div><div id="apList" class="mt-5"></div></div>
+<div id="page-peso" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black text-xl">Peso</h2><button onclick="addW()" class="btn rounded-full px-4 py-2 text-xs">+ Peso</button></div><div id="wList" class="mt-5"></div></div>
+<div id="page-pay" class="hidden p-5"><h2 class="font-black text-xl">Pagamenti</h2><div id="payList" class="mt-4"></div><button id="btnAddPay" onclick="addPay()" class="btn rounded-full px-4 py-2 text-xs mt-3">+ Incasso</button></div>
 </div>
-<p class="text-[9px] text-zinc-600 mt-6 tracking-widest">© 2026 SDC TRAINING • MADE FOR CHAMPIONS</p>
-</div></div>
-<div id="app" class="hidden relative z-10">
-<div class="p-5 border-b border-[#1a2a5a]/30 flex justify-between items-center glass sticky top-0 z-20">
-<div class="flex gap-3 items-center"><div style="width:40px;height:40px;border:1.5px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:8
+<div id="nav" class="hidden fixed bottom-0 left-0 right-0 bg-[#0a0c16] border-t border-white/10 flex justify-around p-3 text-[10px]"><button onclick="showPage('scheda')" id="n-scheda" class="flex flex-col items-center text-[#6a9eff]"><span class="text-[20px]">💪</span>Scheda</button><button onclick="showPage('appuntamenti')" id="n-appuntamenti" class="flex flex-col items-center text-zinc-500"><span class="text-[20px]">📅</span>Book</button><button onclick="showPage('peso')" id="n-peso" class="flex flex-col items-center text-zinc-500"><span class="text-[20px]">⚖️</span>Peso</button><button onclick="showPage('pay')" id="n-pay" class="flex flex-col items-center text-zinc-500"><span class="text-[20px]">💳</span>Pay</button></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBF1MqBEjvmrI1YJi8xCzLuePlcYOsmLdo",authDomain:"sdc-fitness.firebaseapp.com",databaseURL:"https://sdc-fitness-default-rtdb.firebaseio.com",projectId:"sdc-fitness",storageBucket:"sdc-fitness.firebasestorage.app",messagingSenderId:"817117949572",appId:"1:817117949572:web:b74a51081ecaf640d91cd1"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+let clients=["Marcus Vance","Amara Osei","Dante Moretti","Sofia Ricci","Luca Bianchi"],cur=0,curName="",isTrainer=false;
+db.ref('clients').on('value',snap=>{if(snap.val()){clients=snap.val();}else{db.ref('clients').set(clients);}});
+function entra(){let p=document.getElementById('pw').value;if(p==="sdc2024")isTrainer=true;else if(p==="cliente123")isTrainer=false;else{alert("Password errata");return;}cur=document.getElementById('sel').value;curName=clients[cur]||document.getElementById('sel').options[document.getElementById('sel').selectedIndex].text;document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';document.getElementById('nav').style.display='flex';document.getElementById('hName').innerText=curName;document.getElementById('roleBadge').innerHTML=isTrainer?'<span style="color:#6a9eff">● TRAINER</span>':'<span style="color:#888">● CLIENTE</span>';document.getElementById('btnAddEx').style.display=isTrainer?'block':'none';document.getElementById('btnAddAp').style.display=isTrainer?'block':'none';document.getElementById('btnAddPay').style.display=isTrainer?'block':'none';showPage('scheda');listenAll();}
+function showPage(p){['scheda','appuntamenti','peso','pay'].forEach(x=>{document.getElementById('page-'+x).classList.add('hidden');document.getElementById('n-'+x).classList.remove('text-[#6a9eff]');document.getElementById('n-'+x).classList.add('text-zinc-500');});document.getElementById('page-'+p).classList.remove('hidden');document.getElementById('n-'+p).classList.add('text-[#6a9eff]');document.getElementById('n-'+p).classList.remove('text-zinc-500');}
+function listenAll(){db.ref('schede/'+cur).on('value',s=>{let ex=s.val()||[];document.getElementById('exList').innerHTML=ex.map((e,i)=>`<div class="glass rounded-2xl p-4 mb-2 flex justify-between"><div><p class="font-bold">${e.name}</p><p class="text-[11px] text-[#7aa2ff]">${e.serie} x ${e.rep} - ${e.rec}</p></div>${isTrainer?'<button onclick="delEx('+i+')" class="text-red-400">✕</button>':''}</div>`).join('')||'<div class="glass rounded-2xl p-6 text-center text-zinc-500 text-sm">Nessun esercizio</div>';});db.ref('peso/'+cur).on('value',s=>{let w=s.val()||[];document.getElementById('wList').innerHTML=w.map((x,i)=>`<div class="glass rounded-xl p-3 mb-2 flex justify-between"><span>${x.data} - <b>${x.kg}kg</b></span><button onclick="delW('+i+')" class="text-red-400 text-xs">✕</button></div>`).join('');});db.ref('appuntamenti/'+cur).on('value',s=>{let a=s.val()||[];document.getElementById('apList').innerHTML=a.map((x,i)=>`<div class="glass rounded-xl p-3 mb-2 flex justify-between"><span><b>${x.cliente}</b> - ${x.ora} ${x.tipo}</span><button onclick="delAp('+i+')" class="text-red-400">✕</button></div>`).join('')||'<div class="glass rounded-2xl p-6 text-center text-zinc-500 text-sm">Nessun appuntamento</div>';});db.ref('pagamenti').on('value',s=>{let p=s.val()||[];document.getElementById('payList').innerHTML=p.map((x,i)=>`<div class="glass rounded-xl p-3 mb-2 flex justify-between"><span>${x.cliente} - <b>${x.importo}</b></span><button onclick="delPay('+i+')" class="text-red-400 text-xs">✕</button></div>`).join('');});}
+function addEx(){let n=prompt("Esercizio:");if(!n)return;let se=prompt("Serie:","
