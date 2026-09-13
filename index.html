@@ -1,155 +1,119 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>SDC FITNESS - Blue Diamond</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDC FITNESS - Blue Diamond Elite</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{font-family:Inter,sans-serif}
-body{background:#050508;color:#fff;overflow-x:hidden}
-.glass{background:rgba(16,20,36,0.92);border:1px solid rgba(100,150,255,0.18);backdrop-filter:blur(24px)}
-.btn-blue{background:linear-gradient(135deg,#5a92ff,#2a5bff);color:#fff;font-weight:900;box-shadow:0 8px 24px rgba(60,120,255,0.4)}
-.diamond{transform:rotate(45deg);border:1.8px solid #8fb3ff;box-shadow:0 0 30px rgba(100,150,255,0.7), inset 0 0 20px rgba(100,150,255,0.2)}
-.neon-text{text-shadow:0 0 15px rgba(120,170,255,0.9)}
-.page{animation:fade.35s ease}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+body{background:#050508;color:#fff}
+.glass{background:rgba(18,22,40,.92);border:1px solid rgba(90,140,255,.18);backdrop-filter:blur(20px)}
+.btn{background:linear-gradient(135deg,#5a92ff,#2a5bff);box-shadow:0 8px 24px rgba(70,120,255,.4);font-weight:900}
+.diamond{transform:rotate(45deg);border:2px solid #8fb3ff;box-shadow:0 0 35px rgba(110,160,255,.7)}
 </style>
 </head>
 <body class="pb-28">
 
 <!-- LOGIN -->
 <div id="login" class="min-h-screen flex items-center justify-center p-6">
-<div class="w-full max-w-[380px] text-center">
-<div class="relative w-[130px] h-[130px] mx-auto flex items-center justify-center">
-<div class="diamond absolute inset-[8px] rounded-[6px]"></div>
-<div class="absolute w-2 h-2 bg-white rounded-full top-0 left-1/2 -translate-x-1/2 shadow-[0_0_12px_#fff]"></div>
-<div class="absolute w-1.5 h-1.5 bg-white rounded-full right-0 top-1/2 -translate-y-1/2 shadow-[0_0_12px_#fff]"></div>
-<span class="relative text-[48px] font-black tracking-[0.1em] neon-text">SDC</span>
+<div class="w-full max-w-[360px] text-center">
+<div class="relative w-[120px] h-[120px] mx-auto flex items-center justify-center">
+<div class="diamond absolute inset-2 rounded-[8px]"></div>
+<span class="relative text-[42px] font-black tracking-widest" style="text-shadow:0 0 20px #6a9aff">SDC</span>
 </div>
-<p class="mt-6 text-[11px] tracking-[0.6em] text-[#8fb3ff] font-bold neon-text">FITNESS</p>
-<p class="text-[9px] tracking-[0.3em] text-zinc-600 mt-1">PERSONAL TRAINING</p>
+<p class="mt-5 text-[11px] tracking-[0.6em] text-[#8fb3ff] font-bold">FITNESS</p>
 
-<div class="glass rounded-[28px] p-7 mt-10 text-left">
-<p class="text-[10px] tracking-[0.3em] font-black text-[#7aa2ff]">CLIENTE</p>
-<select id="sel" class="w-full mt-3 bg-[#080b18] rounded-2xl px-5 py-4 text-[14px] font-bold outline-none border border-[#2a4a8a]/40">
-<option value="0">Marcus Vance</option><option value="1">Sloane Sterling</option><option value="2">Dante Moretti</option><option value="3">Elena Rostova</option><option value="4">Amara Osei</option><option value="5">Julian Kincaid</option>
+<div class="glass rounded-[26px] p-6 mt-8 text-left">
+<label class="text-[10px] font-black tracking-[0.3em] text-[#7aa2ff]">CLIENTE</label>
+<select id="sel" class="w-full mt-2 bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3.5 text-white font-bold outline-none">
+<option value="0">Marcus Vance</option>
+<option value="1">Sloane Sterling</option>
+<option value="2">Dante Moretti</option>
+<option value="3">Amara Osei</option>
+<option value="4">Elena Rostova</option>
 </select>
-<p class="text-[10px] tracking-[0.3em] font-black text-[#7aa2ff] mt-6">PASSWORD</p>
-<input id="pw" type="password" value="sdc2024" class="w-full mt-3 bg-[#080b18] rounded-2xl px-5 py-4 outline-none border border-[#2a4a8a]/40 text-white">
-<button onclick="entra()" class="w-full mt-7 btn-blue rounded-full py-4 text-[13px] tracking-wide">ENTRA NELL'APP →</button>
-<p class="text-[10px] text-zinc-500 mt-3 text-center">Password: sdc2024</p>
+
+<label class="text-[10px] font-black tracking-[0.3em] text-[#7aa2ff] mt-5 block">PASSWORD</label>
+<input id="pw" type="password" value="sdc2024" class="w-full mt-2 bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3.5 text-white outline-none">
+
+<button id="btnEntra" onclick="entra()" class="w-full mt-6 btn rounded-full py-4 text-[13px]">ENTRA NELL'APP →</button>
+<p class="text-[10px] text-zinc-500 text-center mt-3">Password: sdc2024 (lascia così e clicca)</p>
 </div>
 </div>
 </div>
 
-<!-- APP COMPLETA -->
+<!-- APP -->
 <div id="app" class="hidden">
-<!-- HEADER -->
-<div class="sticky top-0 z-30 bg-[#050508]/85 backdrop-blur-xl border-b border-[#1e2f5a]/40 px-5 py-4 flex justify-between items-center">
+<div class="sticky top-0 z-30 bg-[#050508]/90 backdrop-blur-xl border-b border-[#1e2f5a]/30 px-5 py-4 flex justify-between items-center">
 <div class="flex items-center gap-3">
-<div class="relative w-9 h-9 flex items-center justify-center"><div class="diamond absolute inset-0 rounded-[4px] border-[#6a9aff]"></div><span class="relative text-[11px] font-black neon-text">SDC</span></div>
-<div><p id="hName" class="font-black text-[13px]"></p><p class="text-[10px] text-[#7aa2ff] tracking-widest">BLUE DIAMOND • ELITE</p></div>
+<div class="relative w-8 h-8 flex items-center justify-center"><div class="diamond absolute inset-0 rounded-[4px] border-[#7aa2ff]"></div><span class="relative text-[10px] font-black">SDC</span></div>
+<div><p id="hName" class="font-black text-[13px]">SDC</p><p class="text-[9px] text-[#7aa2ff]">BLUE DIAMOND • ELITE</p></div>
 </div>
-<button onclick="location.reload()" class="glass rounded-full px-3 py-1.5 text-[10px]">Esci</button>
-</div>
-
-<!-- DASH -->
-<div id="p-dash" class="page p-5">
-<h1 class="text-[26px] font-black tracking-tight">Studio Panoramica</h1>
-<p class="text-[12px] text-[#7aa2ff] mt-1">Benvenuto in SDC Blue Diamond</p>
-<div class="grid grid-cols-2 gap-3 mt-6">
-<div class="glass rounded-[22px] p-5"><p class="text-[9px] tracking-widest text-[#7aa2ff] font-black">SESSIONI OGGI</p><p class="text-[28px] font-black mt-1">8</p><p class="text-[11px] text-zinc-500">2 completate</p></div>
-<div class="glass rounded-[22px] p-5 border-[#5a92ff]/40"><p class="text-[9px] tracking-widest text-[#7aa2ff] font-black">FATTURATO</p><p class="text-[20px] font-black mt-1 text-[#8fb3ff]">10.200€</p><p class="text-[11px] text-[#8fb3ff]">+12% mese</p></div>
-</div>
-<div class="mt-6"><div class="flex justify-between items-center"><p class="font-bold text-[13px]">Appuntamenti Oggi</p><button onclick="go('appt')" class="text-[11px] text-[#7aa2ff]">Vedi tutti →</button></div><div id="dashList" class="mt-3 space-y-2"></div></div>
+<button onclick="location.reload()" class="text-[11px] bg-[#121428] border border-[#2a4a8a]/40 px-3 py-1.5 rounded-full">Esci</button>
 </div>
 
-<!-- PROGRESSI -->
-<div id="p-prog" class="page hidden p-5">
-<div class="flex justify-between items-center"><h2 class="text-[20px] font-black">Progressi</h2><button onclick="openM('weight')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Peso</button></div>
-<div class="mt-4 bg-white text-black rounded-[28px] p-6"><p class="font-black text-[12px]">Peso • Live Tracking</p><canvas id="chart" height="160" class="mt-4"></canvas></div>
-<div class="grid grid-cols-3 gap-2 mt-4">
-<div class="glass rounded-[20px] p-4"><p class="text-[9px] font-black text-[#7aa2ff]">PESO</p><p id="kW" class="font-black text-[16px] mt-1"></p></div>
-<div class="glass rounded-[20px] p-4"><p class="text-[9px] font-black text-[#7aa2ff]">BF%</p><p class="font-black text-[16px] mt-1">15.8%</p></div>
-<div class="glass rounded-[20px] p-4"><p class="text-[9px] font-black text-[#7aa2ff]">VITA</p><p class="font-black text-[16px] mt-1">89cm</p></div>
+<div id="p-dash" class="p-5"><h1 class="text-[24px] font-black">Panoramica</h1><div class="grid grid-cols-2 gap-3 mt-5"><div class="glass rounded-[20px] p-4"><p class="text-[9px] text-[#7aa2ff] font-black">SESSIONI</p><p class="text-[22px] font-black mt-1">8 oggi</p></div><div class="glass rounded-[20px] p-4"><p class="text-[9px] text-[#7aa2ff] font-black">FATTURATO</p><p class="text-[18px] font-black mt-1 text-[#8fb3ff]">10.200€</p></div></div><div class="mt-6"><p class="font-bold text-[13px]">Appuntamenti</p><div id="dashList" class="mt-3 space-y-2"></div></div></div>
+
+<div id="p-prog" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black text-[18px]">Progressi</h2><button onclick="openM('weight')" class="btn rounded-full px-4 py-2 text-[11px]">+ Peso</button></div><div class="bg-white rounded-[24px] p-5 mt-4"><canvas id="chart" height="160"></canvas></div><p id="kW" class="mt-4 text-[#7aa2ff] font-bold"></p></div>
+
+<div id="p-scheda" class="hidden p-5"><div class="flex justify-between items-center"><h2 class="font-black">Scheda</h2><button onclick="openM('ex')" class="btn rounded-full px-4 py-2 text-[11px]">+ Esercizio</button></div><div id="exList" class="mt-5 space-y-3"></div></div>
+
+<div id="p-pag" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black">Pagamenti</h2><button onclick="openM('pay')" class="btn rounded-full px-4 py-2 text-[11px]">+ Incasso</button></div><div id="payList" class="mt-5 space-y-2"></div></div>
+
+<div id="p-appt" class="hidden p-5"><div class="flex justify-between"><h2 class="font-black">Appuntamenti</h2><button onclick="openM('appt')" class="btn rounded-full px-4 py-2 text-[11px]">+ Nuovo</button></div><div id="apptList" class="mt-5 space-y-3"></div></div>
+
+<div class="fixed bottom-4 left-4 right-4 bg-[#101428]/95 border border-[#2a4a8a]/40 rounded-[24px] flex justify-around py-4">
+<button onclick="go('dash')" id="bdash" class="text-[#8fb3ff] text-[10px] font-black">DASH</button>
+<button onclick="go('prog')" id="bprog" class="text-zinc-500 text-[10px] font-black">PROGR</button>
+<button onclick="go('scheda')" id="bscheda" class="text-zinc-500 text-[10px] font-black">SCHEDA</button>
+<button onclick="go('pag')" id="bpag" class="text-zinc-500 text-[10px] font-black">PAG</button>
+<button onclick="go('appt')" id="bappt" class="text-zinc-500 text-[10px] font-black">AI</button>
 </div>
 </div>
 
-<!-- SCHEDA -->
-<div id="p-scheda" class="page hidden p-5">
-<div class="flex justify-between items-end"><div><p class="text-[10px] tracking-[0.3em] text-[#7aa2ff] font-black">SCHEDA ATTIVA</p><h2 class="text-[18px] font-black mt-1">Decathlon Hybrid Peak</h2><p id="sCount" class="text-[11px] text-zinc-500 mt-1"></p></div><button onclick="openM('ex')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Esercizio</button></div>
-<div id="exList" class="mt-6 space-y-3"></div>
-</div>
-
-<!-- PAGAMENTI -->
-<div id="p-pag" class="page hidden p-5">
-<div class="flex justify-between items-center"><h2 class="text-[20px] font-black">Pagamenti</h2><button onclick="openM('pay')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Incasso</button></div>
-<div id="payList" class="mt-6 space-y-2"></div>
-</div>
-
-<!-- APPUNTAMENTI -->
-<div id="p-appt" class="page hidden p-5">
-<div class="flex justify-between items-center"><h2 class="text-[20px] font-black">Appuntamenti</h2><button onclick="openM('appt')" class="btn-blue rounded-full px-4 py-2 text-[11px]">+ Nuovo</button></div>
-<div id="apptList" class="mt-6 space-y-3"></div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="fixed bottom-5 left-4 right-4 bg-[#0f1428]/95 backdrop-blur-[30px] border border-[#2a4a8a]/40 rounded-[26px] flex justify-around py-4 shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-<button onclick="go('dash')" id="b-dash" class="text-[#8fb3ff] neon-text text-[10px] font-black tracking-widest">DASH</button>
-<button onclick="go('prog')" id="b-prog" class="text-[#4a5f8a] text-[10px] font-black tracking-widest">PROGR</button>
-<button onclick="go('scheda')" id="b-scheda" class="text-[#4a5f8a] text-[10px] font-black tracking-widest">SCHEDA</button>
-<button onclick="go('pag')" id="b-pag" class="text-[#4a5f8a] text-[10px] font-black tracking-widest">PAG</button>
-<button onclick="go('appt')" id="b-appt" class="text-[#4a5f8a] text-[10px] font-black tracking-widest">AI</button>
-</div>
-</div>
-
-<!-- MODAL -->
-<div id="modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur flex items-end sm:items-center justify-center p-4">
-<div class="glass w-full max-w-[380px] rounded-[28px] p-6 border-[#4f8bff]/30"><p id="mT" class="font-black text-[16px]"></p><div id="mB" class="mt-4"></div><div class="flex gap-2 mt-6"><button onclick="closeM()" class="flex-1 glass rounded-full py-3.5 text-[12px] font-bold">Annulla</button><button id="mS" class="flex-1 btn-blue rounded-full py-3.5 text-[12px]">Salva</button></div></div>
-</div>
+<div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 items-end sm:items-center justify-center p-4"><div class="glass w-full max-w-[360px] rounded-[26px] p-6"><p id="mT" class="font-black"></p><div id="mB" class="mt-4"></div><div class="flex gap-2 mt-6"><button onclick="closeM()" class="flex-1 glass rounded-full py-3 text-[12px]">Annulla</button><button id="mS" class="flex-1 btn rounded-full py-3 text-[12px]">Salva</button></div></div></div>
 
 <script>
-// DATI
 let cur=0,ch=null,mt=null;
-const NAMES=["Marcus Vance","Sloane Sterling","Dante Moretti","Elena Rostova","Amara Osei","Julian Kincaid"];
-let data=JSON.parse(localStorage.getItem('sdc_blue_complete')||'{"w":{"0":[{"d":"12 Giu","w":86},{"d":"11 Set","w":83.8}],"4":[{"d":"15 Ago","w":78.4},{"d":"12 Set","w":76.9}]},"ex":{"0":[["Burpee","4","10","60s"],["Pull-up","3","8","90s"]],"4":[["Hip Thrust","4","12","70kg"]]},"pay":[["Amara Osei","1400€","11/09"],["Trevor Sterling","1800€","10/09"]],"ap":[["Marcus Vance","07:00-08:00","Strength"],["Amara Osei","11:30-12:30","Hybrid"]]}');
-function save(){localStorage.setItem('sdc_blue_complete',JSON.stringify(data));render();}
+const NAMES=["Marcus Vance","Sloane Sterling","Dante Moretti","Amara Osei","Elena Rostova"];
+let data=JSON.parse(localStorage.getItem('sdc_BLUE_V4')||'{"w":{"0":[{"d":"12 Giu","w":86},{"d":"11 Set","w":83.8}]},"ex":{"0":[["Burpee","4","10","60s"]]},"pay":[["Amara Osei","1400€","11/09"]],"ap":[["Marcus","07:00","Strength"]]}');
+
 function entra(){
+ try{
   cur=parseInt(document.getElementById('sel').value);
+  let pw=document.getElementById('pw').value;
+  if(pw.trim()==="") { alert("Scrivi password: sdc2024"); return; }
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('hName').textContent=NAMES[cur]||'SDC Client';
-  render(); go('dash');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('hName').textContent=NAMES[cur];
+  render();
+  go('dash');
+ }catch(e){ alert("Errore entra: "+e.message); }
 }
+
 function render(){
-  let w=data.w[cur]||data.w["0"]||[];
-  document.getElementById('kW').textContent=w.length?w[w.length-1].w+'kg':'-';
-  try{if(ch)ch.destroy();let ctx=document.getElementById('chart');if(ctx&&w.length){ch=new Chart(ctx,{type:'line',data:{labels:w.map(x=>x.d),datasets:[{data:w.map(x=>x.w),borderColor:'#2a5bff',backgroundColor:'rgba(80,120,255,0.15)',tension:0.4,fill:true,borderWidth:3,pointRadius:5,pointBackgroundColor:'#8fb3ff'}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{font:{size:10}}}}}});}}catch(e){}
-  document.getElementById('exList').innerHTML=(data.ex[cur]||[]).map((e,i)=>`<div class="glass rounded-[20px] p-5 flex justify-between items-center"><div><p class="font-bold text-[14px]">${e[0]}</p><p class="text-[11px] text-[#7aa2ff] mt-1">${e[1]}x${e[2]} • ${e[3]}</p></div><button onclick="data.ex[${cur}].splice(${i},1);save()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">✕</button></div>`).join('')||'<div class="glass rounded-[22px] p-8 text-center"><p class="text-zinc-500 text-[12px]">Nessun esercizio</p><p class="text-[11px] text-zinc-600 mt-1">Clicca + Esercizio</p></div>';
-  document.getElementById('sCount').textContent=(data.ex[cur]||[]).length+' esercizi';
-  document.getElementById('payList').innerHTML=data.pay.map((p,i)=>`<div class="glass rounded-[18px] p-4 flex justify-between items-center"><div><p class="font-bold text-[13px]">${p[0]}</p><p class="text-[11px] text-[#7aa2ff]">${p[1]} • ${p[2]}</p></div><button onclick="data.pay.splice(${i},1);save()" class="text-zinc-500">✕</button></div>`).join('');
-  document.getElementById('apptList').innerHTML=data.ap.map((a,i)=>`<div class="glass rounded-[20px] p-4 flex justify-between items-center"><div><p class="font-bold text-[13px]">${a[0]}</p><p class="text-[11px] text-[#7aa2ff]">${a[1]} • ${a[2]}</p></div><button onclick="data.ap.splice(${i},1);save()" class="text-zinc-500">✕</button></div>`).join('');
-  document.getElementById('dashList').innerHTML=data.ap.slice(0,3).map(a=>`<div class="glass rounded-[18px] p-4 flex justify-between items-center"><p class="font-bold text-[12px]">${a[0]} • ${a[1]}</p><span class="text-[9px] bg-[#5a92ff]/20 text-[#8fb3ff] px-3 py-1 rounded-full font-black">FATTO</span></div>`).join('');
+ let w=data.w[cur]||data.w["0"]||[];
+ document.getElementById('kW').textContent=w.length?"Ultimo peso: "+w[w.length-1].w+"kg":"";
+ try{if(ch)ch.destroy();if(w.length){ch=new Chart(document.getElementById('chart'),{type:'line',data:{labels:w.map(x=>x.d),datasets:[{data:w.map(x=>x.w),borderColor:'#2a5bff',backgroundColor:'rgba(80,120,255,.15)',tension:.4,fill:true,borderWidth:3}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});}}catch(e){}
+ document.getElementById('exList').innerHTML=(data.ex[cur]||[]).map((e,i)=>`<div class="glass rounded-[18px] p-4 flex justify-between"><div><b>${e[0]}</b><p class="text-[11px] text-[#7aa2ff]">${e[1]}x${e[2]} • ${e[3]}</p></div><button onclick="data.ex[${cur}].splice(${i},1);save()">✕</button></div>`).join('')||'<p class="text-zinc-600 text-center py-10 text-[12px]">Nessun esercizio</p>';
+ document.getElementById('payList').innerHTML=data.pay.map((p,i)=>`<div class="glass rounded-[18px] p-4 flex justify-between"><span><b>${p[0]}</b> • ${p[1]}</span><button onclick="data.pay.splice(${i},1);save()">✕</button></div>`).join('');
+ document.getElementById('apptList').innerHTML=data.ap.map((a,i)=>`<div class="glass rounded-[18px] p-4 flex justify-between"><span><b>${a[0]}</b> ${a[1]} ${a[2]}</span><button onclick="data.ap.splice(${i},1);save()">✕</button></div>`).join('');
+ document.getElementById('dashList').innerHTML=data.ap.map(a=>`<div class="glass rounded-[18px] p-4 text-[12px]"><b>${a[0]}</b> • ${a[1]}</div>`).join('');
 }
-function go(t){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById('p-'+t).classList.remove('hidden');document.querySelectorAll('[id^=b-]').forEach(b=>{b.className='text-[#4a5f8a] text-[10px] font-black tracking-widest'});let a=document.getElementById('b-'+t);a.className='text-[#8fb3ff] neon-text text-[10px] font-black tracking-widest';}
-function openM(type){mt=type;document.getElementById('modal').classList.remove('hidden');document.getElementById('modal').classList.add('flex');let b=document.getElementById('mB'),ti=document.getElementById('mT');
-if(type=='ex'){ti.textContent='Nuovo Esercizio';b.innerHTML='<input id="i1" placeholder="Nome es. Hip Thrust" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 mb-2 text-white outline-none"><div class="grid grid-cols-3 gap-2"><input id="i2" placeholder="Serie" class="bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-3 py-3 text-white outline-none"><input id="i3" placeholder="Rip" class="bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-3 py-3 text-white outline-none"><input id="i4" placeholder="Rec / Peso" class="bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-3 py-3 text-white outline-none"></div>';}
-if(type=='weight'){ti.textContent='Nuova Pesata';b.innerHTML='<input id="i1" placeholder="Data es. 13 Set" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 mb-2 text-white outline-none"><input id="i2" type="number" step="0.1" placeholder="Peso kg" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 text-white outline-none">';}
-if(type=='pay'){ti.textContent='Nuovo Incasso';b.innerHTML='<input id="i1" placeholder="Cliente" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 mb-2 text-white outline-none"><input id="i2" placeholder="Importo es. 1500€" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 mb-2 text-white outline-none"><input id="i3" placeholder="Data" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 text-white outline-none">';}
-if(type=='appt'){ti.textContent='Nuovo Appuntamento';b.innerHTML='<input id="i1" placeholder="Cliente" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 mb-2 text-white outline-none"><input id="i2" placeholder="Orario es. 18:00-19:00" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 mb-2 text-white outline-none"><input id="i3" placeholder="Tipo" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-2xl px-4 py-3 text-white outline-none">';}
-document.getElementById('mS').onclick=doSave;
+function save(){localStorage.setItem('sdc_BLUE_V4',JSON.stringify(data));render();}
+function go(t){document.getElementById('p-dash').classList.add('hidden');document.getElementById('p-prog').classList.add('hidden');document.getElementById('p-scheda').classList.add('hidden');document.getElementById('p-pag').classList.add('hidden');document.getElementById('p-appt').classList.add('hidden');document.getElementById('p-'+t).classList.remove('hidden');['dash','prog','scheda','pag','appt'].forEach(x=>{let el=document.getElementById('b'+x); if(el) el.style.color=x==t?'#8fb3ff':'#6b7280';});}
+function openM(t){mt=t;let m=document.getElementById('modal');m.classList.remove('hidden');m.classList.add('flex');let b=document.getElementById('mB'),tt=document.getElementById('mT');
+ if(t=='ex'){tt.textContent='Nuovo Esercizio';b.innerHTML='<input id="i1" placeholder="Nome" class="w-full bg-[#080b18] border border-[#2a4a8a]/40 rounded-xl px-4 py-3 mb-2 text-white"><div class="grid grid-cols-3 gap-2"><input id="i2" placeholder="Serie" class="bg-[#080b18] border border-white/10 rounded-xl px-3 py-3 text-white"><input id="i3" placeholder="Rip" class="bg-[#080b18] border border-white/10 rounded-xl px-3 py-3 text-white"><input id="i4" placeholder="Rec" class="bg-[#080b18] border border-white/10 rounded-xl px-3 py-3 text-white"></div>';}
+ if(t=='weight'){tt.textContent='Peso';b.innerHTML='<input id="i1" placeholder="Data" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 mb-2 text-white"><input id="i2" type="number" placeholder="Kg" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 text-white">';}
+ if(t=='pay'){tt.textContent='Incasso';b.innerHTML='<input id="i1" placeholder="Cliente" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 mb-2 text-white"><input id="i2" placeholder="Importo" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 mb-2 text-white"><input id="i3" placeholder="Data" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 text-white">';}
+ if(t=='appt'){tt.textContent='Appuntamento';b.innerHTML='<input id="i1" placeholder="Cliente" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 mb-2 text-white"><input id="i2" placeholder="Orario" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 mb-2 text-white"><input id="i3" placeholder="Tipo" class="w-full bg-[#080b18] border border-white/10 rounded-xl px-4 py-3 text-white">';}
+ document.getElementById('mS').onclick=doSave;
 }
-function closeM(){document.getElementById('modal').classList.add('hidden');document.getElementById('modal').classList.remove('flex');}
-function doSave(){
-let v1=document.getElementById('i1')?.value,v2=document.getElementById('i2')?.value,v3=document.getElementById('i3')?.value,v4=document.getElementById('i4')?.value;
-if(mt=='ex'&&v1){if(!data.ex[cur])data.ex[cur]=[];data.ex[cur].push([v1,v2||'3',v3||'10',v4||'60s']);}
-if(mt=='weight'&&v2){if(!data.w[cur])data.w[cur]=[];data.w[cur].push({d:v1||'Oggi',w:parseFloat(v2)});}
-if(mt=='pay'&&v1){data.pay.unshift([v1,v2||'0€',v3||'Oggi']);}
-if(mt=='appt'&&v1){data.ap.unshift([v1,v2||'09:00',v3||'Sessione']);}
-save();closeM();
-}
+function closeM(){let m=document.getElementById('modal');m.classList.add('hidden');m.classList.remove('flex');}
+function doSave(){let v1=document.getElementById('i1')?.value,v2=document.getElementById('i2')?.value,v3=document.getElementById('i3')?.value,v4=document.getElementById('i4')?.value;if(mt=='ex'&&v1){if(!data.ex[cur])data.ex[cur]=[];data.ex[cur].push([v1,v2||'3',v3||'10',v4||'60s']);}if(mt=='weight'&&v2){if(!data.w[cur])data.w[cur]=[];data.w[cur].push({d:v1||'Oggi',w:parseFloat(v2)});}if(mt=='pay'&&v1){data.pay.unshift([v1,v2||'0€',v3||'Oggi']);}if(mt=='appt'&&v1){data.ap.unshift([v1,v2||'09:00',v3||'Sessione']);}save();closeM();}
 </script>
 </body>
 </html>
