@@ -337,6 +337,7 @@ async function persist(){
    Cambia SOLO questa email prima del primo utilizzo se vuoi un'altra email trainer.
    La password viene impostata in Firebase Authentication, non nel codice. */
 const TRAINER_USERNAME='SDCTrainer';
+const TRAINER_EMAIL='sdc.trainer@gmail.com';
 
 async function login(){
   clearLoginError();
@@ -350,9 +351,10 @@ async function login(){
 
   let email='';
   if(role==='admin'){
-    email=document.getElementById('adminUsername').value.trim();
-    if(!email){loginError('Inserisci lo username del trainer.');return;}
-    if(email!=='SDCTrainer'){loginError('Username trainer non corretto.');return;}
+    const username=document.getElementById('adminUsername').value.trim();
+    if(!username){loginError('Inserisci lo username del trainer.');return;}
+    if(username!==TRAINER_USERNAME){loginError('Username trainer non corretto.');return;}
+    email=TRAINER_EMAIL;
   }else{
     email=document.getElementById('loginClientEmail').value.trim().toLowerCase();
     if(!email){loginError('Inserisci l’email del cliente.');return;}
