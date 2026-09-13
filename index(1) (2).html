@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050914">
+<title>SDC Training</title>
+<style>
+:root{--bg:#050914;--panel:#0b1220;--panel2:#101a2c;--line:#233b63;--blue:#58b7ff;--blue2:#315cff;--muted:#8291ad;--ok:#4ee1a0;--danger:#ff607d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(700px 420px at 50% -80px,#173b80 0,transparent 58%),var(--bg);color:#fff;font-family:Inter,Arial,sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.wrap{width:min(100%,760px);margin:auto;padding:22px 16px 120px}
+.brand{font-weight:900;letter-spacing:-1.5px;background:linear-gradient(180deg,#c4e8ff,#3875ff);-webkit-background-clip:text;color:transparent}.muted{color:var(--muted)}.small{font-size:11px}.eyebrow{font-size:10px;letter-spacing:2px;color:#79bbff;font-weight:900;text-transform:uppercase}
+.card{background:linear-gradient(145deg,rgba(18,29,50,.96),rgba(7,13,24,.98));border:1px solid rgba(106,169,255,.2);border-radius:22px;box-shadow:0 0 28px rgba(40,100,210,.12)}
+.btn{border:0;border-radius:15px;background:linear-gradient(135deg,#65bbff,#2c58ff);color:#fff;font-weight:900;padding:13px 17px}.btn.secondary{background:#14223b;color:#a9d3ff;border:1px solid #29466f}.btn.danger{background:#321522;color:#ff9bae;border:1px solid #66263e}
+.field{width:100%;border:1px solid #294267;background:#08101d;color:#fff;border-radius:14px;padding:13px;outline:none}.field:focus{border-color:#55a8ff;box-shadow:0 0 0 3px #3d8dff22}label{display:block;margin:0 0 7px;font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:#82baff;font-weight:800}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}
+.login{min-height:100vh;display:grid;place-items:center;padding:25px 16px}.loginbox{width:min(100%,430px);text-align:center}.logo{width:132px;height:132px;border:2px solid #5ea3ff;transform:rotate(45deg);margin:0 auto 45px;border-radius:10px;display:grid;place-items:center;box-shadow:0 0 35px #3b84ff99}.logo span{transform:rotate(-45deg);font-size:40px}.login-card{padding:22px;text-align:left}.formgap>*+*{margin-top:14px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.role{padding:7px 10px;border-radius:999px;background:#10213c;border:1px solid #294d7c;color:#79bdff;font-size:9px;font-weight:900}.client-switch{width:160px;padding:9px}
+.hero{padding:21px;position:relative;overflow:hidden}.hero h2{font-size:25px;margin:7px 0}.hero:after{content:"";position:absolute;width:180px;height:180px;right:-70px;top:-90px;background:#1e78ff;filter:blur(60px);opacity:.28}.hero>*{position:relative;z-index:1}
+.stat{padding:15px;text-align:center}.stat b{display:block;font-size:21px;margin-top:5px}.section-head{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 11px}.section-head h2{font-size:18px;margin:0}.list{display:grid;gap:10px}.item{padding:15px}.item h3{font-size:15px;margin:0 0 5px}.item p{font-size:12px;color:var(--muted);margin:4px 0}
+.days{display:flex;gap:7px;overflow:auto;padding:2px 0 10px}.day{white-space:nowrap;border:1px solid #294267;background:#0b1526;color:#8fa3c4;border-radius:13px;padding:9px 12px;font-weight:800}.day.active{color:#fff;background:linear-gradient(135deg,#4e9eff,#2859ff)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.chip{font-size:10px;border-radius:999px;padding:5px 8px;color:#9dcbff;background:#101d33;border:1px solid #27456f}.exercise{display:grid;grid-template-columns:1fr auto;gap:12px}.load{width:88px;text-align:center}
+.nav{position:fixed;z-index:50;left:12px;right:12px;bottom:10px;margin:auto;width:min(calc(100% - 24px),730px);padding:7px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#070e18ed;border:1px solid #6fabff35;border-radius:23px;backdrop-filter:blur(18px)}.nav button{border:0;background:transparent;color:#6c7e9d;border-radius:15px;padding:7px 2px;font-size:8px;font-weight:800}.nav span{font-size:18px;display:block;margin-bottom:2px}.nav button.active{background:#162643;color:#6cbaff}
+.icon{width:38px;height:38px;border-radius:12px;border:1px solid #294267;background:#101a2d;color:#b7d8ff}.admin-only{display:none}.admin .admin-only{display:inline-flex}.admin .admin-flex{display:flex}
+.modal{position:fixed;z-index:100;inset:0;background:#000b;display:grid;place-items:end center;padding:16px}.sheet{width:min(100%,690px);max-height:90vh;overflow:auto;padding:21px;border-radius:24px;background:#0b1322;border:1px solid #2b4975}.sheet h2{margin:0}.actions{display:flex;gap:8px;margin-top:16px}.actions>*{flex:1}.toast{position:fixed;z-index:200;top:16px;left:50%;transform:translateX(-50%);background:#15243c;border:1px solid #315685;padding:11px 16px;border-radius:13px;box-shadow:0 0 25px #0008;font-size:12px}.empty{text-align:center;color:#647694;padding:26px}.ok{color:var(--ok)}.no{color:#ff8da2}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.grid3 .stat:last-child{grid-column:span 2}.hero h2{font-size:21px}.topbar{gap:8px}.client-switch{width:130px}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast hidden"></div>
+
+<section id="login" class="login">
+  <div class="loginbox">
+    <div class="logo"><span class="brand">SDC</span></div>
+    <h1 class="brand" style="font-size:42px;margin:0">SDC TRAINING</h1>
+    <p class="muted" style="letter-spacing:3px;font-size:10px;margin:9px 0 23px">PERSONAL TRAINING · PRO ELITE</p>
+    <div class="card login-card formgap">
+      <div>
+        <label>Tipo di accesso</label>
+        <select id="loginRole" class="field">
+          <option value="client">Cliente</option>
+          <option value="admin">Personal trainer</option>
+        </select>
+      </div>
+      <div id="clientWrap">
+        <label>Cliente</label>
+        <select id="loginClient" class="field"></select>
+      </div>
+      <div id="adminWrap" class="hidden">
+        <label>Nome utente trainer</label>
+        <input id="adminUser" class="field" autocomplete="username" placeholder="SDCTrainer">
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="loginPassword" class="field" type="password" autocomplete="current-password" placeholder="Inserisci la password">
+      </div>
+      <button class="btn" style="width:100%" id="loginBtn">ENTRA →</button>
+      <p class="small muted" style="text-align:center;margin:0">Versione standalone: i dati restano nel dispositivo. Se Firebase è configurato, viene usata anche la sincronizzazione.</p>
+    </div>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+<main class="wrap">
+<header class="topbar">
+  <div><div class="brand" style="font-size:24px">SDC TRAINING</div><div class="small muted" id="welcome"></div></div>
+  <div class="row">
+    <select id="adminClientSwitch" class="field client-switch admin-only"></select>
+    <span id="roleBadge" class="role"></span>
+    <button id="logoutBtn" class="icon" title="Esci">↪</button>
+  </div>
+</header>
+<section id="page-dashboard" class="page"></section>
+<section id="page-scheda" class="page hidden"></section>
+<section id="page-pagamenti" class="page hidden"></section>
+<section id="page-appuntamenti" class="page hidden"></section>
+<section id="page-profilo" class="page hidden"></section>
+</main>
+<nav class="nav">
+  <button data-page="dashboard"><span>⌂</span>Dashboard</button>
+  <button data-page="scheda"><span>◒</span>Scheda</button>
+  <button data-page="pagamenti"><span>€</span>Pagamenti</button>
+  <button data-page="appuntamenti"><span>▣</span>Appuntamenti</button>
+  <button data-page="profilo"><span>◉</span>Profilo</button>
+</nav>
+</section>
+
+<div id="modal" class="modal hidden">
+ <div class="sheet">
+  <div class="row between"><h2 id="modalTitle"></h2><button class="icon" onclick="closeModal()">✕</button></div>
+  <div id="modalBody"></div>
+ </div>
+</div>
+
+<script>
+/* =========================
+   CONFIGURAZIONE
+   ========================= */
+const ADMIN_USERNAME="SDCTrainer";
+const ADMIN_PASSWORD="SDC!Elite26#PT";
+const STORAGE_KEY="sdc_training_v11";
+
+/* Firebase opzionale: lascia così se non vuoi sincronizzazione.
+   Per usarlo inserisci la configurazione del tuo progetto Firebase. */
+const firebaseConfig={
+  apiKey:"",
+  authDomain:"",
+  databaseURL:"",
+  projectId:"",
+  storageBucket:"",
+  messagingSenderId:"",
+  appId:""
+};
+
+const DAYS=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+let db=null, selectedDay=DAYS[(new Date().getDay()+6)%7];
+let session={role:null,clientId:null,page:"dashboard"};
+
+const emptyState=()=>({
+  clients:{},
+  workouts:{},
+  payments:{},
+  appointments:{},
+  weightHistory:{}
+});
+
+let state=loadLocal();
+
+/* =========================
+   DATI / SALVATAGGIO
+   ========================= */
+function clone(v){return JSON.parse(JSON.stringify(v))}
+function normalise(x){
+  x=x||emptyState();
+  ["clients","workouts","payments","appointments","weightHistory"].forEach(k=>x[k]=x[k]||{});
+  return x;
+}
+function loadLocal(){
+  try{return normalise(JSON.parse(localStorage.getItem(STORAGE_KEY))||emptyState())}
+  catch(e){return emptyState()}
+}
+function saveLocal(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function persist(){
+  saveLocal();
+  if(db) db.ref("appV11").set(state).catch(()=>toast("Salvato localmente; sincronizzazione non riuscita"));
+  renderAll();
+}
+function initFirebase(){
+  if(!firebaseConfig.apiKey)return;
+  const s=document.createElement("script");
+  s.src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js";
+  s.onload=()=>{
+    const d=document.createElement("script");
+    d.src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js";
+    d.onload=()=>{
+      try{
+        firebase.initializeApp(firebaseConfig);
+        db=firebase.database();
+        db.ref("appV11").on("value",snap=>{
+          if(snap.exists()){state=normalise(snap.val());saveLocal();renderAll()}
+          else db.ref("appV11").set(state);
+        });
+      }catch(e){db=null}
+    };
+    document.head.appendChild(d);
+  };
+  document.head.appendChild(s);
+}
+
+/* =========================
+   UTILITY
+   ========================= */
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function money(v){return new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR"}).format(Number(v)||0)}
+function today(){return new Date().toISOString().slice(0,10)}
+function val(id){return document.getElementById(id).value.trim()}
+function toast(t){
+  const e=document.getElementById("toast");e.textContent=t;e.classList.remove("hidden");
+  clearTimeout(toast.timer);toast.timer=setTimeout(()=>e.classList.add("hidden"),2200);
+}
+function clients(){return Object.entries(state.clients).sort((a,b)=>a[1].name.localeCompare(b[1].name,"it"))}
+function current(){return state.clients[session.clientId]}
+function curWorkout(){
+  state.workouts[session.clientId]=state.workouts[session.clientId]||{};
+  return state.workouts[session.clientId];
+}
+function fillClientSelects(){
+  const opts=clients().map(([id,c])=>`<option value="${esc(id)}">${esc(c.name)}</option>`).join("");
+  document.getElementById("loginClient").innerHTML=opts||'<option value="">Nessun cliente creato</option>';
+  document.getElementById("adminClientSwitch").innerHTML=opts;
+  if(session.clientId)document.getElementById("adminClientSwitch").value=session.clientId;
+}
+
+/* =========================
+   LOGIN
+   ========================= */
+function login(){
+  const role=document.getElementById("loginRole").value;
+  const pw=document.getElementById("loginPassword").value;
+  if(role==="admin"){
+    if(val("adminUser")!==ADMIN_USERNAME || pw!==ADMIN_PASSWORD)
+      return toast("Nome utente o password trainer non corretti");
+    const first=clients()[0]?.[0]||null;
+    session={role:"admin",clientId:first,page:"dashboard"};
+  }else{
+    const cid=document.getElementById("loginClient").value;
+    if(!cid || !state.clients[cid])return toast("Nessun cliente disponibile");
+    if(pw!==state.clients[cid].password)return toast("Password cliente non corretta");
+    session={role:"client",clientId:cid,page:"dashboard"};
+  }
+  if(!session.clientId && role==="admin"){
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.body.className="admin";
+    renderAll();
+    openClientModal();
+    return;
+  }
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.body.className=role;
+  renderAll();
+}
+function logout(){
+  session={role:null,clientId:null,page:"dashboard"};
+  document.body.className="";
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+  document.getElementById("loginPassword").value="";
+}
+
+/* =========================
+   NAV / RENDER
+   ========================= */
+function showPage(p){
+  session.page=p;
+  document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
+  document.getElementById("page-"+p).classList.remove("hidden");
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===p));
+  renderPage(p);window.scrollTo(0,0);
+}
+function renderAll(){
+  fillClientSelects();
+  if(!session.role)return;
+  if(!state.clients[session.clientId])session.clientId=clients()[0]?.[0]||null;
+  if(!session.clientId)return;
+  document.body.className=session.role;
+  document.getElementById("welcome").innerHTML=`Ciao, <b>${esc(current().name)}</b>`;
+  document.getElementById("roleBadge").textContent=session.role==="admin"?"TRAINER":"CLIENTE";
+  document.getElementById("adminClientSwitch").value=session.clientId;
+  showPage(session.page);
+}
+function renderPage(p){
+  ({dashboard:renderDashboard,scheda:renderScheda,pagamenti:renderPayments,appuntamenti:renderAppointments,profilo:renderProfile})[p]();
+}
+function nextAppointment(){
+  return (state.appointments[session.clientId]||[]).filter(a=>a.date>=today()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
+}
+function todayWorkout(){
+  const day=DAYS[(new Date().getDay()+6)%7],w=curWorkout();
+  return {day,work:w[day]||Object.values(w)[0]};
+}
+
+/* =========================
+   DASHBOARD
+   ========================= */
+function renderDashboard(){
+  const c=current(),tw=todayWorkout(),ap=nextAppointment();
+  const paid=(state.payments[session.clientId]||[]).filter(p=>p.status==="Pagato").length;
+  document.getElementById("page-dashboard").innerHTML=`
+  <div class="card hero">
+    <div class="eyebrow">Allenamento di oggi</div>
+    <h2>${esc(tw.work?.title||"Giorno di recupero")}</h2>
+    <p class="muted">${esc(tw.day)} · ${tw.work?.exercises?.length||0} esercizi</p>
+    <button class="btn" onclick="showPage('scheda')">APRI SCHEDA →</button>
+  </div>
+  <div class="grid3" style="margin-top:13px">
+    <div class="card stat"><span class="eyebrow">Peso</span><b>${esc(c.weight||"-")} kg</b></div>
+    <div class="card stat"><span class="eyebrow">Obiettivo</span><b>${esc(c.target||"-")} kg</b></div>
+    <div class="card stat"><span class="eyebrow">Pagamenti</span><b>${paid}</b></div>
+  </div>
+  <div class="section-head"><h2>Accessi rapidi</h2></div>
+  <div class="grid2">
+    <button class="card item" onclick="showPage('appuntamenti')" style="color:#fff;text-align:left">
+      <div class="eyebrow">Prossimo appuntamento</div>
+      <h3 style="margin-top:9px">${ap?esc(ap.date)+" · "+esc(ap.time):"Nessun appuntamento"}</h3>
+    </button>
+    <button class="card item" onclick="showPage('profilo')" style="color:#fff;text-align:left">
+      <div class="eyebrow">Profilo</div><h3 style="margin-top:9px">Aggiorna peso</h3>
+    </button>
+  </div>
+  <div class="section-head"><h2>Nota del trainer</h2></div>
+  <div class="card item"><p style="font-size:14px;color:#b8c5db">${esc(c.notes||"Nessuna nota inserita.")}</p></div>
+  ${session.role==="admin"?`<div class="section-head"><h2>Gestione clienti</h2><button class="btn" onclick="openClientModal()">+ CLIENTE</button></div>`:""}
+  `;
+}
+
+/* =========================
+   SCHEDA
+   ========================= */
+function renderScheda(){
+  const w=curWorkout();
+  if(!w[selectedDay]){
+    const first=Object.keys(w)[0];
+    if(first)selectedDay=first;
+  }
+  const plan=w[selectedDay];
+  document.getElementById("page-scheda").innerHTML=`
+  <div class="section-head" style="margin-top:0">
+    <div><div class="eyebrow">Programma</div><h2>Scheda settimanale</h2></div>
+    <button class="btn admin-only" onclick="openWorkoutModal()">+ GIORNO</button>
+  </div>
+  <div class="days">${DAYS.map(d=>`<button class="day ${d===selectedDay?"active":""}" onclick="selectedDay='${d}';renderScheda()">${d.slice(0,3)}</button>`).join("")}</div>
+  <div class="card item">
+    <div class="row between">
+      <div><div class="eyebrow">${esc(selectedDay)}</div><h2 style="margin:6px 0">${esc(plan?.title||"Riposo")}</h2></div>
+      ${plan?`<div class="row admin-flex"><button class="icon" onclick="openWorkoutModal('${esc(selectedDay)}')">✎</button><button class="icon" onclick="deleteWorkout('${esc(selectedDay)}')">✕</button></div>`:""}
+    </div>
+  </div>
+  <div class="section-head"><h2>Esercizi</h2>${plan?`<button class="btn admin-only" onclick="openExerciseModal('${esc(selectedDay)}')">+ ESERCIZIO</button>`:""}</div>
+  <div class="list">
+  ${!plan||!plan.exercises?.length?`<div class="empty">Nessun esercizio per questo giorno.</div>`:
+  plan.exercises.map(e=>`
+    <article class="card item exercise">
+      <div><h3>${esc(e.name)}</h3><div class="chips"><span class="chip">${esc(e.sets)} serie</span><span class="chip">${esc(e.reps)} rip.</span><span class="chip">${esc(e.rest)} sec recupero</span></div></div>
+      <div><label>Carico kg</label><input class="field load" type="number" step="0.5" value="${esc(e.load||0)}" onchange="updateLoad('${esc(selectedDay)}','${esc(e.id)}',this.value)">
+      <div class="row admin-flex" style="justify-content:flex-end;margin-top:7px"><button class="icon" onclick="openExerciseModal('${esc(selectedDay)}','${esc(e.id)}')">✎</button><button class="icon" onclick="deleteExercise('${esc(selectedDay)}','${esc(e.id)}')">✕</button></div></div>
+    </article>`).join("")}
+  </div>`;
+}
+
+/* =========================
+   PAGAMENTI / APPUNTAMENTI
+   ========================= */
+function renderPayments(){
+  const arr=(state.payments[session.clientId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById("page-pagamenti").innerHTML=`
+  <div class="section-head" style="margin-top:0"><div><div class="eyebrow">Contabilità</div><h2>Pagamenti</h2></div><button class="btn admin-only" onclick="openPaymentModal()">+ PAGAMENTO</button></div>
+  <div class="list">${arr.length?arr.map(p=>`
+    <article class="card item row between"><div><h3>${esc(p.note||"Pagamento")}</h3><p>${esc(p.date)} · <span class="${p.status==="Pagato"?"ok":"no"}">${esc(p.status)}</span></p></div>
+    <div style="text-align:right"><b>${money(p.amount)}</b><div class="admin-flex row" style="justify-content:flex-end;margin-top:7px"><button class="icon" onclick="openPaymentModal('${esc(p.id)}')">✎</button><button class="icon" onclick="deleteRecord('payments','${esc(p.id)}')">✕</button></div></div></article>`).join(""):`<div class="empty">Nessun pagamento registrato.</div>`}</div>`;
+}
+function renderAppointments(){
+  const arr=(state.appointments[session.clientId]||[]).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  document.getElementById("page-appuntamenti").innerHTML=`
+  <div class="section-head" style="margin-top:0"><div><div class="eyebrow">Agenda</div><h2>Appuntamenti</h2></div><button class="btn admin-only" onclick="openAppointmentModal()">+ APPUNTAMENTO</button></div>
+  <div class="list">${arr.length?arr.map(a=>`
+    <article class="card item row between"><div><h3>${esc(a.title)}</h3><p>${esc(a.date)} · ${esc(a.time)}</p></div><div class="admin-flex row"><button class="icon" onclick="openAppointmentModal('${esc(a.id)}')">✎</button><button class="icon" onclick="deleteRecord('appointments','${esc(a.id)}')">✕</button></div></article>`).join(""):`<div class="empty">Nessun appuntamento programmato.</div>`}</div>`;
+}
+
+/* =========================
+   PROFILO
+   ========================= */
+function renderProfile(){
+  const c=current(),hist=(state.weightHistory[session.clientId]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById("page-profilo").innerHTML=`
+  <div class="card item"><div class="eyebrow">Profilo atleta</div><h2>${esc(c.name)}</h2>
+  <div style="font-size:38px;font-weight:900">${esc(c.weight||"-")} <span style="font-size:15px;color:#8aa0c2">kg</span></div>
+  <div class="grid2" style="margin-top:13px"><div><label>Peso attuale</label><input id="profileWeight" class="field" type="number" step="0.1" value="${esc(c.weight||"")}"></div>
+  <div><label>Peso obiettivo</label><input id="profileTarget" class="field" type="number" step="0.1" value="${esc(c.target||"")}" ${session.role==="client"?"disabled":""}></div></div>
+  <button class="btn" style="margin-top:13px" onclick="saveWeight()">SALVA PESO</button></div>
+  <div class="section-head"><h2>Storico peso</h2></div>
+  <div class="list">${hist.length?hist.map(h=>`<div class="card item row between"><span>${esc(h.date)}</span><b>${esc(h.value)} kg</b></div>`).join(""):`<div class="empty">Nessuna rilevazione.</div>`}</div>
+  ${session.role==="admin"?`<div class="section-head"><h2>Gestione cliente</h2><button class="btn" onclick="openClientModal('${esc(session.clientId)}')">MODIFICA</button></div>
+  <div class="card item"><p>${esc(c.notes||"Nessuna nota")}</p><div class="actions"><button class="btn secondary" onclick="openClientModal()">NUOVO CLIENTE</button><button class="btn danger" onclick="deleteClient()">RIMUOVI</button></div></div>`:""}`;
+}
+function saveWeight(){
+  const c=current(),v=Number(document.getElementById("profileWeight").value),target=Number(document.getElementById("profileTarget").value);
+  if(!v)return toast("Inserisci un peso valido");
+  c.weight=v;if(session.role==="admin"&&target)c.target=target;
+  const h=state.weightHistory[session.clientId]||(state.weightHistory[session.clientId]=[]);
+  const old=h.find(x=>x.date===today());if(old)old.value=v;else h.push({date:today(),value:v});
+  persist();toast("Peso aggiornato");
+}
+
+/* =========================
+   MODALI
+   ========================= */
+function openModal(title,html){document.getElementById("modalTitle").textContent=title;document.getElementById("modalBody").innerHTML=html;document.getElementById("modal").classList.remove("hidden")}
+function closeModal(){document.getElementById("modal").classList.add("hidden")}
+
+function openClientModal(cid){
+  if(session.role!=="admin")return;
+  const c=cid?state.clients[cid]:{};
+  openModal(cid?"Modifica cliente":"Nuovo cliente",`
+    <div class="formgap">
+      <div><label>Nome e cognome</label><input id="mName" class="field" value="${esc(c.name||"")}"></div>
+      <div><label>Password cliente</label><input id="mPassword" class="field" value="${esc(c.password||"")}" autocomplete="new-password"></div>
+      <div class="grid2"><div><label>Peso kg</label><input id="mWeight" type="number" step="0.1" class="field" value="${esc(c.weight||"")}"></div><div><label>Obiettivo kg</label><input id="mTarget" type="number" step="0.1" class="field" value="${esc(c.target||"")}"></div></div>
+      <div><label>Note trainer</label><textarea id="mNotes" class="field" rows="3">${esc(c.notes||"")}</textarea></div>
+      <button class="btn" style="width:100%" onclick="saveClient('${esc(cid||"")}')">SALVA CLIENTE</button>
+    </div>`);
+}
+function saveClient(cid){
+  const name=val("mName"),password=val("mPassword");
+  if(!name||!password)return toast("Inserisci nome e password");
+  const key=cid||name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-")+"-"+id().slice(-3);
+  state.clients[key]={name,password,weight:Number(val("mWeight"))||0,target:Number(val("mTarget"))||0,notes:val("mNotes")};
+  state.workouts[key]=state.workouts[key]||{};state.payments[key]=state.payments[key]||[];state.appointments[key]=state.appointments[key]||[];state.weightHistory[key]=state.weightHistory[key]||[];
+  session.clientId=key;closeModal();persist();toast("Cliente salvato");
+}
+function deleteClient(){
+  if(session.role!=="admin")return;
+  if(!confirm("Rimuovere definitivamente questo cliente e tutti i suoi dati?"))return;
+  const k=session.clientId;delete state.clients[k];delete state.workouts[k];delete state.payments[k];delete state.appointments[k];delete state.weightHistory[k];
+  session.clientId=clients()[0]?.[0]||null;persist();if(!session.clientId)logout();
+}
+function openWorkoutModal(day){
+  const p=curWorkout()[day]||{};
+  openModal(day?"Modifica giornata":"Nuova giornata",`
+  <div class="formgap"><div><label>Giorno</label><select id="mDay" class="field">${DAYS.map(d=>`<option ${d===day?"selected":""}>${d}</option>`).join("")}</select></div>
+  <div><label>Titolo allenamento</label><input id="mWorkoutTitle" class="field" value="${esc(p.title||"")}" placeholder="Es. Petto e tricipiti"></div>
+  <button class="btn" style="width:100%" onclick="saveWorkout('${esc(day||"")}')">SALVA GIORNATA</button></div>`);
+}
+function saveWorkout(oldDay){
+  const day=val("mDay"),title=val("mWorkoutTitle");if(!title)return toast("Inserisci il titolo");
+  const w=curWorkout(),old=w[oldDay]||{exercises:[]};if(oldDay&&oldDay!==day)delete w[oldDay];w[day]={title,exercises:old.exercises||[]};selectedDay=day;closeModal();persist();
+}
+function deleteWorkout(day){if(confirm("Eliminare questa giornata e tutti gli esercizi?")){delete curWorkout()[day];persist()}}
+function openExerciseModal(day,eid){
+  const list=curWorkout()[day]?.exercises||[],e=list.find(x=>x.id===eid)||{};
+  openModal(eid?"Modifica esercizio":"Nuovo esercizio",`
+  <div class="formgap"><div><label>Esercizio</label><input id="mExName" class="field" value="${esc(e.name||"")}"></div>
+  <div class="grid2"><div><label>Serie</label><input id="mSets" type="number" class="field" value="${esc(e.sets||4)}"></div><div><label>Ripetizioni</label><input id="mReps" class="field" value="${esc(e.reps||"10")}"></div></div>
+  <div class="grid2"><div><label>Recupero sec</label><input id="mRest" type="number" class="field" value="${esc(e.rest||60)}"></div><div><label>Carico kg</label><input id="mLoad" type="number" step="0.5" class="field" value="${esc(e.load||0)}"></div></div>
+  <button class="btn" style="width:100%" onclick="saveExercise('${esc(day)}','${esc(eid||"")}')">SALVA ESERCIZIO</button></div>`);
+}
+function saveExercise(day,eid){
+  const list=curWorkout()[day].exercises||(curWorkout()[day].exercises=[]),obj={id:eid||id(),name:val("mExName"),sets:Number(val("mSets"))||1,reps:val("mReps"),rest:Number(val("mRest"))||0,load:Number(val("mLoad"))||0};
+  if(!obj.name)return toast("Inserisci il nome");const i=list.findIndex(x=>x.id===eid);if(i>=0)list[i]=obj;else list.push(obj);closeModal();persist();
+}
+function deleteExercise(day,eid){if(confirm("Eliminare questo esercizio?")){curWorkout()[day].exercises=curWorkout()[day].exercises.filter(x=>x.id!==eid);persist()}}
+function updateLoad(day,eid,v){const e=curWorkout()[day].exercises.find(x=>x.id===eid);if(e){e.load=Number(v)||0;persist();toast("Carico aggiornato")}}
+function openPaymentModal(pid){
+  const arr=state.payments[session.clientId]||[],p=arr.find(x=>x.id===pid)||{};
+  openModal(pid?"Modifica pagamento":"Nuovo pagamento",`
+  <div class="formgap"><div class="grid2"><div><label>Data</label><input id="mPayDate" type="date" class="field" value="${esc(p.date||today())}"></div><div><label>Importo €</label><input id="mAmount" type="number" step="0.01" class="field" value="${esc(p.amount||"")}"></div></div>
+  <div><label>Stato</label><select id="mStatus" class="field"><option ${p.status==="Pagato"?"selected":""}>Pagato</option><option ${p.status==="Da pagare"?"selected":""}>Da pagare</option></select></div>
+  <div><label>Descrizione</label><input id="mPayNote" class="field" value="${esc(p.note||"")}"></div>
+  <button class="btn" style="width:100%" onclick="savePayment('${esc(pid||"")}')">SALVA PAGAMENTO</button></div>`);
+}
+function savePayment(pid){
+  const arr=state.payments[session.clientId]||(state.payments[session.clientId]=[]),p={id:pid||id(),date:val("mPayDate"),amount:Number(val("mAmount"))||0,status:val("mStatus"),note:val("mPayNote")};
+  const i=arr.findIndex(x=>x.id===pid);if(i>=0)arr[i]=p;else arr.push(p);closeModal();persist();
+}
+function openAppointmentModal(aid){
+  const arr=state.appointments[session.clientId]||[],a=arr.find(x=>x.id===aid)||{};
+  openModal(aid?"Modifica appuntamento":"Nuovo appuntamento",`
+  <div class="formgap"><div><label>Titolo</label><input id="mApTitle" class="field" value="${esc(a.title||"Allenamento PT")}"></div>
+  <div class="grid2"><div><label>Data</label><input id="mApDate" type="date" class="field" value="${esc(a.date||today())}"></div><div><label>Ora</label><input id="mApTime" type="time" class="field" value="${esc(a.time||"09:00")}"></div></div>
+  <button class="btn" style="width:100%" onclick="saveAppointment('${esc(aid||"")}')">SALVA APPUNTAMENTO</button></div>`);
+}
+function saveAppointment(aid){
+  const arr=state.appointments[session.clientId]||(state.appointments[session.clientId]=[]),a={id:aid||id(),title:val("mApTitle"),date:val("mApDate"),time:val("mApTime")};
+  const i=arr.findIndex(x=>x.id===aid);if(i>=0)arr[i]=a;else arr.push(a);closeModal();persist();
+}
+function deleteRecord(type,rid){
+  if(confirm("Eliminare questo elemento?")){state[type][session.clientId]=(state[type][session.clientId]||[]).filter(x=>x.id!==rid);persist()}
+}
+
+/* =========================
+   EVENTI
+   ========================= */
+document.getElementById("loginRole").onchange=e=>{
+  const admin=e.target.value==="admin";
+  document.getElementById("clientWrap").classList.toggle("hidden",admin);
+  document.getElementById("adminWrap").classList.toggle("hidden",!admin);
+};
+document.getElementById("loginBtn").onclick=login;
+document.getElementById("loginPassword").onkeydown=e=>{if(e.key==="Enter")login()};
+document.getElementById("logoutBtn").onclick=logout;
+document.getElementById("adminClientSwitch").onchange=e=>{session.clientId=e.target.value;renderAll()};
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
+
+fillClientSelects();
+initFirebase();
+</script>
+</body>
+</html>
