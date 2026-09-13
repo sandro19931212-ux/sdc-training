@@ -1,30 +1,37 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SDC BLUE - LIVE REALTIME</title>
+<html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SDC LIVE</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<style>body{background:#050508;color:#fff;font-family:Inter,sans-serif}.glass{background:#15182b;border:1px solid #2a4a8a}.btn{background:linear-gradient(135deg,#5a92ff,#2a5bff);font-weight:900;box-shadow:0 0 20px rgba(90,140,255,.4)}</style>
-</head><body class="pb-28">
-<!-- LOGIN -->
-<div id="login" class="min-h-screen flex items-center justify-center p-6"><div class="w-[380px] text-center"><div style="width:100px;height:100px;margin:0 auto;border:2px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:8px;box-shadow:0 0 30px #5a92ff"><span style="transform:rotate(-45deg);font-weight:900;font-size:30px">SDC</span></div><p class="text-[#8fb3ff] tracking-[6px] mt-4 text-[11px] font-bold">FITNESS - LIVE ITALIA</p>
-<div class="glass rounded-[24px] p-5 mt-6 text-left"><label class="text-[10px] text-[#7aa2ff] font-black">CLIENTE</label><select id="sel" class="w-full mt-2 bg-[#0a0c16] rounded-xl p-3.5 text-white"></select><div class="flex gap-2 mt-3"><button onclick="addClient()" class="flex-1 bg-[#1a1e35] rounded-xl py-3 text-[11px] font-bold">+ NUOVO CLIENTE</button><button onclick="delClient()" class="bg-[#2a1520] rounded-xl px-4 py-3 text-[11px] text-red-400">Elimina</button></div><input id="pw" type="password" value="sdc2024" class="w-full mt-4 bg-[#0a0c16] rounded-xl p-3 text-white"><button onclick="entra()" class="w-full mt-4 btn rounded-full py-4">ENTRA NELL'APP LIVE →</button><p id="conn" class="text-[10px] text-center mt-3 text-yellow-400">Connessione al cloud Italia...</p></div></div></div>
+<style>body{background:#050508;color:#fff;font-family:Inter,sans-serif}.glass{background:#15182b;border:1px solid #2a4a8a}.btn{background:linear-gradient(135deg,#5a92ff,#2a5bff);font-weight:900}.nav-active{color:#5a92ff!important;}</style>
+</head><body class="pb-24">
+<div id="login" class="min-h-screen flex items-center justify-center p-6"><div class="w-[380px] text-center"><div style="width:100px;height:100px;margin:0 auto;border:2px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:8px;box-shadow:0 0 30px #5a92ff"><span style="transform:rotate(-45deg);font-weight:900;font-size:30px">SDC</span></div>
+<div class="glass rounded-[24px] p-5 mt-6 text-left"><label class="text-[10px] text-[#7aa2ff] font-black">SELEZIONA CLIENTE</label><select id="sel" class="w-full mt-2 bg-[#0a0c16] rounded-xl p-3.5 text-white"></select>
+<input id="pw" type="password" placeholder="Password" class="w-full mt-4 bg-[#0a0c16] rounded-xl p-3 text-white border border-white/10">
+<p class="text-[10px] text-zinc-500 mt-2">Trainer: sdc2024 | Cliente: cliente123</p>
+<button onclick="entra()" class="w-full mt-4 btn rounded-full py-4">ENTRA →</button><p id="conn" class="text-[10px] text-center mt-3 text-yellow-400">Connessione...</p></div></div></div>
 
-<!-- APP -->
 <div id="app" class="hidden">
-<div class="p-4 border-b border-[#1e2f5a] flex justify-between items-center"><div class="flex gap-3 items-center"><div style="width:34px;height:34px;border:1.5px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:6px"><span style="transform:rotate(-45deg);font-weight:900;font-size:11px">SDC</span></div><div><b id="hName">-</b><p class="text-[9px] text-green-400">● LIVE REALTIME ATTIVO</p></div></div><button onclick="location.reload()" class="text-[11px] bg-[#15182b] px-4 py-2 rounded-full">Esci</button></div>
+<div class="p-4 border-b border-[#1e2f5a] flex justify-between"><div class="flex gap-3 items-center"><div style="width:34px;height:34px;border:1.5px solid #7aa2ff;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:6px"><span style="transform:rotate(-45deg);font-weight:900;font-size:11px">SDC</span></div><div><b id="hName">-</b><p id="roleBadge" class="text-[9px]"></p></div></div><button onclick="location.reload()" class="text-[11px] bg-[#15182b] px-4 py-2 rounded-full">Esci</button></div>
 
-<div class="p-4"><div class="flex justify-between items-center"><h2 class="font-black text-[18px]">Scheda Allenamento</h2><button onclick="addEx()" class="btn rounded-full px-5 py-2.5 text-xs">+ Esercizio</button></div><p class="text-[11px] text-[#7aa2ff] mt-1">Tocca il testo per modificare - il cliente vede subito</p><div id="exList" class="mt-4"></div></div>
+<div id="page-scheda" class="p-4"><div class="flex justify-between"><h2 class="font-black text-[18px]">Scheda</h2><button id="btnAddEx" onclick="addEx()" class="btn rounded-full px-5 py-2.5 text-xs">+ Esercizio</button></div><div id="exList" class="mt-4"></div></div>
 
-<div class="p-4 mt-2 border-t border-white/10"><div class="flex justify-between"><h2 class="font-black">Peso & Progressi</h2><button onclick="addW()" class="btn rounded-full px-4 py-2 text-xs">+ Peso</button></div><div id="wList" class="mt-3"></div></div>
+<div id="page-appuntamenti" class="hidden p-4"><div class="flex justify-between"><h2 class="font-black text-[18px]">Appuntamenti</h2><button id="btnAddAp" onclick="addAp()" class="btn rounded-full px-4 py-2 text-xs">+ Aggiungi</button></div><div id="apList" class="mt-4"></div></div>
 
-<div class="p-4 mt-2 border-t border-white/10"><div class="flex justify-between"><h2 class="font-black">Appuntamenti</h2><button onclick="addAp()" class="btn rounded-full px-4 py-2 text-xs">+ Aggiungi</button></div><div id="apList" class="mt-3"></div></div>
+<div id="page-peso" class="p-4 hidden"><div class="flex justify-between"><h2 class="font-black text-[18px]">Peso</h2><button onclick="addW()" class="btn rounded-full px-4 py-2 text-xs">+ Segna Peso</button></div><p class="text-[11px] text-[#7aa2ff]">Cliente può aggiungere il suo peso</p><div id="wList" class="mt-4"></div></div>
 
-<div class="p-4 mt-2 border-t border-white/10"><div class="flex justify-between"><h2 class="font-black">Pagamenti</h2><button onclick="addPay()" class="btn rounded-full px-4 py-2 text-xs">+ Incasso</button></div><div id="payList" class="mt-3"></div></div>
+<div id="page-pay" class="p-4 hidden"><h2 class="font-black text-[18px]">Pagamenti</h2><div id="payList" class="mt-4"></div><button id="btnAddPay" onclick="addPay()" class="btn rounded-full px-4 py-2 text-xs mt-3">+ Incasso</button></div>
+</div>
+
+<!-- NAV BASSO - ORA CON APPUNTAMENTI -->
+<div id="nav" class="hidden fixed bottom-0 left-0 right-0 bg-[#0a0c16] border-t border-[#1e2f5a] flex justify-around p-3 text-[10px]">
+<button onclick="showPage('scheda')" id="n-scheda" class="nav-active flex flex-col items-center"><span class="text-[18px]">💪</span>Scheda</button>
+<button onclick="showPage('appuntamenti')" id="n-appuntamenti" class="flex flex-col items-center text-zinc-500"><span class="text-[18px]">📅</span>Appuntamenti</button>
+<button onclick="showPage('peso')" id="n-peso" class="flex flex-col items-center text-zinc-500"><span class="text-[18px]">⚖️</span>Peso</button>
+<button onclick="showPage('pay')" id="n-pay" class="flex flex-col items-center text-zinc-500"><span class="text-[18px]">💳</span>Pagamenti</button>
 </div>
 
 <script>
-// CONFIG TUO - ITALIA OK
 const firebaseConfig = {
   apiKey: "AIzaSyBF1MqBEjvmrI1YJi8xCzLuePlcYOsmLdo",
   authDomain: "sdc-fitness.firebaseapp.com",
@@ -32,58 +39,70 @@ const firebaseConfig = {
   projectId: "sdc-fitness",
   storageBucket: "sdc-fitness.firebasestorage.app",
   messagingSenderId: "817117949572",
-  appId: "1:817117949572:web:b74a51081ecaf640d91cd1",
-  measurementId: "G-EMR8Q95DNY"
+  appId: "1:817117949572:web:b74a51081ecaf640d91cd1"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const db=firebase.database();
+let clients=[], cur=0, curName="", isTrainer=false;
 
-let clients=[], cur=0, curName="";
-
-db.ref('clients').on('value', snap=>{
-  clients = snap.val() || ["Marcus Vance","Amara Osei","Dante Moretti"];
-  let sel=document.getElementById('sel');
-  sel.innerHTML=clients.map((c,i)=>`<option value="${i}">${c}</option>`).join('');
-  document.getElementById('conn').innerHTML="● <span style='color:#4ade80'>Online - Realtime Italia attivo</span>";
-  if(clients.length===3 &&!snap.val()){db.ref('clients').set(clients);}
+db.ref('clients').on('value',snap=>{
+  clients=snap.val()||["Marcus Vance","Amara Osei","Dante Moretti"];
+  document.getElementById('sel').innerHTML=clients.map((c,i)=>`<option value="${i}">${c}</option>`).join('');
+  document.getElementById('conn').innerHTML="● <span style='color:#4ade80'>Online Realtime</span>";
+  if(!snap.val()) db.ref('clients').set(clients);
 });
 
 function entra(){
-  if(document.getElementById('pw').value!=="sdc2024"){alert("Password errata");return;}
-  cur=document.getElementById('sel').value;
-  curName=clients[cur];
+  let p=document.getElementById('pw').value;
+  if(p==="sdc2024") isTrainer=true;
+  else if(p==="cliente123") isTrainer=false;
+  else {alert("Password errata! Usa sdc2024 per trainer o cliente123 per cliente");return;}
+  cur=document.getElementById('sel').value; curName=clients[cur];
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
+  document.getElementById('nav').style.display='flex';
   document.getElementById('hName').innerText=curName;
-  listenAll();
+  document.getElementById('roleBadge').innerHTML=isTrainer?'<span class="text-green-400">● TRAINER - MODIFICA ATTIVA</span>':'<span class="text-[#7aa2ff]">● CLIENTE - SOLO PESO</span>';
+  document.getElementById('btnAddEx').style.display=isTrainer?'block':'none';
+  document.getElementById('btnAddAp').style.display=isTrainer?'block':'none';
+  document.getElementById('btnAddPay').style.display=isTrainer?'block':'none';
+  showPage('scheda'); listenAll();
+}
+function showPage(p){
+  ['scheda','appuntamenti','peso','pay'].forEach(x=>{
+    document.getElementById('page-'+x).classList.add('hidden');
+    document.getElementById('n-'+x).classList.remove('nav-active');
+    document.getElementById('n-'+x).classList.add('text-zinc-500');
+  });
+  document.getElementById('page-'+p).classList.remove('hidden');
+  document.getElementById('n-'+p).classList.add('nav-active');
+  document.getElementById('n-'+p).classList.remove('text-zinc-500');
 }
 function listenAll(){
   db.ref('schede/'+cur).on('value',s=>{
     let ex=s.val()||[];
-    document.getElementById('exList').innerHTML=ex.map((e,i)=>`<div class="glass rounded-2xl p-4 mb-2 flex justify-between"><div class="flex-1"><p class="font-bold" contenteditable="true" onblur="updEx(${i},'name',this.innerText)">${e.name}</p><p class="text-[11px] text-[#7aa2ff] mt-1"><span contenteditable="true" onblur="updEx(${i},'serie',this.innerText)">${e.serie}</span> serie x <span contenteditable="true" onblur="updEx(${i},'rep',this.innerText)">${e.rep}</span> • <span contenteditable="true" onblur="updEx(${i},'rec',this.innerText)">${e.rec}</span></p></div><button onclick="delEx(${i})" class="text-red-400 ml-3">✕</button></div>`).join('')||'<p class="text-center text-zinc-500 py-8">Nessun esercizio - clicca +</p>';
+    document.getElementById('exList').innerHTML=ex.map((e,i)=>`<div class="glass rounded-2xl p-4 mb-2 flex justify-between"><div class="flex-1"><p class="font-bold" ${isTrainer?'contenteditable="true" onblur="updEx('+i+',\'name\',this.innerText)"':''}>${e.name}</p><p class="text-[11px] text-[#7aa2ff] mt-1">${isTrainer?'<span contenteditable="true" onblur="updEx('+i+',\'serie\',this.innerText)">'+e.serie+'</span> x <span contenteditable="true" onblur="updEx('+i+',\'rep\',this.innerText)">'+e.rep+'</span> • <span contenteditable="true" onblur="updEx('+i+',\'rec\',this.innerText)">'+e.rec+'</span>':e.serie+' x '+e.rep+' • '+e.rec}</p></div>${isTrainer?'<button onclick="delEx('+i+')" class="text-red-400 ml-3">✕</button>':''}</div>`).join('')||'<p class="text-center text-zinc-500 py-8">Nessun esercizio</p>';
   });
   db.ref('peso/'+cur).on('value',s=>{
     let w=s.val()||[];
-    document.getElementById('wList').innerHTML=w.map((x,i)=>`<div class="glass rounded-xl p-3 mb-1.5 flex justify-between text-[13px]"><span>${x.data} - <b>${x.kg}kg</b></span><button onclick="delW(${i})" class="text-red-400">✕</button></div>`).join('');
+    document.getElementById('wList').innerHTML=w.map((x,i)=>`<div class="glass rounded-xl p-3 mb-1.5 flex justify-between text-[13px]"><span>${x.data} - <b>${x.kg}kg</b></span>${isTrainer?'<button onclick="delW('+i+')" class="text-red-400">✕</button>':''}</div>`).join('');
   });
   db.ref('appuntamenti/'+cur).on('value',s=>{
     let a=s.val()||[];
-    document.getElementById('apList').innerHTML=a.map((x,i)=>`<div class="glass rounded-xl p-3 mb-1.5 flex justify-between text-[12px]"><span><b contenteditable="true" onblur="updAp(${i},'cliente',this.innerText)">${x.cliente}</b> - ${x.ora} ${x.tipo}</span><button onclick="delAp(${i})" class="text-red-400">✕</button></div>`).join('');
+    document.getElementById('apList').innerHTML=a.map((x,i)=>`<div class="glass rounded-xl p-3 mb-1.5 flex justify-between text-[12px]"><span><b>${x.cliente}</b> - ${x.ora} ${x.tipo}</span>${isTrainer?'<button onclick="delAp('+i+')" class="text-red-400">✕</button>':''}</div>`).join('');
   });
   db.ref('pagamenti').on('value',s=>{
     let p=s.val()||[];
-    document.getElementById('payList').innerHTML=p.map((x,i)=>`<div class="glass rounded-xl p-3 mb-1.5 flex justify-between text-[12px]"><span>${x.cliente} - <b>${x.importo}</b> <small>${x.data}</small></span><button onclick="delPay(${i})" class="text-red-400">✕</button></div>`).join('');
+    document.getElementById('payList').innerHTML=p.map((x,i)=>`<div class="glass rounded-xl p-3 mb-1.5 flex justify-between text-[12px]"><span>${x.cliente} - <b>${x.importo}</b> ${x.data}</span>${isTrainer?'<button onclick="delPay('+i+')" class="text-red-400">✕</button>':''}</div>`).join('');
   });
 }
-function addClient(){let n=prompt("Nome nuovo cliente:");if(n){clients.push(n);db.ref('clients').set(clients);}}
-function delClient(){if(confirm("Eliminare "+clients[cur]+"?")){clients.splice(cur,1);db.ref('clients').set(clients);}}
-function addEx(){let name=prompt("Esercizio:");if(!name)return;let s=prompt("Serie:","4");let r=prompt("Ripetizioni:","10");let rec=prompt("Recupero/Peso:","60s");db.ref('schede/'+cur).once('value',snap=>{let arr=snap.val()||[];arr.push({name,serie:s,rep:r,rec});db.ref('schede/'+cur).set(arr);});}
-function updEx(i,k,v){db.ref('schede/'+cur).once('value',snap=>{let arr=snap.val()||[];arr[i][k]=v;db.ref('schede/'+cur).set(arr);});}
-function delEx(i){db.ref('schede/'+cur).once('value',snap=>{let arr=snap.val()||[];arr.splice(i,1);db.ref('schede/'+cur).set(arr);});}
-function addW(){let d=prompt("Data:","Oggi");let kg=prompt("Peso:","80");if(kg){db.ref('peso/'+cur).once('value',snap=>{let arr=snap.val()||[];arr.push({data:d,kg});db.ref('peso/'+cur).set(arr);});}}
-function delW(i){db.ref('peso/'+cur).once('value',snap=>{let arr=snap.val()||[];arr.splice(i,1);db.ref('peso/'+cur).set(arr);});}
-function addAp(){let o=prompt("Orario:","09:00");let t=prompt("Tipo:","Sessione");if(o){db.ref('appuntamenti/'+cur).once('value',snap=>{let arr=snap.val()||[];arr.push({cliente:curName,ora:o,tipo:t});db.ref('appuntamenti/'+cur).set(arr);});}}
-function delAp(i){db.ref('appuntamenti/'+cur).once('value',snap=>{let arr=snap.val()||[];arr.splice(i,1);db.ref('appuntamenti/'+cur).set(arr);});}
-function addPay(){let imp=prompt("Importo:","150€");if(imp){db.ref('pagamenti').once('value',snap=>{let arr=snap.val()||[];arr.unshift({cliente:curName,importo:imp,data:new Date().toLocaleDateString()});db.ref('pagamenti').set(arr);});}}
-function delPay(i){db.ref('pagamenti').once('value',snap=>{let arr=snap.val()||[];arr.splice(i,1);db.ref('pagamenti').set(arr);});}
+function addEx(){if(!isTrainer)return;let n=prompt("Esercizio:");if(!n)return;let se=prompt("Serie:","4"),re=prompt("Rip:","10"),rc=prompt("Rec:","60s");db.ref('schede/'+cur).once('value',s=>{let a=s.val()||[];a.push({name:n,serie:se,rep:re,rec:rc});db.ref('schede/'+cur).set(a);});}
+function updEx(i,k,v){if(!isTrainer)return;db.ref('schede/'+cur).once('value',s=>{let a=s.val()||[];a[i][k]=v;db.ref('schede/'+cur).set(a);});}
+function delEx(i){db.ref('schede/'+cur).once('value',s=>{let a=s.val()||[];a.splice(i,1);db.ref('schede/'+cur).set(a);});}
+function addW(){let kg=prompt("Quanto pesi oggi? (kg)","80");if(kg){db.ref('peso/'+cur).once('value',s=>{let a=s.val()||[];a.push({data:new Date().toLocaleDateString(),kg});db.ref('peso/'+cur).set(a);});}}
+function delW(i){db.ref('peso/'+cur).once('value',s=>{let a=s.val()||[];a.splice(i,1);db.ref('peso/'+cur).set(a);});}
+function addAp(){let o=prompt("Orario:","09:00"),t=prompt("Tipo:","Personal");if(o){db.ref('appuntamenti/'+cur).once('value',s=>{let a=s.val()||[];a.push({cliente:curName,ora:o,tipo:t});db.ref('appuntamenti/'+cur).set(a);});}}
+function delAp(i){db.ref('appuntamenti/'+cur).once('value',s=>{let a=s.val()||[];a.splice(i,1);db.ref('appuntamenti/'+cur).set(a);});}
+function addPay(){let imp=prompt("Importo:","150€");if(imp){db.ref('pagamenti').once('value',s=>{let a=s.val()||[];a.unshift({cliente:curName,importo:imp,data:new Date().toLocaleDateString()});db.ref('pagamenti').set(a);});}}
+function delPay(i){db.ref('pagamenti').once('value',s=>{let a=s.val()||[];a.splice(i,1);db.ref('pagamenti').set(a);});}
 </script></body></html>
