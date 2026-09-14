@@ -1,7 +1,5 @@
-
-const CACHE_NAME = "sdc-fitness-v1";
+const CACHE_NAME = "sdc-fitness-v2";
 const APP_SHELL = [
-  "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icon-192.png",
@@ -28,13 +26,30 @@ self.addEventListener("fetch", event => {
   const req = event.request;
   if (req.method !== "GET") return;
 
+  // Per le pagine HTML: forza sempre la rete e bypassa la cache HTTP del browser.
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req, { cache: "no-store" })
+        .then(resp => {
+          const copy = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy)).catch(() => {});
+          return resp;
+        })
+        .catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
+  // Per gli altri file: rete prima, cache offline come fallback.
   event.respondWith(
-    fetch(req)
+    fetch(req, { cache: "reload" })
       .then(resp => {
-        const copy = resp.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
+        if (resp && resp.ok) {
+          const copy = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
+        }
         return resp;
       })
-      .catch(() => caches.match(req).then(r => r || caches.match("./index.html")))
+      .catch(() => caches.match(req))
   );
 });

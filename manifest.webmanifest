@@ -1,8 +1,9 @@
 {
+  "id": "./",
   "name": "SDC Fitness",
   "short_name": "SDC Fitness",
   "description": "App SDC Fitness per trainer e clienti.",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
