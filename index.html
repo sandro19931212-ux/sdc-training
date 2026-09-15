@@ -2076,7 +2076,10 @@ async function setTrainerPage(page){
   saveSession();
   if(page==='appointments'){
     try{await syncAppointmentsFromSupabase();}catch(e){console.warn('Sync appuntamenti trainer:',e);}
-      try{await syncWeightsFromSupabase();}catch(e){console.warn('Sync pesi trainer:',e);}
+    try{await syncWeightsFromSupabase();}catch(e){console.warn('Sync pesi trainer:',e);}
+  }
+  if(page==='clients'){
+    try{await syncWeightsFromSupabase();}catch(e){console.warn('Sync pesi trainer:',e);}
   }
   if(page==='payments'){
     try{await syncPaymentsFromSupabase();}catch(e){console.warn('Sync pagamenti trainer:',e);}
@@ -2131,7 +2134,7 @@ function trainer(){
       <section class="page-head">
         <div class="page-kicker">Clienti</div>
         <h1>I tuoi clienti</h1>
-        <div class="page-sub">Gestisci i clienti e apri direttamente la loro scheda.</div>
+        <div class="page-sub">Apri il profilo del cliente per vedere dati, peso e storico. La scheda di allenamento resta nella sezione Scheda.</div>
       </section>
 
       <div class="actions">
@@ -2139,14 +2142,18 @@ function trainer(){
       </div>
 
       <section class="section">
-        <div class="list">${db.clients.length?db.clients.map(c=>`
+        <div class="list">${db.clients.length?db.clients.map(c=>{
+          const cw=db.weights.filter(w=>String(w.clientId)===String(c.id)).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+          const lastWeight=cw.length?cw[cw.length-1].weight:null;
+          return `
           <div class="row">
-            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")}</small></div>
+            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}</small></div>
             <div class="actions" style="margin:0">
-              <button class="mini-btn blue" onclick="openClient('${c.id}')">Apri</button>
+              <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>
               <button class="mini-btn red" onclick="delClient('${c.id}')">Elimina</button>
             </div>
-          </div>`).join(""):`<div class="card empty">Nessun cliente. Crea il primo account.</div>`}
+          </div>`;
+        }).join(""):`<div class="card empty">Nessun cliente. Crea il primo account.</div>`}
         </div>
       </section>
     </div>`;
@@ -2389,6 +2396,50 @@ function deleteTrainerInlineExercise(cid,wid){
   db.workouts=db.workouts.filter(x=>String(x.id)!==String(wid));
   openClient(cid,true);
 }
+async function openTrainerClientProfile(cid,skipSync=false){
+  const c=db.clients.find(x=>String(x.id)===String(cid)); if(!c)return;
+  if(!skipSync){
+    try{await syncWeightsFromSupabase(cid);}catch(e){console.warn('Sync pesi cliente trainer:',e);}
+  }
+  const weights=db.weights.filter(x=>String(x.clientId)===String(cid)).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const latest=weights.length?weights[weights.length-1]:null;
+  const rows=weights.length?weights.slice().reverse().map((x,idx,arr)=>{
+    const originalIndex=weights.length-1-idx;
+    const previous=originalIndex>0?Number(weights[originalIndex-1].weight):null;
+    const current=Number(x.weight);
+    let delta='Prima misurazione', cls='same';
+    if(previous!=null && Number.isFinite(current) && Number.isFinite(previous)){
+      const d=current-previous;
+      if(Math.abs(d)<0.001){delta='0.0 kg';cls='same';}
+      else if(d>0){delta='+'+d.toFixed(1)+' kg';cls='up';}
+      else{delta=d.toFixed(1)+' kg';cls='down';}
+    }
+    return `<div class="weight-history-row"><div><strong>${esc(x.weight)} kg</strong><small>${fmtDate(x.date)}</small></div><div class="weight-delta ${cls}">${delta}</div></div>`;
+  }).join(''):`<div class="card empty">Nessun peso registrato.</div>`;
+
+  showSheetPage(`
+    <div class="sectionhead"><div><div class="page-kicker">Profilo cliente</div><h2>${esc(c.name)}</h2><div class="page-sub">Dati personali, peso e accesso rapido alla scheda.</div></div></div>
+    <div class="info-card">
+      <div class="info-row"><span>Email</span><strong>${esc(c.email||'—')}</strong></div>
+      <div class="info-row"><span>Telefono</span><strong>${esc(c.phone||'—')}</strong></div>
+      <div class="info-row"><span>Data di nascita</span><strong>${c.birth?fmtDate(c.birth):'—'}</strong></div>
+      <div class="info-row"><span>Note</span><strong>${esc(c.note||'—')}</strong></div>
+    </div>
+
+    <section class="section">
+      <div class="sectionhead"><h2>Peso</h2><span class="badge">${latest?esc(latest.weight)+' kg':'Nessun dato'}</span></div>
+      <div class="weight-history-list">${rows}</div>
+    </section>
+
+    <div class="actions">
+      <button class="btn blue" onclick="weightForm('${c.id}')">＋ Registra peso</button>
+      <button class="btn" onclick="clientForm(db.clients.find(x=>String(x.id)==='${c.id}'))">Modifica dati</button>
+      <button class="btn" onclick="openClient('${c.id}')">Apri scheda</button>
+      <button class="btn" onclick="closeModal()">Chiudi</button>
+    </div>
+  `);
+}
+
 async function openClient(cid,skipSync=false){
   const c=db.clients.find(x=>x.id===cid); if(!c)return;
   if(!skipSync){try{await syncWorkoutsFromSupabase(cid);}catch(e){console.warn('Sync scheda trainer:',e);}}
@@ -2480,7 +2531,7 @@ function saveWorkout(cid,wid){
   if(!item.exercise)return alert('Inserisci il nome dell\'esercizio.');
   db.workouts=wid?db.workouts.map(x=>x.id===wid?item:x):[...db.workouts,item];save();openClient(cid)
 }
-function weightForm(cid){show(`<h2>Registra peso</h2><label>Data</label><input id="wdate" type="date" value="${new Date().toISOString().slice(0,10)}"><label>Peso (kg)</label><input id="wval" type="number" step="0.1"><div class="actions"><button class="btn" onclick="openClient('${cid}')">Annulla</button><button class="btn blue" onclick="saveWeight('${cid}')">Salva</button></div>`)}
+function weightForm(cid){show(`<h2>Registra peso</h2><label>Data</label><input id="wdate" type="date" value="${new Date().toISOString().slice(0,10)}"><label>Peso (kg)</label><input id="wval" type="number" step="0.1"><div class="actions"><button class="btn" onclick="openTrainerClientProfile('${cid}',true)">Annulla</button><button class="btn blue" onclick="saveWeight('${cid}')">Salva</button></div>`)}
 async function saveWeight(cid){
   const c=db.clients.find(x=>String(x.id)===String(cid));
   if(!c)return alert('Cliente non trovato.');
@@ -2493,7 +2544,7 @@ async function saveWeight(cid){
     const {error}=await sb.from('weights').insert({id:weightId,client_id:String(c.id),client_user_id:c.supabaseUserId,weight:value,weight_date:date});
     if(error) throw error;
     db.weights.push({id:weightId,clientId:String(c.id),supabaseUserId:c.supabaseUserId,date,weight:String(value)});
-    save();openClient(cid);
+    save();await openTrainerClientProfile(cid,true);
   }catch(err){alert('Errore salvataggio peso: '+(err.message||err));}
 }
 
