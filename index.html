@@ -1350,6 +1350,118 @@ input:focus,select:focus,textarea:focus{
   }
 }
 
+
+
+/* ===== FIX NOMI ESERCIZI LUNGHI: 2 RIGHE, PAROLE INTERE ===== */
+/* Il nome va a capo solo tra parole: mai spezzare una parola a metà. */
+.ex-name{
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+  hyphens:none!important;
+}
+
+/* In modifica trainer il nome è un textarea a 2 righe, ma la riga resta alta uguale. */
+.trainer-inline-row .inline-name textarea{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:44px!important;
+  min-height:44px!important;
+  max-height:44px!important;
+  margin:0!important;
+  padding:3px 8px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  outline:none!important;
+  color:#fff!important;
+  text-align:left!important;
+  font-weight:900!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+  resize:none!important;
+  overflow:hidden!important;
+  white-space:pre-wrap!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+  hyphens:none!important;
+  appearance:none;
+  -webkit-appearance:none;
+}
+.trainer-inline-row .inline-name textarea:focus{
+  background:rgba(21,91,176,.12)!important;
+  box-shadow:inset 0 0 0 1px rgba(70,166,255,.32)!important;
+}
+
+@media(max-width:480px){
+  .trainer-inline-row .inline-name textarea{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding:3px 7px!important;
+    font-size:12.5px!important;
+    line-height:1.12!important;
+  }
+  .app.scheda-focus .trainer-inline-row{
+    height:60px!important;
+    min-height:60px!important;
+  }
+}
+
+/* ===== FIX SERIE LUNGHE: 2 RIGHE, PAROLE INTERE ===== */
+.ex-sets{
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+  hyphens:none!important;
+}
+.trainer-inline-row .inline-sets textarea{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:44px!important;
+  min-height:44px!important;
+  max-height:44px!important;
+  margin:0!important;
+  padding:3px 2px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  outline:none!important;
+  color:#fff!important;
+  text-align:center!important;
+  font-weight:900!important;
+  font-size:12px!important;
+  line-height:1.08!important;
+  resize:none!important;
+  overflow:hidden!important;
+  white-space:pre-wrap!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+  hyphens:none!important;
+  appearance:none;
+  -webkit-appearance:none;
+}
+.trainer-inline-row .inline-sets textarea:focus{
+  background:rgba(21,91,176,.12)!important;
+  box-shadow:inset 0 0 0 1px rgba(70,166,255,.32)!important;
+}
+@media(max-width:480px){
+  .trainer-inline-row .inline-sets textarea{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding:3px 1px!important;
+    font-size:10.5px!important;
+    line-height:1.05!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -1626,14 +1738,14 @@ async function viewProgressPhoto(clientId,photoId){const arr=await getClientPhot
 async function comparePhotos(clientId){const a=document.getElementById('compareA')?.value,b=document.getElementById('compareB')?.value;if(!a||!b||a===b)return alert('Seleziona due foto diverse.');const arr=await getClientPhotos(clientId);const pa=arr.find(x=>String(x.id)===String(a)),pb=arr.find(x=>String(x.id)===String(b));const box=document.getElementById('compareResult');if(!pa||!pb||!box)return;box.innerHTML=`<div class="compare-grid"><div><img src="${pa.dataUrl}"><div class="compare-label">${fmtDate(pa.date)}</div></div><div><img src="${pb.dataUrl}"><div class="compare-label">${fmtDate(pb.date)}</div></div></div>`;}
 
 async function syncClientsFromSupabase(){
-  const {data,error}=await sb.from('clients').select('id,user_id,name,email,created_at').order('created_at',{ascending:true});
+  const {data,error}=await sb.from('clients').select('id,user_id,name,email,phone,birth,note,created_at').order('created_at',{ascending:true});
   if(error) throw error;
   for(const sc of (data||[])){
     const existing=db.clients.find(c=>String(c.id)===String(sc.id)||String(c.email||'').toLowerCase()===String(sc.email||'').toLowerCase());
     if(existing){
-      existing.id=sc.id; existing.name=sc.name; existing.email=sc.email; existing.supabaseUserId=sc.user_id;
+      existing.id=sc.id; existing.name=sc.name; existing.email=sc.email; existing.phone=sc.phone||''; existing.birth=sc.birth||''; existing.note=sc.note||''; existing.supabaseUserId=sc.user_id;
     }else{
-      db.clients.push({id:sc.id,name:sc.name,email:sc.email,password:'',phone:'',birth:'',note:'',supabaseUserId:sc.user_id});
+      db.clients.push({id:sc.id,name:sc.name,email:sc.email,password:'',phone:sc.phone||'',birth:sc.birth||'',note:sc.note||'',supabaseUserId:sc.user_id});
     }
   }
   save();
@@ -1790,6 +1902,34 @@ async function syncAppointmentsFromSupabase(){
   return remote;
 }
 
+async function syncWeightsFromSupabase(clientId=null){
+  let query=sb
+    .from('weights')
+    .select('id,client_id,client_user_id,weight,weight_date,created_at')
+    .order('weight_date',{ascending:true});
+  if(clientId) query=query.eq('client_id',String(clientId));
+  const {data,error}=await query;
+  if(error) throw error;
+
+  const remote=(data||[]).map(w=>({
+    id:String(w.id),
+    clientId:String(w.client_id),
+    supabaseUserId:w.client_user_id||'',
+    date:w.weight_date||'',
+    weight:w.weight==null?'':String(w.weight)
+  }));
+
+  if(clientId){
+    db.weights=[...db.weights.filter(w=>String(w.clientId)!==String(clientId)),...remote];
+  }else if(session?.role==='client'&&session?.userId){
+    db.weights=[...db.weights.filter(w=>String(w.clientId)!==String(session.userId)),...remote];
+  }else{
+    db.weights=remote;
+  }
+  save();
+  return remote;
+}
+
 async function login(){
   const role=roleEl().value;
   const usernameEl=document.getElementById("username");
@@ -1806,22 +1946,24 @@ async function login(){
     const actualRole=data.user.app_metadata?.role;
     if(role==="trainer" && actualRole!=="trainer"){await sb.auth.signOut();throw new Error('Account trainer non autorizzato.');}
     if(role==="client"){
-      const {data:client,error:clientError}=await sb.from('clients').select('id,user_id,name,email').eq('user_id',data.user.id).single();
+      const {data:client,error:clientError}=await sb.from('clients').select('id,user_id,name,email,phone,birth,note').eq('user_id',data.user.id).single();
       if(clientError||!client){await sb.auth.signOut();throw new Error('Profilo cliente non trovato.');}
       let local=db.clients.find(c=>String(c.id)===String(client.id)||String(c.email||'').toLowerCase()===String(client.email||'').toLowerCase());
-      if(local){local.id=client.id;local.name=client.name;local.email=client.email;local.supabaseUserId=client.user_id;}
-      else{local={id:client.id,name:client.name,email:client.email,password:'',phone:'',birth:'',note:'',supabaseUserId:client.user_id};db.clients.push(local);}
+      if(local){local.id=client.id;local.name=client.name;local.email=client.email;local.phone=client.phone||'';local.birth=client.birth||'';local.note=client.note||'';local.supabaseUserId=client.user_id;}
+      else{local={id:client.id,name:client.name,email:client.email,password:'',phone:client.phone||'',birth:client.birth||'',note:client.note||'',supabaseUserId:client.user_id};db.clients.push(local);}
       save();
       session={role:'client',userId:client.id,supabaseUserId:data.user.id,page:'scheda',clientDay:'Giorno 1'};
       try{await syncWorkoutsFromSupabase(client.id);}catch(e){console.warn('Sync scheda cliente:',e);}
       try{await syncPaymentsFromSupabase();}catch(e){console.warn('Sync pagamenti cliente:',e);}
       try{await syncAppointmentsFromSupabase();}catch(e){console.warn('Sync appuntamenti cliente:',e);}
+      try{await syncWeightsFromSupabase(client.id);}catch(e){console.warn('Sync pesi cliente:',e);}
     }else{
       await syncClientsFromSupabase();
       session={role:'trainer',userId:null,supabaseUserId:data.user.id,page:'dashboard',clientDay:'Giorno 1'};
       try{await syncWorkoutsFromSupabase();}catch(e){console.warn('Sync schede trainer:',e);}
       try{await syncPaymentsFromSupabase();}catch(e){console.warn('Sync pagamenti trainer:',e);}
       try{await syncAppointmentsFromSupabase();}catch(e){console.warn('Sync appuntamenti trainer:',e);}
+      try{await syncWeightsFromSupabase();}catch(e){console.warn('Sync pesi trainer:',e);}
     }
     saveSession();
     render();
@@ -1849,6 +1991,9 @@ async function setPage(page){
   }
   if(page==='scheda'&&session?.role==='client'){
     try{await syncWorkoutsFromSupabase(session.userId);}catch(e){console.warn('Sync scheda:',e);}
+  }
+  if(page==='dashboard'&&session?.role==='client'){
+    try{await syncWeightsFromSupabase(session.userId);}catch(e){console.warn('Sync pesi:',e);}
   }
   render();
 }
@@ -1901,6 +2046,7 @@ async function setTrainerPage(page){
   saveSession();
   if(page==='appointments'){
     try{await syncAppointmentsFromSupabase();}catch(e){console.warn('Sync appuntamenti trainer:',e);}
+      try{await syncWeightsFromSupabase();}catch(e){console.warn('Sync pesi trainer:',e);}
   }
   if(page==='payments'){
     try{await syncPaymentsFromSupabase();}catch(e){console.warn('Sync pagamenti trainer:',e);}
@@ -2146,7 +2292,7 @@ async function saveClient(cid){
       const c={...old,name:n,email:e,phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value};
       db.clients=db.clients.map(x=>String(x.id)===String(cid)?c:x);save();
       if(old.supabaseUserId){
-        const {error}=await sb.from('clients').update({name:n,email:e}).eq('id',cid);
+        const {error}=await sb.from('clients').update({name:n,email:e,phone:c.phone||'',birth:c.birth||null,note:c.note||''}).eq('id',cid);
         if(error) console.warn(error);
       }
       closeModal();render();
@@ -2163,6 +2309,8 @@ async function saveClient(cid){
     if(!res.ok||!out.success) throw new Error(out.error||'Errore creazione cliente.');
     const sc=out.client;
     const c={id:sc.id,name:n,email:e,password:'',phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value,supabaseUserId:sc.user_id};
+    const {error:profileError}=await sb.from('clients').update({phone:c.phone||'',birth:c.birth||null,note:c.note||''}).eq('id',String(sc.id));
+    if(profileError) throw profileError;
     db.clients.push(c);save();closeModal();render();
     alert('Cliente creato correttamente. Ora può accedere dal suo telefono con email e password.');
   }catch(err){alert('Errore: '+(err.message||err));}
@@ -2227,8 +2375,8 @@ async function openClient(cid,skipSync=false){
         <div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>
         ${dayExercises.length?dayExercises.map(ex=>`<div class="exercise-row trainer-inline-row">
           <button class="mini-btn red trainer-inline-delete" onclick="deleteTrainerInlineExercise('${cid}','${ex.id}')" aria-label="Elimina">×</button>
-          <div class="ex-name inline-name"><input data-inline-name="${ex.id}" value="${esc(ex.exercise)}" oninput="trainerInlineEdit('${ex.id}','exercise',this.value)"></div>
-          <div class="ex-cell ex-sets"><input value="${esc(ex.sets)}" oninput="trainerInlineEdit('${ex.id}','sets',this.value)"></div>
+          <div class="ex-name inline-name"><textarea rows="2" data-inline-name="${ex.id}" oninput="trainerInlineEdit('${ex.id}','exercise',this.value)">${esc(ex.exercise)}</textarea></div>
+          <div class="ex-cell ex-sets inline-sets"><textarea rows="2" oninput="trainerInlineEdit('${ex.id}','sets',this.value)">${esc(ex.sets)}</textarea></div>
           <div class="ex-cell"><input value="${esc(ex.reps)}" oninput="trainerInlineEdit('${ex.id}','reps',this.value)"></div>
           <div class="ex-cell"><input value="${esc(ex.rest)}" oninput="trainerInlineEdit('${ex.id}','rest',this.value)"></div>
           <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="trainerInlineEdit('${ex.id}','load',this.value)"></div>
@@ -2303,7 +2451,21 @@ function saveWorkout(cid,wid){
   db.workouts=wid?db.workouts.map(x=>x.id===wid?item:x):[...db.workouts,item];save();openClient(cid)
 }
 function weightForm(cid){show(`<h2>Registra peso</h2><label>Data</label><input id="wdate" type="date" value="${new Date().toISOString().slice(0,10)}"><label>Peso (kg)</label><input id="wval" type="number" step="0.1"><div class="actions"><button class="btn" onclick="openClient('${cid}')">Annulla</button><button class="btn blue" onclick="saveWeight('${cid}')">Salva</button></div>`)}
-function saveWeight(cid){db.weights.push({id:id('we'),clientId:cid,date:wdate.value,weight:wval.value});save();openClient(cid)}
+async function saveWeight(cid){
+  const c=db.clients.find(x=>String(x.id)===String(cid));
+  if(!c)return alert('Cliente non trovato.');
+  if(!c.supabaseUserId)return alert('Cliente non collegato a Supabase.');
+  const date=document.getElementById('wdate')?.value||new Date().toISOString().slice(0,10);
+  const value=parseFloat(String(document.getElementById('wval')?.value||'').replace(',','.'));
+  if(!Number.isFinite(value)||value<20||value>400)return alert('Inserisci un peso valido.');
+  const weightId=id('we');
+  try{
+    const {error}=await sb.from('weights').insert({id:weightId,client_id:String(c.id),client_user_id:c.supabaseUserId,weight:value,weight_date:date});
+    if(error) throw error;
+    db.weights.push({id:weightId,clientId:String(c.id),supabaseUserId:c.supabaseUserId,date,weight:String(value)});
+    save();openClient(cid);
+  }catch(err){alert('Errore salvataggio peso: '+(err.message||err));}
+}
 
 async function deleteAppointment(aid){
   const ap=db.appointments.find(x=>String(x.id)===String(aid));
@@ -2446,6 +2608,77 @@ async function updateExerciseLoad(exId,val){
   }
 }
 
+function clientWeightForm(){
+  const c=db.clients.find(x=>x.id===session.userId); if(!c)return;
+  const existing=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const last=existing.length?existing[existing.length-1].weight:'';
+  show(`<h2>Aggiorna il tuo peso</h2>
+    <div class="page-sub">Inserisci il peso attuale. Verrà aggiunto al tuo storico.</div>
+    <label>Data</label><input id="clientWeightDate" type="date" value="${new Date().toISOString().slice(0,10)}">
+    <label>Peso (kg)</label><input id="clientWeightValue" type="number" inputmode="decimal" step="0.1" min="20" max="400" placeholder="Es. 78.5" value="${esc(last)}">
+    <div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveClientWeight()">Salva peso</button></div>`);
+  setTimeout(()=>document.getElementById('clientWeightValue')?.focus(),50);
+}
+
+async function saveClientWeight(){
+  const c=db.clients.find(x=>String(x.id)===String(session.userId)); if(!c)return;
+  const date=document.getElementById('clientWeightDate')?.value||new Date().toISOString().slice(0,10);
+  const raw=String(document.getElementById('clientWeightValue')?.value||'').replace(',','.');
+  const value=parseFloat(raw);
+  if(!Number.isFinite(value)||value<20||value>400)return alert('Inserisci un peso valido.');
+  if(!session?.supabaseUserId)return alert('Sessione Supabase non disponibile.');
+  const weightId=id('we');
+  try{
+    const {error}=await sb.from('weights').insert({
+      id:weightId,
+      client_id:String(c.id),
+      client_user_id:session.supabaseUserId,
+      weight:value,
+      weight_date:date
+    });
+    if(error) throw error;
+    db.weights.push({id:weightId,clientId:String(c.id),supabaseUserId:session.supabaseUserId,date,weight:String(value)});
+    save();closeModal();render();
+  }catch(err){
+    alert('Errore salvataggio peso: '+(err.message||err));
+  }
+}
+
+function clientProfileForm(){
+  const c=db.clients.find(x=>x.id===session.userId); if(!c)return;
+  show(`<h2>Modifica profilo</h2>
+    <div class="page-sub">Puoi aggiornare i tuoi dati personali. Email e password non sono modificabili da qui.</div>
+    <div class="formgrid">
+      <div class="full"><label>Nome e cognome</label><input id="cpName" value="${esc(c.name||'')}"></div>
+      <div class="full"><label>Email</label><input type="email" value="${esc(c.email||'')}" disabled></div>
+      <div><label>Telefono</label><input id="cpPhone" type="tel" value="${esc(c.phone||'')}"></div>
+      <div><label>Data di nascita</label><input id="cpBirth" type="date" value="${esc(c.birth||'')}"></div>
+      <div class="full"><label>Note personali</label><textarea id="cpNote" rows="3">${esc(c.note||'')}</textarea></div>
+    </div>
+    <div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveClientProfile()">Salva modifiche</button></div>`);
+}
+
+async function saveClientProfile(){
+  const c=db.clients.find(x=>x.id===session.userId); if(!c)return;
+  const name=document.getElementById('cpName')?.value.trim()||'';
+  if(!name)return alert('Inserisci nome e cognome.');
+  const phone=document.getElementById('cpPhone')?.value.trim()||'';
+  const birth=document.getElementById('cpBirth')?.value||'';
+  const note=document.getElementById('cpNote')?.value||'';
+  const previous={...c};
+  c.name=name;c.phone=phone;c.birth=birth;c.note=note;save();
+  try{
+    if(c.supabaseUserId){
+      const {error}=await sb.from('clients').update({name,phone,birth:birth||null,note}).eq('id',String(c.id)).eq('user_id',session.supabaseUserId);
+      if(error) throw error;
+    }
+    closeModal();render();
+  }catch(err){
+    Object.assign(c,previous);save();
+    alert('Errore salvataggio profilo: '+(err.message||err));
+  }
+}
+
 function client(){
   const c=db.clients.find(x=>x.id===session.userId); if(!c)return logout();
   const topEl=document.querySelector(".top");
@@ -2475,7 +2708,7 @@ function client(){
       <div class="metric-board client-dashboard-metrics">
         <div class="metric-box photo-quick" onclick="openPhotoHistory('${c.id}',false)"><b>▣</b><span>Check Foto</span></div>
         <div class="metric-box" onclick="setPage('appuntamenti')"><b>${appointments.length}</b><span>Appuntamenti</span></div>
-        <div class="metric-box"><b>${esc(latestWeight)}</b><span>Ultimo peso (kg)</span></div>
+        <div class="metric-box" onclick="clientWeightForm()" style="cursor:pointer"><b>${esc(latestWeight)}</b><span>Ultimo peso (kg)</span></div>
         <div class="metric-box" onclick="setPage('pagamenti')"><b>${payments.filter(x=>String(x.status).toLowerCase()==='pagato').length}</b><span>Pagamenti</span></div>
       </div>
     </section>
@@ -2509,10 +2742,16 @@ function client(){
   const altro=`
     <section class="page-head"><div class="page-kicker">Altro</div><h1>Profilo e impostazioni</h1><div class="page-sub">Profilo, appuntamenti e personalizzazione della tua app.</div></section>
     <section class="section">
-      <button class="more-action-card theme-access-card" style="width:100%" onclick="openThemeSettings()">
+      <div class="more-action-grid">
+        <button class="more-action-card" style="width:100%" onclick="clientProfileForm()">
+          <div class="more-symbol">✎</div>
+          <div><strong>Modifica profilo</strong><span>Aggiorna nome, telefono e data di nascita</span></div>
+        </button>
+        <button class="more-action-card theme-access-card" style="width:100%" onclick="openThemeSettings()">
         <div class="more-symbol">🎨</div>
         <div><strong>Tema e colori</strong><span>Scegli colore principale e sfondo</span></div>
-      </button>
+        </button>
+      </div>
     </section>
     <section class="section"><div class="sectionhead"><h2>Appuntamenti</h2></div><div class="list">${appointments.length?appointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)}</strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessun appuntamento.</div>`}</div></section>
     <section class="section"><div class="sectionhead"><h2>Profilo</h2></div><div class="info-card"><div class="info-row"><span>Email</span><strong>${esc(c.email)}</strong></div><div class="info-row"><span>Telefono</span><strong>${esc(c.phone||'—')}</strong></div><div class="info-row"><span>Data di nascita</span><strong>${esc(c.birth||'—')}</strong></div></div></section>`;
