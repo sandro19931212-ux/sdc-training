@@ -1949,9 +1949,12 @@ async function syncClientsFromSupabase(){
 
 
 async function syncWorkoutsFromSupabase(clientId=null){
+  const workoutSelect=session?.role==='client'
+    ? 'id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,note,created_at,updated_at'
+    : 'id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,created_at,updated_at';
   let query=sb
     .from('workouts')
-    .select('id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,created_at,updated_at')
+    .select(workoutSelect)
     .order('created_at',{ascending:true});
   if(clientId) query=query.eq('client_id',String(clientId));
   const {data,error}=await query;
@@ -1967,7 +1970,8 @@ async function syncWorkoutsFromSupabase(clientId=null){
     sets:w.sets==null?'':String(w.sets),
     reps:w.reps==null?'':String(w.reps),
     rest:w.rest==null?'':String(w.rest),
-    load:w.load==null?'':String(w.load)
+    load:w.load==null?'':String(w.load),
+    note:session?.role==='client'?(w.note==null?'':String(w.note)):''
   }));
 
   if(clientId){
@@ -2007,6 +2011,7 @@ async function saveWorkoutsToSupabase(clientId){
     reps:String(w.reps??''),
     rest:String(w.rest??''),
     load:String(w.load??''),
+    ...(session?.role==='client'?{note:String(w.note??'')} : {}),
     updated_at:new Date().toISOString()
   }));
 
@@ -2511,7 +2516,7 @@ async function archiveCurrentWorkout(cid,reason='Nuova scheda'){
     title:current[0]?.title||'Allenamento',
     archivedAt:new Date().toISOString(),
     workouts:current.map(w=>({
-      title:w.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'',reps:w.reps||'',rest:w.rest||'',load:w.load??''
+      title:w.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'',reps:w.reps||'',rest:w.rest||'',load:w.load??'',note:w.note||''
     }))
   };
   const {error}=await sb.from('workout_archives').insert({
@@ -2599,7 +2604,7 @@ async function reuseWorkoutArchive(archiveId){
     await saveWorkoutsToSupabase(c.id);
     await archiveCurrentWorkout(c.id,'Riutilizzo scheda');
     const restored=(a.workouts||[]).map(w=>({
-      id:id('wo'),clientId:String(c.id),supabaseUserId:c.supabaseUserId||'',title:w.title||a.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'3',reps:w.reps||'10',rest:w.rest||'60',load:w.load??''
+      id:id('wo'),clientId:String(c.id),supabaseUserId:c.supabaseUserId||'',title:w.title||a.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'3',reps:w.reps||'10',rest:w.rest||'60',load:w.load??'',note:w.note||''
     }));
     db.workouts=[...db.workouts.filter(w=>String(w.clientId)!==String(c.id)),...restored];
     save();
@@ -2624,7 +2629,8 @@ function buildDefaultClientWorkouts(client){
         sets:'3',
         reps:'10',
         rest:'60',
-        load:''
+        load:'',
+        note:''
       });
     }
   });
@@ -2721,7 +2727,7 @@ function trainerInlineEdit(wid,field,val){
   w[field]=val;
 }
 function addTrainerInlineExercise(cid,day){
-  const item={id:id('wo'),clientId:cid,title:'Allenamento',exercise:'',day:day||'Giorno 1',load:'',sets:'3',reps:'10',rest:'60'};
+  const item={id:id('wo'),clientId:cid,title:'Allenamento',exercise:'',day:day||'Giorno 1',load:'',sets:'3',reps:'10',rest:'60',note:''};
   db.workouts.push(item);
   openClient(cid,true);
   setTimeout(()=>{
@@ -2869,7 +2875,8 @@ function workoutForm(cid,w=null){
     <div class="actions"><button class="btn" onclick="openClient('${cid}')">Annulla</button><button class="btn blue" onclick="saveWorkout('${cid}','${w?.id||''}')">Salva</button></div>`)
 }
 function saveWorkout(cid,wid){
-  const item={id:wid||id('wo'),clientId:cid,title:wtit.value||'Allenamento',exercise:wex.value.trim(),day:wday.value,load:wload.value.trim(),sets:wset.value,reps:wrep.value,rest:wrest.value};
+  const previous=wid?db.workouts.find(x=>String(x.id)===String(wid)):null;
+  const item={id:wid||id('wo'),clientId:cid,title:wtit.value||'Allenamento',exercise:wex.value.trim(),day:wday.value,load:wload.value.trim(),sets:wset.value,reps:wrep.value,rest:wrest.value,note:previous?.note||''};
   if(!item.exercise)return alert('Inserisci il nome dell\'esercizio.');
   db.workouts=wid?db.workouts.map(x=>x.id===wid?item:x):[...db.workouts,item];save();openClient(cid)
 }
@@ -3202,14 +3209,15 @@ function client(){
         <div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>
         ${dayExercises.length?dayExercises.map(ex=>`
         <div class="exercise-row">
-          <div class="ex-name">${esc(ex.exercise)}</div>
+          <div class="ex-name"><button type="button" class="exercise-name-button" onclick="openExerciseNote('${ex.id}')"><span>${esc(ex.exercise)}</span>${ex.note?'<span class="exercise-note-dot" title="Nota presente"></span>':''}</button></div>
           <div class="ex-cell ex-sets">${esc(ex.sets)}</div>
           <div class="ex-cell">${esc(ex.reps)}</div>
           <div class="ex-cell">${fmtRest(ex.rest)}</div>
           <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" onchange="updateExerciseLoad('${ex.id}',this.value)"></div>
         </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${currentDay}.</div>`}
       </div>
-    </section>`;
+    </section>
+    ${workoutTimerMarkup()}`;
 
   const pagamenti=`
     <section class="page-head"><div class="page-kicker">Pagamenti</div><h1>I tuoi pagamenti</h1><div class="page-sub">Storico e stato aggiornato dei tuoi pagamenti.</div></section>
@@ -3253,6 +3261,172 @@ function client(){
     {key:'altro',label:'Altro',img:ICONS.more,action:"setPage('altro')"}
   ],navActive);
 }
+
+// ===== NOTE ESERCIZIO =====
+async function openExerciseNote(exId){
+  if(session?.role!=='client') return;
+  const ex=db.workouts.find(x=>String(x.id)===String(exId)&&String(x.clientId)===String(session.userId));
+  if(!ex)return alert('Esercizio non trovato.');
+  const note=String(ex.note||'');
+  show(`
+    <div class="sectionhead"><div><div class="page-kicker">Nota esercizio</div><h2>${esc(ex.exercise||'Esercizio')}</h2></div></div>
+    <div class="page-sub" style="margin-bottom:12px">Scrivi liberamente appunti, sensazioni o indicazioni da ricordare.</div>
+    <textarea id="exerciseNoteText" class="exercise-note-textarea" maxlength="2000" placeholder="Es. Aumentare il peso, fastidio alla spalla, presa più stretta...">${esc(note)}</textarea>
+    <div class="exercise-note-counter">Massimo 2000 caratteri</div>
+    <div class="actions">
+      <button class="btn" onclick="closeModal()">Chiudi</button>
+      <button class="btn blue" onclick="saveExerciseNote('${ex.id}')">Salva nota</button>
+    </div>`);
+}
+async function saveExerciseNote(exId){
+  if(session?.role!=='client')return;
+  const ex=db.workouts.find(x=>String(x.id)===String(exId)&&String(x.clientId)===String(session.userId));
+  if(!ex)return alert('Esercizio non trovato.');
+  const el=document.getElementById('exerciseNoteText');
+  const note=String(el?.value||'').trim();
+  const previous=ex.note||'';
+  ex.note=note;
+  save();
+  try{
+    const {error}=await sb.from('workouts').update({note,updated_at:new Date().toISOString()}).eq('id',String(exId)).eq('client_id',String(session.userId));
+    if(error)throw error;
+    closeModal();
+    render();
+  }catch(err){
+    ex.note=previous;save();
+    alert('Errore salvataggio nota: '+(err.message||err));
+  }
+}
+
+// ===== TIMER RECUPERO SCHEDA =====
+let workoutTimerInterval=null;
+let workoutTimerAlarmInterval=null;
+let workoutTimerAudioCtx=null;
+function workoutTimerKey(){return 'sdc_workout_countdown_'+String(session?.userId||'guest');}
+function defaultWorkoutTimer(){return {duration:60,remaining:60,endsAt:0,running:false,finished:false};}
+function readWorkoutTimer(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(workoutTimerKey())||'null');
+    const s={...defaultWorkoutTimer(),...(raw||{})};
+    s.duration=Math.max(1,Number(s.duration)||60);
+    s.remaining=Math.max(0,Number(s.remaining));
+    s.endsAt=Number(s.endsAt)||0;
+    s.running=!!s.running;
+    s.finished=!!s.finished;
+    if(s.running&&s.endsAt){
+      s.remaining=Math.max(0,Math.ceil((s.endsAt-Date.now())/1000));
+      if(s.remaining<=0){s.running=false;s.endsAt=0;s.finished=true;}
+    }
+    return s;
+  }catch(e){return defaultWorkoutTimer();}
+}
+function writeWorkoutTimer(s){localStorage.setItem(workoutTimerKey(),JSON.stringify(s));}
+function formatWorkoutTimer(sec){
+  const total=Math.max(0,Math.floor(Number(sec)||0)), h=Math.floor(total/3600), m=Math.floor((total%3600)/60), s=total%60;
+  return h>0?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function workoutTimerBeepOnce(){
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx)return;
+    if(!workoutTimerAudioCtx) workoutTimerAudioCtx=new AudioCtx();
+    if(workoutTimerAudioCtx.state==='suspended') workoutTimerAudioCtx.resume();
+    const osc=workoutTimerAudioCtx.createOscillator();
+    const gain=workoutTimerAudioCtx.createGain();
+    osc.type='sine';
+    osc.frequency.value=880;
+    gain.gain.setValueAtTime(.0001,workoutTimerAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.16,workoutTimerAudioCtx.currentTime+.01);
+    gain.gain.exponentialRampToValueAtTime(.0001,workoutTimerAudioCtx.currentTime+.28);
+    osc.connect(gain);gain.connect(workoutTimerAudioCtx.destination);
+    osc.start();osc.stop(workoutTimerAudioCtx.currentTime+.3);
+  }catch(e){console.warn('Timer beep:',e);}
+}
+function startWorkoutTimerAlarm(){
+  if(workoutTimerAlarmInterval)return;
+  workoutTimerBeepOnce();
+  try{if(navigator.vibrate)navigator.vibrate([220,100,220]);}catch(e){}
+  workoutTimerAlarmInterval=setInterval(()=>{
+    workoutTimerBeepOnce();
+    try{if(navigator.vibrate)navigator.vibrate([220,100,220]);}catch(e){}
+  },1200);
+}
+function stopWorkoutTimerAlarm(resetTimer=true){
+  if(workoutTimerAlarmInterval){
+    clearInterval(workoutTimerAlarmInterval);
+    workoutTimerAlarmInterval=null;
+  }
+  if(resetTimer){
+    const s=readWorkoutTimer();
+    writeWorkoutTimer({duration:s.duration,remaining:s.duration,endsAt:0,running:false,finished:false});
+    updateWorkoutTimerDisplay();
+  }
+}
+function updateWorkoutTimerDisplay(){
+  const prev=JSON.parse(localStorage.getItem(workoutTimerKey())||'null')||defaultWorkoutTimer();
+  const s=readWorkoutTimer();
+  if(s.finished&&!prev.finished)startWorkoutTimerAlarm();
+  if(!s.finished&&workoutTimerAlarmInterval)stopWorkoutTimerAlarm(false);
+  writeWorkoutTimer(s);
+  const el=document.getElementById('workoutTimerDisplay');
+  if(el)el.textContent=formatWorkoutTimer(s.remaining);
+  const play=document.getElementById('workoutTimerPlay');
+  if(play){play.textContent=s.running?'In corso':'Start';play.disabled=!!s.running;}
+  const input=document.getElementById('workoutTimerSeconds');
+  if(input){
+    input.disabled=!!s.running;
+    if(!s.running&&document.activeElement!==input)input.value=String(s.duration);
+  }
+  const card=document.querySelector('.workout-timer-card');
+  if(card)card.classList.toggle('timer-finished',s.finished&&s.remaining===0);
+  const stop=document.getElementById('workoutTimerStop');
+  if(stop)stop.style.display=s.finished?'block':'none';
+  const controls=document.getElementById('workoutTimerControls');
+  if(controls)controls.style.display=s.finished?'none':'block';
+  const title=document.getElementById('workoutTimerTitle');
+  if(title)title.textContent=s.finished?'Tempo scaduto':'Scegli il tempo';
+}
+function workoutTimerPlay(){
+  const current=readWorkoutTimer();
+  if(current.running)return;
+  stopWorkoutTimerAlarm(false);
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(AudioCtx){
+      if(!workoutTimerAudioCtx) workoutTimerAudioCtx=new AudioCtx();
+      if(workoutTimerAudioCtx.state==='suspended') workoutTimerAudioCtx.resume();
+    }
+  }catch(e){}
+  const input=document.getElementById('workoutTimerSeconds');
+  const sec=Math.max(1,Math.min(3600,Math.floor(Number(input?.value)||current.duration||60)));
+  const s={duration:sec,remaining:sec,endsAt:Date.now()+sec*1000,running:true,finished:false};
+  writeWorkoutTimer(s);
+  updateWorkoutTimerDisplay();
+}
+function workoutTimerMarkup(){
+  const s=readWorkoutTimer();
+  return `<section class="workout-timer-card ${s.finished?'timer-finished':''}">
+    <div class="workout-timer-head">
+      <div>
+        <div class="page-kicker">Timer recupero</div>
+        <h2 id="workoutTimerTitle">${s.finished?'Tempo scaduto':'Scegli il tempo'}</h2>
+      </div>
+      <div id="workoutTimerDisplay" class="workout-timer-display">${formatWorkoutTimer(s.remaining)}</div>
+    </div>
+    <div class="workout-timer-simple">
+      <div id="workoutTimerControls" style="${s.finished?'display:none':''}">
+        <label for="workoutTimerSeconds">Secondi</label>
+        <div class="workout-timer-inputrow">
+          <input id="workoutTimerSeconds" type="number" min="1" max="3600" inputmode="numeric" value="${s.duration}" ${s.running?'disabled':''}>
+          <button id="workoutTimerPlay" class="btn blue" onclick="workoutTimerPlay()" ${s.running?'disabled':''}>${s.running?'In corso':'Start'}</button>
+        </div>
+      </div>
+      <button id="workoutTimerStop" class="btn danger workout-timer-stop" onclick="stopWorkoutTimerAlarm(true)" style="${s.finished?'display:block':'display:none'}">STOP</button>
+    </div>
+  </section>`;
+}
+if(!workoutTimerInterval) workoutTimerInterval=setInterval(updateWorkoutTimerDisplay,250);
+
 function show(x){
   const modalEl=document.getElementById('modal');
   const modalBodyEl=document.getElementById('modalBody');
@@ -3330,6 +3504,38 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 }
 
 </script>
+
+
+<style>
+/* ===== NOTE ESERCIZIO ===== */
+.exercise-name-button{width:100%;min-width:0;border:0;background:transparent;color:inherit;padding:0;margin:0;display:flex;align-items:center;justify-content:flex-start;gap:8px;text-align:left;font:inherit;cursor:pointer}
+.exercise-name-button span:first-child{min-width:0;overflow-wrap:normal;word-break:normal;white-space:normal}
+.exercise-note-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px;background:var(--theme-accent);box-shadow:0 0 10px rgba(var(--theme-accent-rgb),.7)}
+.note-name-wrap{position:relative;padding-right:28px!important}
+.exercise-note-indicator{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:9px;border:1px solid rgba(var(--theme-accent-rgb),.28);background:rgba(var(--theme-surface-rgb),.75);color:#9aa8bb;font-size:12px;display:grid;place-items:center;cursor:pointer}
+.exercise-note-indicator.has-note{color:var(--theme-accent);border-color:rgba(var(--theme-accent-rgb),.62);box-shadow:0 0 12px rgba(var(--theme-accent-rgb),.14)}
+.exercise-note-textarea{width:100%;min-height:180px;resize:vertical;background:rgba(var(--theme-surface-rgb),.76);border:1px solid rgba(var(--theme-accent-rgb),.34);border-radius:18px;color:#f7fbff;padding:14px 15px;line-height:1.5;font:inherit;outline:none}
+.exercise-note-textarea:focus{border-color:var(--theme-accent);box-shadow:0 0 0 2px rgba(var(--theme-accent-rgb),.10),0 0 18px rgba(var(--theme-accent-rgb),.14)}
+.exercise-note-textarea[readonly]{opacity:.86}
+.exercise-note-counter{font-size:11px;color:#75839a;text-align:right;margin-top:7px}
+
+/* ===== TIMER RECUPERO SCHEDA ===== */
+.workout-timer-card{margin-top:16px;padding:16px;border:1px solid rgba(var(--theme-accent-rgb),.24);border-radius:24px;background:linear-gradient(145deg,rgba(var(--theme-surface-rgb),.88),rgba(var(--theme-surface-rgb),.54));box-shadow:0 16px 36px rgba(0,0,0,.16)}
+.workout-timer-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+.workout-timer-head h2{margin:2px 0 0;font-size:18px}
+.workout-timer-display{font-variant-numeric:tabular-nums;font-size:30px;font-weight:800;letter-spacing:.03em;color:#f7fbff;text-shadow:0 0 18px rgba(var(--theme-accent-rgb),.18)}
+.workout-timer-simple{margin-top:14px}
+.workout-timer-simple label{display:block;margin:0 0 7px;font-size:10px;color:#7f8ca2}
+.workout-timer-inputrow{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:9px}
+.workout-timer-inputrow input{height:46px;border-radius:14px;border:1px solid rgba(var(--theme-accent-rgb),.28);background:rgba(var(--theme-surface-rgb),.7);color:#fff;padding:0 14px;font-size:17px;font-weight:800;outline:none}
+.workout-timer-inputrow input:focus{border-color:var(--theme-accent);box-shadow:0 0 0 2px rgba(var(--theme-accent-rgb),.10)}
+.workout-timer-inputrow input:disabled{opacity:.62}
+.workout-timer-inputrow .btn{height:46px;width:100%;min-width:0}
+.workout-timer-inputrow .btn:disabled{opacity:.72;cursor:default}
+.workout-timer-stop{width:100%;height:50px;font-size:16px;font-weight:900;letter-spacing:.08em}
+.workout-timer-card.timer-finished{box-shadow:0 0 0 1px rgba(var(--theme-accent-rgb),.35),0 0 28px rgba(var(--theme-accent-rgb),.18)}
+@media(max-width:390px){.workout-timer-display{font-size:27px}.workout-timer-card{padding:14px}.workout-timer-inputrow{grid-template-columns:minmax(0,1fr) 104px}}
+</style>
 
 </body>
 </html>
