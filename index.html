@@ -2804,9 +2804,48 @@ render();
 </script>
 
 <script>
+// Aggiornamento automatico PWA: quando pubblichi una nuova versione su GitHub,
+// il nuovo service worker viene controllato, attivato e applicato subito.
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=2").catch(err => console.warn("SW:", err));
+  let reloadingForUpdate = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloadingForUpdate) return;
+    reloadingForUpdate = true;
+    window.location.reload();
+  });
+
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
+
+      const activateWaitingWorker = () => {
+        if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
+      };
+
+      activateWaitingWorker();
+
+      reg.addEventListener("updatefound", () => {
+        const worker = reg.installing;
+        if (!worker) return;
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            worker.postMessage({ type: "SKIP_WAITING" });
+          }
+        });
+      });
+
+      // Controlla subito e poi periodicamente mentre l'app resta aperta.
+      reg.update().catch(() => {});
+      setInterval(() => reg.update().catch(() => {}), 60 * 1000);
+
+      // Ricontrolla anche quando l'utente torna nell'app.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") reg.update().catch(() => {});
+      });
+    } catch (err) {
+      console.warn("SW:", err);
+    }
   });
 }
 </script>
