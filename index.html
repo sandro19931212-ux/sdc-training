@@ -1622,28 +1622,6 @@ input::placeholder,textarea::placeholder{color:#65758b}
 *::-webkit-scrollbar-thumb{background:rgba(var(--theme-accent-rgb),.35);border-radius:999px}
 *::-webkit-scrollbar-track{background:transparent}
 
-/* Splash iniziale */
-#sdcSplash{
-  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
-  background:
-    radial-gradient(circle at 50% 38%,rgba(var(--theme-accent-rgb),.18),transparent 28%),
-    #000;
-  transition:opacity .42s ease,visibility .42s ease;
-}
-#sdcSplash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.sdc-splash-inner{text-align:center;animation:sdcSplashIn .6s var(--ease-premium) both}
-.sdc-splash-logo{
-  font-family:Georgia,"Times New Roman",serif;font-size:72px;font-weight:800;font-style:italic;line-height:.9;
-  background:linear-gradient(145deg,#d8f7ff 0%,var(--theme-accent) 38%,#145dff 100%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 16px rgba(var(--theme-accent-rgb),.40));
-}
-.sdc-splash-name{margin-top:8px;font-weight:900;font-size:22px;letter-spacing:.06em;color:#f4f8ff}
-.sdc-splash-sub{margin-top:7px;font-size:9px;letter-spacing:.34em;color:#6e91bc;text-transform:uppercase}
-.sdc-splash-line{width:74px;height:2px;border-radius:999px;margin:20px auto 0;background:linear-gradient(90deg,transparent,var(--theme-accent),transparent);animation:sdcPulse 1.15s ease-in-out infinite}
-@keyframes sdcSplashIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
-@keyframes sdcPulse{0%,100%{opacity:.35;transform:scaleX(.72)}50%{opacity:1;transform:scaleX(1)}}
-
 /* Mobile polish */
 @media(max-width:480px){
   .wrap{padding-left:11px!important;padding-right:11px!important}
@@ -1671,15 +1649,6 @@ input::placeholder,textarea::placeholder{color:#65758b}
 
 </head>
 <body>
-<div id="sdcSplash" aria-hidden="true">
-  <div class="sdc-splash-inner">
-    <div class="sdc-splash-logo">S</div>
-    <div class="sdc-splash-name">SDC FITNESS</div>
-    <div class="sdc-splash-sub">Allena il tuo potenziale</div>
-    <div class="sdc-splash-line"></div>
-  </div>
-</div>
-
 <section id="login" class="login">
   <div class="loginbox">
     <div class="login-logo-wrap">
@@ -1727,7 +1696,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const KEY="sdc_training_v6";
 const SESSION_KEY="sdc_session_v6";
 const DAYS=["Giorno 1","Giorno 2","Giorno 3","Giorno 4","Giorno 5"];
-let db=JSON.parse(localStorage.getItem(KEY)||"null")||JSON.parse(localStorage.getItem("sdc_training_v5")||"null")||{clients:[],workouts:[],payments:[],appointments:[],weights:[]};
+let db=JSON.parse(localStorage.getItem(KEY)||"null")||JSON.parse(localStorage.getItem("sdc_training_v5")||"null")||{clients:[],workouts:[],payments:[],appointments:[],weights:[],workoutArchives:[]};
 let session=JSON.parse(localStorage.getItem(SESSION_KEY)||"null")||JSON.parse(localStorage.getItem("sdc_session_v5")||"null");
 const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 const id=p=>p+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -1869,7 +1838,7 @@ function openThemeSettings(){
 }
 
 function ensureDataShape(){
-  db.clients=db.clients||[];db.workouts=db.workouts||[];db.payments=db.payments||[];db.appointments=db.appointments||[];db.weights=db.weights||[];
+  db.clients=db.clients||[];db.workouts=db.workouts||[];db.payments=db.payments||[];db.appointments=db.appointments||[];db.weights=db.weights||[];db.workoutArchives=db.workoutArchives||[];
   db.workouts=db.workouts.map(w=>({...w,day:w.day||"Giorno 1",load:w.load??""}));
   save();
 }
@@ -2467,6 +2436,11 @@ function trainer(){
           <div><strong>Check Foto</strong><span>Apri lo storico fotografico clienti</span></div>
         </button>
 
+        <button class="more-action-card" onclick="openWorkoutArchiveList()">
+          <div class="more-symbol">↺</div>
+          <div><strong>Vecchie schede</strong><span>Consulta e riutilizza le schede archiviate</span></div>
+        </button>
+
         <button class="more-action-card theme-access-card" onclick="openThemeSettings()">
           <div class="more-symbol">🎨</div>
           <div><strong>Tema e colori</strong><span>Personalizza colore principale e sfondo</span></div>
@@ -2501,6 +2475,160 @@ function trainerSchedaPicker(){
     return;
   }
   show(`<h2>Scheda allenamento</h2><div class="page-sub">Seleziona il cliente di cui vuoi vedere o modificare la scheda.</div><div class="list" style="margin-top:14px">${db.clients.map(c=>`<button class="row" style="width:100%;color:inherit;text-align:left" onclick="openClient('${c.id}')"><div><strong>${esc(c.name)}</strong><small>${esc(c.email)}</small></div><span class="badge">Apri scheda</span></button>`).join('')}</div><div class="actions"><button class="btn" onclick="closeModal()">Chiudi</button></div>`);
+}
+
+function workoutArchiveDateLabel(value){
+  if(!value)return '—';
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return String(value);
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+' · '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+async function syncWorkoutArchivesFromSupabase(){
+  const {data,error}=await sb.from('workout_archives').select('id,client_id,client_user_id,title,archived_at,snapshot').order('archived_at',{ascending:false});
+  if(error) throw error;
+  db.workoutArchives=(data||[]).map(a=>({
+    id:String(a.id),
+    clientId:String(a.client_id),
+    clientUserId:a.client_user_id||'',
+    title:a.title||'Scheda archiviata',
+    archivedAt:a.archived_at||'',
+    workouts:Array.isArray(a.snapshot)?a.snapshot:[]
+  }));
+  save();
+  return db.workoutArchives;
+}
+
+async function archiveCurrentWorkout(cid,reason='Nuova scheda'){
+  const c=db.clients.find(x=>String(x.id)===String(cid));
+  if(!c) throw new Error('Cliente non trovato.');
+  const current=db.workouts.filter(w=>String(w.clientId)===String(cid));
+  if(!current.length) return null;
+  const archive={
+    id:id('wa'),
+    clientId:String(cid),
+    clientUserId:c.supabaseUserId||'',
+    title:current[0]?.title||'Allenamento',
+    archivedAt:new Date().toISOString(),
+    workouts:current.map(w=>({
+      title:w.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'',reps:w.reps||'',rest:w.rest||'',load:w.load??''
+    }))
+  };
+  const {error}=await sb.from('workout_archives').insert({
+    id:archive.id,
+    client_id:archive.clientId,
+    client_user_id:archive.clientUserId||null,
+    title:archive.title,
+    archived_at:archive.archivedAt,
+    snapshot:archive.workouts
+  });
+  if(error) throw error;
+  db.workoutArchives=[archive,...(db.workoutArchives||[])];
+  save();
+  return archive;
+}
+
+function makeDefaultWorkoutSet(c,title='Allenamento'){
+  return buildDefaultClientWorkouts(c).map(w=>({...w,title}));
+}
+
+async function createNewClientWorkout(cid){
+  const c=db.clients.find(x=>String(x.id)===String(cid));
+  if(!c)return alert('Cliente non trovato.');
+  if(!confirm(`Creare una nuova scheda per ${c.name}? La scheda attuale verrà salvata in Vecchie schede.`))return;
+  try{
+    const invalid=db.workouts.find(x=>String(x.clientId)===String(cid)&&!String(x.exercise||'').trim());
+    if(invalid)return alert('Completa o elimina gli esercizi senza nome prima di creare una nuova scheda.');
+    await saveWorkoutsToSupabase(cid);
+    await archiveCurrentWorkout(cid,'Nuova scheda');
+    const fresh=makeDefaultWorkoutSet(c,'Allenamento');
+    db.workouts=[...db.workouts.filter(w=>String(w.clientId)!==String(cid)),...fresh];
+    save();
+    await saveWorkoutsToSupabase(cid);
+    window.__trainerClientDay='Giorno 1';
+    alert('Nuova scheda creata. La precedente è stata archiviata.');
+    await openClient(cid,true);
+  }catch(err){
+    alert('Errore creazione nuova scheda: '+(err.message||err)+"\n\nSe è la prima volta che usi lo storico schede, verifica di aver creato la tabella workout_archives in Supabase.");
+  }
+}
+
+async function openWorkoutArchiveList(clientMode=false){
+  try{await syncWorkoutArchivesFromSupabase();}
+  catch(err){return alert('Non riesco a leggere Vecchie schede: '+(err.message||err)+"\n\nVerifica i permessi della tabella workout_archives in Supabase.");}
+  const ownClientId=clientMode?String(session.userId||''):'';
+  const arr=(db.workoutArchives||[]).filter(a=>!clientMode||String(a.clientId)===ownClientId);
+  showSheetPage(`
+    <div class="sectionhead"><div><div class="page-kicker">Archivio</div><h2>${clientMode?'Le mie vecchie schede':'Vecchie schede'}</h2><div class="page-sub">${clientMode?'Consulta le schede precedenti del tuo percorso.':'Le schede precedenti restano salvate e possono essere riutilizzate.'}</div></div></div>
+    <div class="list" style="margin-top:14px">
+      ${arr.length?arr.map(a=>{
+        const c=db.clients.find(x=>String(x.id)===String(a.clientId));
+        return `<button class="row" style="width:100%;color:inherit;text-align:left" onclick="openWorkoutArchive('${a.id}',${clientMode})"><div><strong>${clientMode?esc(a.title||'Scheda'):esc(c?.name||'Cliente')}</strong><small>${workoutArchiveDateLabel(a.archivedAt)}${clientMode?'':' · '+esc(a.title||'Scheda')}</small></div><span class="badge">Apri</span></button>`;
+      }).join(''):`<div class="card empty">${clientMode?'Non hai ancora vecchie schede archiviate.':'Non ci sono ancora schede archiviate.'}</div>`}
+    </div>
+    <div class="actions"><button class="btn" onclick="closeModal()">Chiudi</button></div>
+  `);
+}
+
+function openWorkoutArchive(archiveId,clientMode=false){
+  const a=(db.workoutArchives||[]).find(x=>String(x.id)===String(archiveId));
+  if(!a)return alert('Scheda archiviata non trovata.');
+  if(clientMode&&String(a.clientId)!==String(session.userId||''))return alert('Scheda non disponibile.');
+  const c=db.clients.find(x=>String(x.id)===String(a.clientId));
+  const items=Array.isArray(a.workouts)?a.workouts:[];
+  showSheetPage(`
+    <div class="sectionhead"><div><div class="page-kicker">Vecchia scheda</div><h2>${clientMode?esc(a.title||'Scheda'):esc(c?.name||'Cliente')}</h2><div class="page-sub">Salvata il ${workoutArchiveDateLabel(a.archivedAt)}</div></div></div>
+    ${DAYS.map(day=>{
+      const rows=items.filter(w=>(w.day||'Giorno 1')===day);
+      return `<section class="section"><div class="day-heading"><h3>${day}</h3><div class="line"></div></div><div class="exercise-table"><div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>${rows.length?rows.map(ex=>`<div class="exercise-row"><div class="ex-name">${esc(ex.exercise)}</div><div class="ex-cell ex-sets">${esc(ex.sets)}</div><div class="ex-cell">${esc(ex.reps)}</div><div class="ex-cell">${fmtRest(ex.rest)}</div><div class="ex-cell">${esc(ex.load||'—')}</div></div>`).join(''):`<div class="card empty">Nessun esercizio.</div>`}</div></section>`;
+    }).join('')}
+    <div class="trainer-bottom-actions direct-edit trainer-save-exit">
+      ${clientMode?'':`<button class="btn blue trainer-save-btn" onclick="reuseWorkoutArchive('${a.id}')">Riutilizza questa scheda</button>`}
+      <button class="btn trainer-exit-btn" onclick="openWorkoutArchiveList(${clientMode})">Indietro</button>
+    </div>
+  `);
+}
+
+async function reuseWorkoutArchive(archiveId){
+  const a=(db.workoutArchives||[]).find(x=>String(x.id)===String(archiveId));
+  if(!a)return alert('Scheda archiviata non trovata.');
+  const c=db.clients.find(x=>String(x.id)===String(a.clientId));
+  if(!c)return alert('Cliente non trovato.');
+  if(!confirm(`Riutilizzare questa scheda per ${c.name}? La scheda attuale verrà prima archiviata.`))return;
+  try{
+    await saveWorkoutsToSupabase(c.id);
+    await archiveCurrentWorkout(c.id,'Riutilizzo scheda');
+    const restored=(a.workouts||[]).map(w=>({
+      id:id('wo'),clientId:String(c.id),supabaseUserId:c.supabaseUserId||'',title:w.title||a.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'3',reps:w.reps||'10',rest:w.rest||'60',load:w.load??''
+    }));
+    db.workouts=[...db.workouts.filter(w=>String(w.clientId)!==String(c.id)),...restored];
+    save();
+    await saveWorkoutsToSupabase(c.id);
+    window.__trainerClientDay='Giorno 1';
+    alert('Scheda riutilizzata. La precedente è stata archiviata.');
+    await openClient(c.id,true);
+  }catch(err){alert('Errore nel riutilizzo della scheda: '+(err.message||err));}
+}
+
+function buildDefaultClientWorkouts(client){
+  const rows=[];
+  DAYS.forEach(day=>{
+    for(let i=1;i<=6;i++){
+      rows.push({
+        id:id('wo'),
+        clientId:String(client.id),
+        supabaseUserId:client.supabaseUserId||'',
+        title:'Allenamento',
+        day,
+        exercise:`Esercizio ${i}`,
+        sets:'3',
+        reps:'10',
+        rest:'60',
+        load:''
+      });
+    }
+  });
+  return rows;
 }
 
 function clientForm(c=null){
@@ -2544,8 +2672,22 @@ async function saveClient(cid){
     const c={id:sc.id,name:n,email:e,password:'',phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value,supabaseUserId:sc.user_id};
     const {error:profileError}=await sb.from('clients').update({phone:c.phone||'',birth:c.birth||null,note:c.note||''}).eq('id',String(sc.id));
     if(profileError) throw profileError;
-    db.clients.push(c);save();closeModal();render();
-    alert('Cliente creato correttamente. Ora può accedere dal suo telefono con email e password.');
+    db.clients.push(c);
+
+    // Ogni nuovo cliente parte con 5 giorni già pronti e 6 esercizi per giorno.
+    const defaultWorkouts=buildDefaultClientWorkouts(c);
+    db.workouts=[...db.workouts,...defaultWorkouts];
+    save();
+
+    try{
+      await saveWorkoutsToSupabase(c.id);
+    }catch(workoutErr){
+      console.warn('Creazione scheda preimpostata:',workoutErr);
+      alert('Cliente creato, ma non sono riuscito a sincronizzare la scheda preimpostata. Apri la scheda e premi Salva per riprovare.');
+    }
+
+    closeModal();render();
+    alert('Cliente creato correttamente con 5 giorni già pronti e 6 esercizi per giorno.');
   }catch(err){alert('Errore: '+(err.message||err));}
 }
 async function delClient(cid){
@@ -2567,6 +2709,8 @@ async function delClient(cid){
     db.payments=db.payments.filter(p=>String(p.clientId)!==String(cid));
     db.appointments=db.appointments.filter(a=>String(a.clientId)!==String(cid));
     db.weights=db.weights.filter(w=>String(w.clientId)!==String(cid));
+    db.workoutArchives=(db.workoutArchives||[]).filter(a=>String(a.clientId)!==String(cid));
+    try{await sb.from('workout_archives').delete().eq('client_id',String(cid));}catch(e){console.warn('Eliminazione archivio schede:',e);}
     save();render();
     alert('Cliente eliminato completamente.');
   }catch(err){alert('Errore: '+(err.message||err));}
@@ -2665,6 +2809,7 @@ async function openClient(cid,skipSync=false){
     </section>
     <div class="trainer-bottom-actions direct-edit trainer-save-exit">
       <button class="btn blue trainer-save-btn" onclick="saveTrainerClientSheet('${cid}')">Salva</button>
+      <button class="btn" onclick="createNewClientWorkout('${cid}')">＋ Nuova scheda</button>
       <button class="btn trainer-exit-btn" onclick="exitTrainerClientSheet('${cid}')">Esci</button>
     </div>
     `);
@@ -3078,6 +3223,10 @@ function client(){
           <div class="more-symbol">✎</div>
           <div><strong>Modifica profilo</strong><span>Aggiorna nome, telefono e data di nascita</span></div>
         </button>
+        <button class="more-action-card" style="width:100%" onclick="openWorkoutArchiveList(true)">
+          <div class="more-symbol">↺</div>
+          <div><strong>Vecchie schede</strong><span>Consulta le schede precedenti del tuo percorso</span></div>
+        </button>
         <button class="more-action-card theme-access-card" style="width:100%" onclick="openThemeSettings()">
         <div class="more-symbol">🎨</div>
         <div><strong>Tema e colori</strong><span>Scegli colore principale e sfondo</span></div>
@@ -3180,15 +3329,6 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   });
 }
 
-// Rifinitura grafica: splash iniziale breve, senza rallentare l'app.
-window.addEventListener('load', () => {
-  const splash = document.getElementById('sdcSplash');
-  if (!splash) return;
-  requestAnimationFrame(() => {
-    setTimeout(() => splash.classList.add('hide'), 420);
-    setTimeout(() => splash.remove(), 950);
-  });
-});
 </script>
 
 </body>
