@@ -1,55 +1,75 @@
-const CACHE_NAME = "sdc-fitness-v2";
+const CACHE_NAME = 'sdc-training-v3';
+
 const APP_SHELL = [
-  "./index.html",
-  "./manifest.webmanifest",
-  "./icon-192.png",
-  "./icon-512.png"
+  './',
+  './index.html',
+  './manifest.webmanifest'
 ];
 
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL))
-  );
+self.addEventListener('install', event => {
   self.skipWaiting();
-});
 
-self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(APP_SHELL))
+      .catch(() => {})
   );
-  self.clients.claim();
 });
 
-self.addEventListener("fetch", event => {
-  const req = event.request;
-  if (req.method !== "GET") return;
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys =>
+        Promise.all(
+          keys
+            .filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+        )
+      )
+      .then(() => self.clients.claim())
+  );
+});
 
-  // Per le pagine HTML: forza sempre la rete e bypassa la cache HTTP del browser.
-  if (req.mode === "navigate") {
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const requestUrl = new URL(event.request.url);
+
+  if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(req, { cache: "no-store" })
-        .then(resp => {
-          const copy = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy)).catch(() => {});
-          return resp;
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          const copy = response.clone();
+
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put('./index.html', copy));
+
+          return response;
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(() => caches.match('./index.html'))
     );
+
     return;
   }
 
-  // Per gli altri file: rete prima, cache offline come fallback.
-  event.respondWith(
-    fetch(req, { cache: "reload" })
-      .then(resp => {
-        if (resp && resp.ok) {
-          const copy = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
-        }
-        return resp;
-      })
-      .catch(() => caches.match(req))
-  );
+  if (requestUrl.origin === self.location.origin) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          const copy = response.clone();
+
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, copy));
+
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  }
+});
+
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
