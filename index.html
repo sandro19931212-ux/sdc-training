@@ -1462,6 +1462,36 @@ input:focus,select:focus,textarea:focus{
   }
 }
 
+
+
+/* ===== STORICO PESO CLIENTE ===== */
+.weight-history-summary{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0;
+}
+.weight-history-stat{
+  padding:14px;border-radius:18px;border:1px solid rgba(var(--theme-accent-rgb),.30);
+  background:linear-gradient(155deg,var(--theme-surface-2),var(--theme-surface));
+}
+.weight-history-stat b{display:block;font-size:25px;line-height:1.05;margin-bottom:5px}
+.weight-history-stat span{font-size:11px;color:var(--muted)}
+.weight-history-list{display:grid;gap:8px;margin-top:12px}
+.weight-history-row{
+  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+  padding:13px 14px;border-radius:17px;border:1px solid rgba(var(--theme-accent-rgb),.22);
+  background:linear-gradient(155deg,var(--theme-surface-2),var(--theme-surface));
+}
+.weight-history-row strong{display:block;font-size:17px}
+.weight-history-row small{display:block;color:var(--muted);margin-top:3px}
+.weight-delta{font-size:12px;font-weight:900;padding:6px 9px;border-radius:999px;white-space:nowrap}
+.weight-delta.down{color:#9df0c7;background:rgba(88,231,166,.10);border:1px solid rgba(88,231,166,.20)}
+.weight-delta.up{color:#ffb4c0;background:rgba(255,102,127,.10);border:1px solid rgba(255,102,127,.20)}
+.weight-delta.same{color:#b8c6d9;background:rgba(150,170,200,.08);border:1px solid rgba(150,170,200,.16)}
+.weight-history-add{width:100%;margin-top:14px;min-height:46px}
+@media(max-width:480px){
+  .weight-history-stat b{font-size:22px}
+  .weight-history-row{padding:12px}
+}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -2608,15 +2638,51 @@ async function updateExerciseLoad(exId,val){
   }
 }
 
+function clientWeightHistory(){
+  const c=db.clients.find(x=>String(x.id)===String(session.userId)); if(!c)return;
+  const list=db.weights
+    .filter(x=>String(x.clientId)===String(c.id))
+    .slice()
+    .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+
+  const latest=list.length?Number(list[list.length-1].weight):null;
+  const first=list.length?Number(list[0].weight):null;
+  const totalChange=(Number.isFinite(latest)&&Number.isFinite(first))?latest-first:null;
+  const changeText=totalChange==null?'—':`${totalChange>0?'+':''}${totalChange.toFixed(1)} kg`;
+
+  const rows=list.length?list.slice().reverse().map((x,reverseIndex)=>{
+    const originalIndex=list.length-1-reverseIndex;
+    const current=Number(x.weight);
+    const previous=originalIndex>0?Number(list[originalIndex-1].weight):null;
+    const delta=(Number.isFinite(current)&&Number.isFinite(previous))?current-previous:null;
+    const deltaClass=delta==null||Math.abs(delta)<0.0001?'same':delta<0?'down':'up';
+    const deltaText=delta==null?'Prima misura':Math.abs(delta)<0.0001?'0.0 kg':`${delta>0?'+':''}${delta.toFixed(1)} kg`;
+    return `<div class="weight-history-row">
+      <div><strong>${esc(x.weight)} kg</strong><small>${fmtDate(x.date)}</small></div>
+      <div class="weight-delta ${deltaClass}">${deltaText}</div>
+    </div>`;
+  }).join(''):`<div class="card empty">Non hai ancora registrato nessun peso.</div>`;
+
+  show(`<div class="sectionhead"><div><div class="page-kicker">Progressi</div><h2>Storico peso</h2></div></div>
+    <div class="page-sub">Qui trovi tutte le misurazioni registrate nel tempo.</div>
+    <div class="weight-history-summary">
+      <div class="weight-history-stat"><b>${latest==null?'—':esc(latest.toFixed(1))+' kg'}</b><span>Peso attuale</span></div>
+      <div class="weight-history-stat"><b>${changeText}</b><span>Variazione totale</span></div>
+    </div>
+    <div class="weight-history-list">${rows}</div>
+    <button class="btn blue weight-history-add" onclick="clientWeightForm()">＋ Aggiungi peso</button>
+    <div class="actions"><button class="btn" onclick="closeModal()">Chiudi</button></div>`);
+}
+
 function clientWeightForm(){
-  const c=db.clients.find(x=>x.id===session.userId); if(!c)return;
-  const existing=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const c=db.clients.find(x=>String(x.id)===String(session.userId)); if(!c)return;
+  const existing=db.weights.filter(x=>String(x.clientId)===String(c.id)).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const last=existing.length?existing[existing.length-1].weight:'';
   show(`<h2>Aggiorna il tuo peso</h2>
     <div class="page-sub">Inserisci il peso attuale. Verrà aggiunto al tuo storico.</div>
     <label>Data</label><input id="clientWeightDate" type="date" value="${new Date().toISOString().slice(0,10)}">
     <label>Peso (kg)</label><input id="clientWeightValue" type="number" inputmode="decimal" step="0.1" min="20" max="400" placeholder="Es. 78.5" value="${esc(last)}">
-    <div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveClientWeight()">Salva peso</button></div>`);
+    <div class="actions"><button class="btn" onclick="clientWeightHistory()">Indietro</button><button class="btn blue" onclick="saveClientWeight()">Salva peso</button></div>`);
   setTimeout(()=>document.getElementById('clientWeightValue')?.focus(),50);
 }
 
@@ -2638,7 +2704,7 @@ async function saveClientWeight(){
     });
     if(error) throw error;
     db.weights.push({id:weightId,clientId:String(c.id),supabaseUserId:session.supabaseUserId,date,weight:String(value)});
-    save();closeModal();render();
+    save();render();clientWeightHistory();
   }catch(err){
     alert('Errore salvataggio peso: '+(err.message||err));
   }
@@ -2708,7 +2774,7 @@ function client(){
       <div class="metric-board client-dashboard-metrics">
         <div class="metric-box photo-quick" onclick="openPhotoHistory('${c.id}',false)"><b>▣</b><span>Check Foto</span></div>
         <div class="metric-box" onclick="setPage('appuntamenti')"><b>${appointments.length}</b><span>Appuntamenti</span></div>
-        <div class="metric-box" onclick="clientWeightForm()" style="cursor:pointer"><b>${esc(latestWeight)}</b><span>Ultimo peso (kg)</span></div>
+        <div class="metric-box" onclick="clientWeightHistory()" style="cursor:pointer"><b>${esc(latestWeight)}</b><span>Ultimo peso (kg)</span></div>
         <div class="metric-box" onclick="setPage('pagamenti')"><b>${payments.filter(x=>String(x.status).toLowerCase()==='pagato').length}</b><span>Pagamenti</span></div>
       </div>
     </section>
@@ -2820,7 +2886,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
       const reg = await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
 
       const activateWaitingWorker = () => {
-        if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
+        if (reg.waiting) reg.waiting.postMessage("SKIP_WAITING");
       };
 
       activateWaitingWorker();
@@ -2830,7 +2896,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
         if (!worker) return;
         worker.addEventListener("statechange", () => {
           if (worker.state === "installed" && navigator.serviceWorker.controller) {
-            worker.postMessage({ type: "SKIP_WAITING" });
+            worker.postMessage("SKIP_WAITING");
           }
         });
       });
