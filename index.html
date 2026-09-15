@@ -1519,6 +1519,146 @@ input:focus,select:focus,textarea:focus{
   .weight-history-row{padding:12px}
 }
 
+
+
+/* ===== RIFINITURA GRAFICA FINALE — SDC FITNESS ===== */
+:root{
+  --ease-premium:cubic-bezier(.22,.8,.2,1);
+  --glass:rgba(6,12,22,.78);
+}
+
+html{-webkit-tap-highlight-color:transparent}
+body{overscroll-behavior-y:none}
+button,.metric-box,.card,.more-action-card,.row,.day-tab,.nav-btn{
+  -webkit-user-select:none;user-select:none;
+}
+button,.metric-box,.more-action-card,.day-tab,.nav-btn,.photo-card{
+  transition:transform .18s var(--ease-premium),border-color .18s ease,box-shadow .18s ease,opacity .18s ease,background .22s ease!important;
+}
+button:active,.metric-box:active,.more-action-card:active,.day-tab:active,.photo-card:active{
+  transform:scale(.975)!important;
+}
+
+/* Header più compatto e “native” */
+.top{
+  backdrop-filter:blur(22px) saturate(135%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(135%)!important;
+  box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 -1px rgba(255,255,255,.02)!important;
+}
+
+/* Card con profondità più uniforme */
+.page-head,.card,.info-card,.metric-box,.more-action-card,.photo-card,.scheme-hero{
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.card,.info-card,.metric-box,.more-action-card,.photo-card{
+  box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+.metric-box:hover,.more-action-card:hover,.photo-card:hover{
+  box-shadow:0 12px 32px rgba(0,0,0,.28),0 0 20px rgba(var(--theme-accent-rgb),.10)!important;
+}
+
+/* Titoli */
+.page-head h1,.section h2,.day-heading h3{
+  text-wrap:balance;
+}
+.page-head h1{letter-spacing:-.035em!important}
+.page-sub{line-height:1.5}
+
+/* Bottoni più pieni e coerenti */
+.btn,.mini-btn,.ghost-btn,.primary{
+  position:relative;overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.btn.blue,.mini-btn.blue,.primary{
+  box-shadow:0 8px 24px rgba(var(--theme-accent-rgb),.22),inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+.btn.blue:active,.mini-btn.blue:active,.primary:active{filter:brightness(.94)}
+
+/* Input più leggibili */
+input,select,textarea{
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease!important;
+}
+input::placeholder,textarea::placeholder{color:#65758b}
+
+/* Bottom nav: effetto floating app */
+.bottom{
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.62),0 0 24px rgba(var(--theme-accent-rgb),.13),inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.nav-btn .nav-ico{transition:transform .2s var(--ease-premium),box-shadow .2s ease,background .2s ease!important}
+.nav-btn.active .nav-ico{transform:translateY(-2px) scale(1.035)}
+.nav-btn:active .nav-ico{transform:scale(.92)!important}
+
+/* Pagine: entrata morbida */
+.client-page.active,.trainer-layout>*{
+  animation:sdcPageIn .28s var(--ease-premium) both;
+}
+@keyframes sdcPageIn{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:none}
+}
+
+/* Modali */
+.modal{animation:sdcFade .18s ease both}
+.modalbox{animation:sdcModalIn .24s var(--ease-premium) both}
+@keyframes sdcFade{from{opacity:0}to{opacity:1}}
+@keyframes sdcModalIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+
+/* Foto */
+.photo-card img{transition:transform .35s var(--ease-premium),filter .25s ease}
+.photo-card:hover img{transform:scale(1.015)}
+.compare-grid img{box-shadow:0 12px 28px rgba(0,0,0,.32)}
+
+/* Scheda */
+.exercise-row{transition:border-color .18s ease,box-shadow .18s ease,transform .18s var(--ease-premium)!important}
+.exercise-row:focus-within{border-color:rgba(var(--theme-accent-rgb),.9)!important;box-shadow:0 0 18px rgba(var(--theme-accent-rgb),.20)!important}
+.day-tab.active{transform:translateY(-1px)}
+
+/* Scrollbar discreta */
+*{scrollbar-width:thin;scrollbar-color:rgba(var(--theme-accent-rgb),.35) transparent}
+*::-webkit-scrollbar{width:6px;height:6px}
+*::-webkit-scrollbar-thumb{background:rgba(var(--theme-accent-rgb),.35);border-radius:999px}
+*::-webkit-scrollbar-track{background:transparent}
+
+/* Splash iniziale */
+#sdcSplash{
+  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+  background:
+    radial-gradient(circle at 50% 38%,rgba(var(--theme-accent-rgb),.18),transparent 28%),
+    #000;
+  transition:opacity .42s ease,visibility .42s ease;
+}
+#sdcSplash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.sdc-splash-inner{text-align:center;animation:sdcSplashIn .6s var(--ease-premium) both}
+.sdc-splash-logo{
+  font-family:Georgia,"Times New Roman",serif;font-size:72px;font-weight:800;font-style:italic;line-height:.9;
+  background:linear-gradient(145deg,#d8f7ff 0%,var(--theme-accent) 38%,#145dff 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 16px rgba(var(--theme-accent-rgb),.40));
+}
+.sdc-splash-name{margin-top:8px;font-weight:900;font-size:22px;letter-spacing:.06em;color:#f4f8ff}
+.sdc-splash-sub{margin-top:7px;font-size:9px;letter-spacing:.34em;color:#6e91bc;text-transform:uppercase}
+.sdc-splash-line{width:74px;height:2px;border-radius:999px;margin:20px auto 0;background:linear-gradient(90deg,transparent,var(--theme-accent),transparent);animation:sdcPulse 1.15s ease-in-out infinite}
+@keyframes sdcSplashIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes sdcPulse{0%,100%{opacity:.35;transform:scaleX(.72)}50%{opacity:1;transform:scaleX(1)}}
+
+/* Mobile polish */
+@media(max-width:480px){
+  .wrap{padding-left:11px!important;padding-right:11px!important}
+  .page-head{border-radius:24px!important}
+  .card,.info-card,.metric-box,.more-action-card{border-radius:20px!important}
+  .bottom{bottom:8px!important;left:8px!important;right:8px!important}
+  .nav-btn .nav-label{letter-spacing:-.01em}
+  .modal{align-items:end!important;padding:10px!important}
+  .modalbox{width:100%!important;border-radius:26px 26px 20px 20px!important;max-height:88vh!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -1531,6 +1671,15 @@ input:focus,select:focus,textarea:focus{
 
 </head>
 <body>
+<div id="sdcSplash" aria-hidden="true">
+  <div class="sdc-splash-inner">
+    <div class="sdc-splash-logo">S</div>
+    <div class="sdc-splash-name">SDC FITNESS</div>
+    <div class="sdc-splash-sub">Allena il tuo potenziale</div>
+    <div class="sdc-splash-line"></div>
+  </div>
+</div>
+
 <section id="login" class="login">
   <div class="loginbox">
     <div class="login-logo-wrap">
@@ -3030,6 +3179,16 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
     }
   });
 }
+
+// Rifinitura grafica: splash iniziale breve, senza rallentare l'app.
+window.addEventListener('load', () => {
+  const splash = document.getElementById('sdcSplash');
+  if (!splash) return;
+  requestAnimationFrame(() => {
+    setTimeout(() => splash.classList.add('hide'), 420);
+    setTimeout(() => splash.remove(), 950);
+  });
+});
 </script>
 
 </body>
