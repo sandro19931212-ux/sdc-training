@@ -1839,7 +1839,15 @@ function openThemeSettings(){
 
 function ensureDataShape(){
   db.clients=db.clients||[];db.workouts=db.workouts||[];db.payments=db.payments||[];db.appointments=db.appointments||[];db.weights=db.weights||[];db.workoutArchives=db.workoutArchives||[];
-  db.workouts=db.workouts.map(w=>({...w,day:w.day||"Giorno 1",load:w.load??""}));
+  {
+  const counters={};
+  db.workouts=db.workouts.map(w=>{
+    const day=w.day||"Giorno 1";
+    const key=String(w.clientId||'')+'|'+day;
+    counters[key]=(counters[key]||0)+1;
+    return {...w,day,load:w.load??"",position:Number(w.position)||counters[key]};
+  });
+}
   save();
 }
 ensureDataShape();
@@ -1950,11 +1958,13 @@ async function syncClientsFromSupabase(){
 
 async function syncWorkoutsFromSupabase(clientId=null){
   const workoutSelect=session?.role==='client'
-    ? 'id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,note,created_at,updated_at'
-    : 'id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,created_at,updated_at';
+    ? 'id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,note,position,created_at,updated_at'
+    : 'id,client_id,client_user_id,title,day,exercise,sets,reps,rest,load,position,created_at,updated_at';
   let query=sb
     .from('workouts')
     .select(workoutSelect)
+    .order('day',{ascending:true})
+    .order('position',{ascending:true})
     .order('created_at',{ascending:true});
   if(clientId) query=query.eq('client_id',String(clientId));
   const {data,error}=await query;
@@ -1971,7 +1981,8 @@ async function syncWorkoutsFromSupabase(clientId=null){
     reps:w.reps==null?'':String(w.reps),
     rest:w.rest==null?'':String(w.rest),
     load:w.load==null?'':String(w.load),
-    note:session?.role==='client'?(w.note==null?'':String(w.note)):''
+    note:session?.role==='client'?(w.note==null?'':String(w.note)):'',
+    position:Number(w.position)||9999
   }));
 
   if(clientId){
@@ -2011,6 +2022,7 @@ async function saveWorkoutsToSupabase(clientId){
     reps:String(w.reps??''),
     rest:String(w.rest??''),
     load:String(w.load??''),
+    position:Number(w.position)||9999,
     ...(session?.role==='client'?{note:String(w.note??'')} : {}),
     updated_at:new Date().toISOString()
   }));
@@ -2516,7 +2528,7 @@ async function archiveCurrentWorkout(cid,reason='Nuova scheda'){
     title:current[0]?.title||'Allenamento',
     archivedAt:new Date().toISOString(),
     workouts:current.map(w=>({
-      title:w.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'',reps:w.reps||'',rest:w.rest||'',load:w.load??'',note:w.note||''
+      title:w.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'',reps:w.reps||'',rest:w.rest||'',load:w.load??'',note:w.note||'',position:Number(w.position)||9999
     }))
   };
   const {error}=await sb.from('workout_archives').insert({
@@ -2604,7 +2616,7 @@ async function reuseWorkoutArchive(archiveId){
     await saveWorkoutsToSupabase(c.id);
     await archiveCurrentWorkout(c.id,'Riutilizzo scheda');
     const restored=(a.workouts||[]).map(w=>({
-      id:id('wo'),clientId:String(c.id),supabaseUserId:c.supabaseUserId||'',title:w.title||a.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'3',reps:w.reps||'10',rest:w.rest||'60',load:w.load??'',note:w.note||''
+      id:id('wo'),clientId:String(c.id),supabaseUserId:c.supabaseUserId||'',title:w.title||a.title||'Allenamento',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:w.sets||'3',reps:w.reps||'10',rest:w.rest||'60',load:w.load??'',note:w.note||'',position:Number(w.position)||9999
     }));
     db.workouts=[...db.workouts.filter(w=>String(w.clientId)!==String(c.id)),...restored];
     save();
@@ -2630,7 +2642,8 @@ function buildDefaultClientWorkouts(client){
         reps:'10',
         rest:'60',
         load:'',
-        note:''
+        note:'',
+        position:i
       });
     }
   });
@@ -2727,7 +2740,10 @@ function trainerInlineEdit(wid,field,val){
   w[field]=val;
 }
 function addTrainerInlineExercise(cid,day){
-  const item={id:id('wo'),clientId:cid,title:'Allenamento',exercise:'',day:day||'Giorno 1',load:'',sets:'3',reps:'10',rest:'60',note:''};
+  const targetDay=day||'Giorno 1';
+  const sameDay=db.workouts.filter(w=>String(w.clientId)===String(cid)&&(w.day||'Giorno 1')===targetDay);
+  const nextPosition=Math.max(0,...sameDay.map(w=>Number(w.position)||0))+1;
+  const item={id:id('wo'),clientId:cid,title:'Allenamento',exercise:'',day:targetDay,load:'',sets:'3',reps:'10',rest:'60',note:'',position:nextPosition};
   db.workouts.push(item);
   openClient(cid,true);
   setTimeout(()=>{
@@ -2795,7 +2811,7 @@ async function openClient(cid,skipSync=false){
   const appList=db.appointments.filter(x=>x.clientId===cid);
   const pay=db.payments.filter(x=>x.clientId===cid);
   const trainerDay=(window.__trainerClientDay&&DAYS.includes(window.__trainerClientDay))?window.__trainerClientDay:'Giorno 1';
-  const dayExercises=w.filter(x=>x.day===trainerDay);
+  const dayExercises=w.filter(x=>x.day===trainerDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
   showSheetPage(`<div class="sectionhead"><div><div class="page-kicker">Scheda cliente</div><h2>${esc(c.name)}</h2><div class="page-sub">${esc(c.email)}</div></div></div>
     <section class="scheme-hero" style="margin-top:12px">
       <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day}</button>`).join('')}</div>
@@ -3197,7 +3213,7 @@ function client(){
   const weightList=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const latestWeight=weightList.length?weightList[weightList.length-1].weight:'—';
   const currentDay=session.clientDay&&DAYS.includes(session.clientDay)?session.clientDay:'Giorno 1';
-  const dayExercises=workouts.filter(x=>x.day===currentDay);
+  const dayExercises=workouts.filter(x=>x.day===currentDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
   const currentProgram=workouts[0]?.title||'Scheda attiva';
   const progressCount=weightList.length;
 
