@@ -3018,20 +3018,38 @@ async function savePayment(){
   }
 }
 
-async function updateExerciseLoad(exId,val){
-  const previous=db.workouts.find(x=>String(x.id)===String(exId))?.load??'';
-  db.workouts=db.workouts.map(x=>String(x.id)===String(exId)?{...x,load:val}:x);
+const exerciseLoadSaveTimers={};
+
+function queueExerciseLoadSave(exId,val){
+  db.workouts=db.workouts.map(x=>String(x.id)===String(exId)?{...x,load:String(val??'')}:x);
   save();
+  if(session?.role!=='client') return;
+
+  clearTimeout(exerciseLoadSaveTimers[exId]);
+  exerciseLoadSaveTimers[exId]=setTimeout(()=>updateExerciseLoad(exId,val),500);
+}
+
+async function updateExerciseLoad(exId,val){
   if(session?.role!=='client') return;
   try{
     const payload={load:String(val??''),updated_at:new Date().toISOString()};
-    let q=sb.from('workouts').update(payload).eq('id',String(exId));
-    if(session?.supabaseUserId) q=q.eq('client_user_id',session.supabaseUserId);
-    const {error}=await q;
+    let q=sb.from('workouts')
+      .update(payload)
+      .eq('id',String(exId));
+
+    if(session?.supabaseUserId){
+      q=q.eq('client_user_id',session.supabaseUserId);
+    }
+
+    const {data,error}=await q.select('id,load');
     if(error) throw error;
-  }catch(err){
-    db.workouts=db.workouts.map(x=>String(x.id)===String(exId)?{...x,load:previous}:x);
+    if(!data || !data.length){
+      throw new Error('Il peso non è stato salvato sul server. Controllare i permessi Supabase.');
+    }
+
+    db.workouts=db.workouts.map(x=>String(x.id)===String(exId)?{...x,load:String(data[0].load??'')}:x);
     save();
+  }catch(err){
     alert('Errore salvataggio peso: '+(err.message||err));
     try{await syncWorkoutsFromSupabase(session.userId);}catch(e){console.warn(e);}
     render();
@@ -3213,7 +3231,7 @@ function client(){
           <div class="ex-cell ex-sets">${esc(ex.sets)}</div>
           <div class="ex-cell">${esc(ex.reps)}</div>
           <div class="ex-cell">${fmtRest(ex.rest)}</div>
-          <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" onchange="updateExerciseLoad('${ex.id}',this.value)"></div>
+          <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="queueExerciseLoadSave('${ex.id}',this.value)" onblur="updateExerciseLoad('${ex.id}',this.value)"></div>
         </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${currentDay}.</div>`}
       </div>
     </section>
