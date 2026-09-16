@@ -705,6 +705,59 @@ input:focus,select:focus,textarea:focus{border-color:#29a6ff;box-shadow:0 0 0 3p
 }
 
 
+
+/* ===== RIORDINO ESERCIZI TRAINER CON TRASCINAMENTO ===== */
+.trainer-inline-row .trainer-drag-handle{
+  position:absolute!important;
+  left:5px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  width:24px!important;
+  height:34px!important;
+  min-width:24px!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:10px!important;
+  background:rgba(var(--theme-accent-rgb),.10)!important;
+  color:var(--theme-accent)!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:18px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  z-index:18!important;
+  touch-action:none!important;
+  cursor:grab!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+.trainer-inline-row .trainer-drag-handle:active{cursor:grabbing!important}
+.trainer-inline-row .inline-name textarea{
+  padding-left:34px!important;
+}
+.trainer-inline-row.trainer-dragging{
+  opacity:.72!important;
+  transform:scale(.985)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.28)!important;
+  z-index:30!important;
+}
+.trainer-live-sheet.trainer-is-dragging .trainer-inline-row:not(.trainer-dragging){
+  transition:transform .12s ease!important;
+}
+@media(max-width:480px){
+  .trainer-inline-row .trainer-drag-handle{
+    left:4px!important;
+    width:22px!important;
+    min-width:22px!important;
+    height:32px!important;
+    font-size:17px!important;
+  }
+  .trainer-inline-row .inline-name textarea{
+    padding-left:31px!important;
+  }
+}
+
 /* Salva + Esci */
 .trainer-save-exit{
   display:grid!important;
@@ -2739,6 +2792,76 @@ function trainerInlineEdit(wid,field,val){
   if(!w)return;
   w[field]=val;
 }
+
+let trainerDragState=null;
+
+function trainerSyncPositionsFromDOM(cid,day){
+  const rows=[...document.querySelectorAll('.trainer-live-sheet .trainer-inline-row[data-workout-id]')];
+  rows.forEach((row,index)=>{
+    const wid=row.dataset.workoutId;
+    const w=db.workouts.find(x=>
+      String(x.id)===String(wid) &&
+      String(x.clientId)===String(cid) &&
+      (x.day||'Giorno 1')===day
+    );
+    if(w) w.position=index+1;
+  });
+  save();
+}
+
+function trainerDragStart(ev,cid,day,wid){
+  if(ev.button!==undefined && ev.button!==0)return;
+  const handle=ev.currentTarget;
+  const row=handle.closest('.trainer-inline-row');
+  const table=row?.closest('.trainer-live-sheet');
+  if(!row||!table)return;
+
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  trainerDragState={row,table,cid:String(cid),day:String(day),wid:String(wid),pointerId:ev.pointerId};
+  row.classList.add('trainer-dragging');
+  table.classList.add('trainer-is-dragging');
+
+  try{handle.setPointerCapture(ev.pointerId);}catch(e){}
+  document.addEventListener('pointermove',trainerDragMove,{passive:false});
+  document.addEventListener('pointerup',trainerDragEnd,{passive:false});
+  document.addEventListener('pointercancel',trainerDragEnd,{passive:false});
+}
+
+function trainerDragMove(ev){
+  const s=trainerDragState;
+  if(!s)return;
+  ev.preventDefault();
+
+  const el=document.elementFromPoint(ev.clientX,ev.clientY);
+  const target=el?.closest?.('.trainer-inline-row[data-workout-id]');
+  if(!target||target===s.row||target.closest('.trainer-live-sheet')!==s.table)return;
+
+  const rect=target.getBoundingClientRect();
+  const before=ev.clientY < rect.top + rect.height/2;
+  if(before){
+    s.table.insertBefore(s.row,target);
+  }else{
+    s.table.insertBefore(s.row,target.nextSibling);
+  }
+  trainerSyncPositionsFromDOM(s.cid,s.day);
+}
+
+function trainerDragEnd(ev){
+  const s=trainerDragState;
+  if(!s)return;
+  ev?.preventDefault?.();
+
+  trainerSyncPositionsFromDOM(s.cid,s.day);
+  s.row.classList.remove('trainer-dragging');
+  s.table.classList.remove('trainer-is-dragging');
+  trainerDragState=null;
+
+  document.removeEventListener('pointermove',trainerDragMove);
+  document.removeEventListener('pointerup',trainerDragEnd);
+  document.removeEventListener('pointercancel',trainerDragEnd);
+}
 function addTrainerInlineExercise(cid,day){
   const targetDay=day||'Giorno 1';
   const sameDay=db.workouts.filter(w=>String(w.clientId)===String(cid)&&(w.day||'Giorno 1')===targetDay);
@@ -2817,7 +2940,8 @@ async function openClient(cid,skipSync=false){
       <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day}</button>`).join('')}</div>
       <div class="exercise-table trainer-live-sheet">
         <div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>
-        ${dayExercises.length?dayExercises.map(ex=>`<div class="exercise-row trainer-inline-row">
+        ${dayExercises.length?dayExercises.map(ex=>`<div class="exercise-row trainer-inline-row" data-workout-id="${ex.id}">
+          <button class="trainer-drag-handle" type="button" aria-label="Sposta esercizio" title="Trascina per spostare" onpointerdown="trainerDragStart(event,'${cid}','${trainerDay}','${ex.id}')">≡</button>
           <button class="mini-btn red trainer-inline-delete" onclick="deleteTrainerInlineExercise('${cid}','${ex.id}')" aria-label="Elimina">×</button>
           <div class="ex-name inline-name"><textarea rows="2" data-inline-name="${ex.id}" oninput="trainerInlineEdit('${ex.id}','exercise',this.value)">${esc(ex.exercise)}</textarea></div>
           <div class="ex-cell ex-sets inline-sets"><textarea rows="2" oninput="trainerInlineEdit('${ex.id}','sets',this.value)">${esc(ex.sets)}</textarea></div>
@@ -2827,7 +2951,7 @@ async function openClient(cid,skipSync=false){
         </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${trainerDay}.</div>`}
       </div>
       <button class="btn trainer-inline-add" onclick="addTrainerInlineExercise('${cid}','${trainerDay}')">＋ Aggiungi esercizio</button>
-      <div class="trainer-inline-hint">Tocca un campo e scrivi direttamente. Premi Salva quando hai finito.</div>
+      <div class="trainer-inline-hint">Tocca un campo per modificarlo. Tieni premuto ≡ e trascina per cambiare l’ordine. Premi Salva quando hai finito.</div>
     </section>
     <div class="trainer-bottom-actions direct-edit trainer-save-exit">
       <button class="btn blue trainer-save-btn" onclick="saveTrainerClientSheet('${cid}')">Salva</button>
