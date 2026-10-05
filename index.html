@@ -1701,30 +1701,57 @@ input::placeholder,textarea::placeholder{color:#65758b}
 <meta name="apple-mobile-web-app-title" content="SDC Fitness">
 
 
-<style id="sdc-rip-width-fix-v4">
-/* FIX DEFINITIVO RIPETIZIONI LUNGHE SU MOBILE */
+
+<style id="sdc-rip-width-fix-v5">
+/* RIPETIZIONI: spazio reale per valori tipo 15/20 su mobile */
 @media (max-width:480px){
   .exercise-head,
   .exercise-row,
   .app.scheda-focus .exercise-head,
   .app.scheda-focus .exercise-row{
-    grid-template-columns:minmax(0,2.45fr) 50px 68px 48px 60px!important;
+    grid-template-columns:minmax(0,1fr) 54px 76px 48px 64px!important;
   }
-  /* 3° div della riga = RIP */
-  .trainer-inline-row > .ex-cell:nth-of-type(3) input{
-    width:100%!important;
+
+  /* Cella RIP: terza colonna */
+  .trainer-inline-row > .reps-cell{
     min-width:0!important;
+    overflow:visible!important;
+    padding:0!important;
+  }
+  .trainer-inline-row .trainer-reps-input{
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
     max-width:100%!important;
-    font-size:11.5px!important;
-    letter-spacing:-.15px!important;
+    min-width:0!important;
+    height:56px!important;
+    min-height:56px!important;
+    margin:0!important;
+    padding:0 2px!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    text-align:center!important;
+    font-size:11px!important;
+    line-height:1!important;
+    letter-spacing:-.25px!important;
+    font-weight:900!important;
+    overflow:visible!important;
+  }
+  /* Anche nella vista cliente il testo RIP non deve tagliarsi */
+  .exercise-row > .ex-cell:nth-of-type(3){
+    min-width:0!important;
     padding-left:1px!important;
     padding-right:1px!important;
-    text-align:center!important;
+    font-size:12px!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
   }
 }
 </style>
+
 </head>
-<body>
+<body data-build="rip-v5">
 <section id="login" class="login">
   <div class="loginbox">
     <div class="login-logo-wrap">
@@ -2968,7 +2995,7 @@ async function openClient(cid,skipSync=false){
           <button class="mini-btn red trainer-inline-delete" onclick="deleteTrainerInlineExercise('${cid}','${ex.id}')" aria-label="Elimina">×</button>
           <div class="ex-name inline-name"><textarea rows="2" data-inline-name="${ex.id}" oninput="trainerInlineEdit('${ex.id}','exercise',this.value)">${esc(ex.exercise)}</textarea></div>
           <div class="ex-cell ex-sets inline-sets"><textarea rows="2" oninput="trainerInlineEdit('${ex.id}','sets',this.value)">${esc(ex.sets)}</textarea></div>
-          <div class="ex-cell"><input value="${esc(ex.reps)}" oninput="trainerInlineEdit('${ex.id}','reps',this.value)"></div>
+          <div class="ex-cell reps-cell"><input class="trainer-reps-input" value="${esc(ex.reps)}" oninput="trainerInlineEdit('${ex.id}','reps',this.value)"></div>
           <div class="ex-cell"><input value="${esc(ex.rest)}" oninput="trainerInlineEdit('${ex.id}','rest',this.value)"></div>
           <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="trainerInlineEdit('${ex.id}','load',this.value)"></div>
         </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${trainerDay}.</div>`}
@@ -3652,7 +3679,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 
   window.addEventListener("load", async () => {
     try {
-      const reg = await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
+      const reg = await navigator.serviceWorker.register("./sw.js?v=5", { updateViaCache: "none" });
 
       const activateWaitingWorker = () => {
         if (reg.waiting) reg.waiting.postMessage("SKIP_WAITING");
