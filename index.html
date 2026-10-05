@@ -214,7 +214,7 @@ label{display:block;font-size:12px;color:#b0c1d7;margin:14px 0 7px;letter-spacin
   .scheme-hero{padding:12px}
   .days-wrap{gap:6px}.day-tab{min-height:40px;font-size:11px;border-radius:16px}
   .day-heading h3{font-size:21px}.day-heading .motto{font-size:9px;letter-spacing:.22em}
-  .exercise-head,.exercise-row{grid-template-columns:minmax(0,2.7fr) 40px 36px 52px 64px}
+  .exercise-head,.exercise-row{grid-template-columns:minmax(0,2.45fr) 50px 68px 48px 60px}
   .exercise-head{font-size:8px;padding:0 6px}
   .exercise-row{min-height:52px;border-radius:20px}
   .ex-name{padding:0 10px;font-size:13.5px;line-height:1.06}
@@ -395,7 +395,7 @@ input:focus,select:focus,textarea:focus{border-color:#29a6ff;box-shadow:0 0 0 3p
 .ex-sets{padding:8px 6px;font-size:14px}
 @media (max-width:480px){
   .ex-sets{font-size:11px;padding:6px 4px}
-  .exercise-head,.exercise-row{grid-template-columns:minmax(0,2.35fr) 58px 38px 54px 64px}
+  .exercise-head,.exercise-row{grid-template-columns:minmax(0,2.45fr) 50px 68px 48px 60px}
   .exercise-row{min-height:60px}
   .ex-cell,.ex-load-inline{min-height:60px}
 }
@@ -533,7 +533,7 @@ input:focus,select:focus,textarea:focus{border-color:#29a6ff;box-shadow:0 0 0 3p
     font-size:11px;
   }
   .exercise-head,.exercise-row{
-    grid-template-columns:minmax(0,2.45fr) 56px 36px 52px 62px;
+    grid-template-columns:minmax(0,2.45fr) 50px 68px 48px 60px;
   }
 }
 
@@ -1321,7 +1321,7 @@ input:focus,select:focus,textarea:focus{
   }
   .app.scheda-focus .exercise-head,
   .app.scheda-focus .exercise-row{
-    grid-template-columns:minmax(0,2.75fr) 54px 54px 52px 64px!important;
+    grid-template-columns:minmax(0,2.45fr) 50px 68px 48px 60px!important;
   }
   .app.scheda-focus .exercise-row{
     min-height:60px!important;
@@ -1340,17 +1340,6 @@ input:focus,select:focus,textarea:focus{
     width:54px!important;
     height:28px!important;
     font-size:11px!important;
-  }
-}
-
-
-/* FIX RIP MOBILE: valori come 15/20, 12/15, 8/10 sempre leggibili */
-@media (max-width:480px){
-  .app.scheda-focus .trainer-inline-row .ex-cell:nth-of-type(3) input{
-    font-size:11.5px!important;
-    padding-left:1px!important;
-    padding-right:1px!important;
-    letter-spacing:-0.2px!important;
   }
 }
 
@@ -1712,17 +1701,25 @@ input::placeholder,textarea::placeholder{color:#65758b}
 <meta name="apple-mobile-web-app-title" content="SDC Fitness">
 
 
-<style id="fix-rip-column-v3">
-/* FIX DEFINITIVO MOBILE: allarga RIP, restringe REC mantenendo la larghezza totale */
+<style id="sdc-rip-width-fix-v4">
+/* FIX DEFINITIVO RIPETIZIONI LUNGHE SU MOBILE */
 @media (max-width:480px){
+  .exercise-head,
+  .exercise-row,
   .app.scheda-focus .exercise-head,
   .app.scheda-focus .exercise-row{
-    grid-template-columns:minmax(0,2.75fr) 50px 64px 46px 60px!important;
+    grid-template-columns:minmax(0,2.45fr) 50px 68px 48px 60px!important;
   }
-  .app.scheda-focus .trainer-inline-row > .ex-cell:nth-of-type(3) input{
+  /* 3° div della riga = RIP */
+  .trainer-inline-row > .ex-cell:nth-of-type(3) input{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
     font-size:11.5px!important;
+    letter-spacing:-.15px!important;
     padding-left:1px!important;
     padding-right:1px!important;
+    text-align:center!important;
   }
 }
 </style>
@@ -3744,20 +3741,5 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   border-color:var(--theme-accent)!important;
   box-shadow:0 0 0 2px rgba(var(--theme-accent-rgb),.11),0 0 14px rgba(var(--theme-accent-rgb),.16)!important;
   outline:none!important;
-}
-
-
-/* ===== FIX RIPETIZIONI LUNGHE (es. 15/20) SU MOBILE ===== */
-@media (max-width:480px){
-  .app.scheda-focus .exercise-head,
-  .app.scheda-focus .exercise-row{
-    grid-template-columns:minmax(0,2.55fr) 56px 52px 56px 68px!important;
-  }
-  .app.scheda-focus .trainer-inline-row .ex-cell input{
-    font-size:12px!important;
-    padding-left:1px!important;
-    padding-right:1px!important;
-    letter-spacing:0!important;
-  }
 }
 </style>
