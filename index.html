@@ -3719,4 +3719,19 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   box-shadow:0 0 0 2px rgba(var(--theme-accent-rgb),.11),0 0 14px rgba(var(--theme-accent-rgb),.16)!important;
   outline:none!important;
 }
+
+
+/* ===== FIX RIPETIZIONI LUNGHE (es. 15/20) SU MOBILE ===== */
+@media (max-width:480px){
+  .app.scheda-focus .exercise-head,
+  .app.scheda-focus .exercise-row{
+    grid-template-columns:minmax(0,2.55fr) 56px 52px 56px 68px!important;
+  }
+  .app.scheda-focus .trainer-inline-row .ex-cell input{
+    font-size:12px!important;
+    padding-left:1px!important;
+    padding-right:1px!important;
+    letter-spacing:0!important;
+  }
+}
 </style>
