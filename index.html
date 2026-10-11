@@ -2430,6 +2430,39 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 .modal.sheet-page-mode{background:var(--sdc-bg)!important}.modal.sheet-page-mode .modalbox{background:var(--sdc-bg)!important;border:0!important;box-shadow:none!important;max-width:720px!important;padding:20px 16px 120px!important}.sdc-trainer-sheet-head{padding:2px 2px 2px}.sdc-trainer-sheet-head .page-kicker{font-size:9px!important;color:var(--sdc-yellow)!important;margin-bottom:7px}.sdc-trainer-sheet-head h2{margin:0;font-size:30px;line-height:1.05;letter-spacing:-.035em}.sdc-trainer-sheet-head .page-sub{margin-top:7px;color:#9DA1A5!important}.sdc-program-tabs.trainer-tabs{margin-top:18px}
 .sdc-trainer-list{display:grid!important;gap:10px!important;counter-reset:sdctrainer}.sdc-trainer-card{counter-increment:sdctrainer;position:relative!important;display:block!important;overflow:visible!important;min-height:112px!important;padding:13px 42px 12px 55px!important;border-radius:18px!important;border:1px solid rgba(255,255,255,.075)!important;background:linear-gradient(150deg,#1D2023,#171A1C)!important;box-shadow:0 10px 22px rgba(0,0,0,.13)!important}.sdc-trainer-card::before{content:counter(sdctrainer);position:absolute;left:13px;top:14px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sdc-yellow);color:#171717;font-size:12px;font-weight:950}.sdc-trainer-name textarea{min-height:37px!important;height:auto!important;border:0!important;background:transparent!important;padding:2px 0!important;box-shadow:none!important;color:white!important;text-align:left!important;font-size:15px!important;font-weight:850!important;line-height:1.12!important;resize:none!important}.sdc-trainer-card>div{border-left:0!important}.sdc-trainer-metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important;margin-top:8px!important}.sdc-edit-field{display:block!important;margin:0!important;padding:0!important;text-transform:none!important;letter-spacing:0!important;border:0!important;text-align:center!important}.sdc-edit-field>span{display:block!important;margin-bottom:4px;color:#7F8488;font-size:7px;font-weight:900;letter-spacing:.1em}.sdc-edit-field input,.sdc-edit-field textarea{width:100%!important;max-width:none!important;height:32px!important;min-height:32px!important;margin:0!important;padding:4px!important;border-radius:9px!important;border:1px solid rgba(255,255,255,.075)!important;background:#24272A!important;box-shadow:none!important;color:#F2F2EF!important;text-align:center!important;font-size:10.5px!important;font-weight:800!important;resize:none!important}.sdc-trainer-card .trainer-drag-handle{left:auto!important;right:7px!important;top:43px!important;transform:none!important;width:27px!important;height:34px!important;border:1px solid rgba(var(--theme-accent-rgb),.18)!important;border-radius:9px!important;background:rgba(var(--theme-accent-rgb),.065)!important;color:var(--sdc-yellow)!important;font-size:16px!important}.sdc-trainer-card .trainer-inline-delete{top:-6px!important;right:-5px!important;width:21px!important;height:21px!important;border-radius:50%!important;background:#2A2023!important;border:1px solid rgba(255,100,125,.40)!important;color:#FFB5C0!important}.trainer-inline-add{min-height:48px!important;border-radius:15px!important;border:1px dashed rgba(var(--theme-accent-rgb),.24)!important;background:rgba(var(--theme-accent-rgb),.035)!important;color:#EDEDE9!important}.trainer-inline-hint{color:#777D82!important;font-size:10px!important}.trainer-bottom-actions .btn{border-radius:14px!important}.trainer-save-btn{background:linear-gradient(180deg,var(--sdc-yellow-2),var(--sdc-yellow))!important;color:#151515!important;border-color:var(--sdc-yellow)!important}
 
+
+/* ===== BRAND SDC TRAINING NELLA HOME CLIENTE ===== */
+.sdc-client-home-brand{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin:0 2px 18px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,.055);
+}
+.sdc-client-home-brand .sdc-client-brand-sdc{
+  font-size:30px;
+  line-height:.9;
+  font-weight:1000;
+  font-style:italic;
+  letter-spacing:-2.5px;
+  color:var(--sdc-yellow);
+  text-shadow:0 0 18px rgba(var(--theme-accent-rgb),.10);
+}
+.sdc-client-home-brand .sdc-client-brand-training{
+  font-size:10px;
+  line-height:1;
+  font-weight:500;
+  letter-spacing:.34em;
+  padding-left:.34em;
+  color:#F2F2EF;
+}
+@media(max-width:480px){
+  .sdc-client-home-brand{margin-bottom:16px;padding-bottom:11px}
+  .sdc-client-home-brand .sdc-client-brand-sdc{font-size:28px}
+  .sdc-client-home-brand .sdc-client-brand-training{font-size:9px}
+}
+
 /* COMPONENTI SECONDARI */
 .page-head,.card,.info-card,.metric-box,.row,.modalbox,.more-action-card,.session-summary-card,.workout-timer-card,.circuit-result-card,.circuit-stopwatch-card,.circuit-client-rounds,.circuit-topbar{background:#191C1F!important;border-color:var(--sdc-line)!important;box-shadow:0 10px 24px rgba(0,0,0,.12)!important}.page-head{border-radius:20px!important}.page-kicker{color:var(--sdc-yellow)!important}.page-sub,.subtle-note{color:#9DA1A5!important}.more-symbol{color:var(--sdc-yellow)!important;border-color:rgba(var(--theme-accent-rgb),.18)!important;background:rgba(var(--theme-accent-rgb),.06)!important}.btn.blue,.mini-btn.blue,.primary{background:linear-gradient(180deg,var(--sdc-yellow-2),var(--sdc-yellow))!important;color:#151515!important;border-color:var(--sdc-yellow)!important;box-shadow:none!important}.btn,.mini-btn,.ghost-btn,input,select,textarea{border-color:rgba(255,255,255,.09)!important}.badge{color:var(--sdc-yellow)!important;border-color:rgba(var(--theme-accent-rgb),.18)!important;background:rgba(var(--theme-accent-rgb),.06)!important}
 
@@ -4700,6 +4733,7 @@ function client(){
 
   const dashboard=`
     <section class="sdc-client-home">
+      <div class="sdc-client-home-brand" aria-label="SDC Training"><span class="sdc-client-brand-sdc">SDC</span><span class="sdc-client-brand-training">TRAINING</span></div>
       <div class="sdc-client-home-head">
         <div><span class="sdc-greeting-kicker">CIAO,</span><h1>${esc(c.name.split(' ')[0])}</h1><div class="sdc-greeting-line"></div><p>Benvenuto nel tuo percorso</p></div>
         <div class="sdc-client-head-actions"><button class="sdc-notify-btn" type="button" aria-label="Notifiche">${NAV_SVGS.bell}</button><button class="sdc-client-logout-btn" type="button" onclick="logout()">Esci</button></div>
