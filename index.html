@@ -2498,6 +2498,73 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 .sdc-day-title-editor input{height:42px!important;padding:9px 12px!important;border-radius:12px!important;border:1px solid rgba(var(--theme-primary-rgb),.24)!important;background:#1C1F21!important;color:#F5F5F2!important;font-size:14px!important;font-weight:800!important;box-shadow:none!important}
 .sdc-day-title-editor input:focus{border-color:rgba(var(--theme-primary-rgb),.58)!important;box-shadow:0 0 0 2px rgba(var(--theme-primary-rgb),.08)!important}
 </style>
+
+<style id="sdc-client-sheet-ux-fix-v2">
+/* SOLO: valori più leggibili, un solo tipo scheda visibile, freccia apribile */
+.sdc-program-tabs.single{grid-template-columns:1fr!important}
+.sdc-program-tabs.single span.active{width:100%!important}
+
+.sdc-client-ex-meta{font-size:14px!important;gap:8px!important}
+.sdc-client-ex-meta span{font-size:14px!important}
+.sdc-client-ex-meta span b{font-size:15.5px!important;font-weight:850!important;line-height:1!important}
+.sdc-client-ex-meta label em{font-size:12.5px!important;font-weight:700!important}
+.sdc-client-ex-meta input{
+  width:60px!important;
+  height:32px!important;
+  min-height:32px!important;
+  padding:3px 5px!important;
+  font-size:14.5px!important;
+  font-weight:850!important;
+  border-radius:10px!important;
+}
+.sdc-client-chevron{
+  position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important;
+  width:34px!important;height:46px!important;padding:0!important;margin:0!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  color:#D2D3D0!important;font-size:32px!important;font-weight:300!important;line-height:1!important;
+  display:grid!important;place-items:center!important;z-index:3!important;
+}
+.sdc-client-chevron:active{color:var(--theme-accent)!important;transform:translateY(-50%) scale(.94)!important}
+
+.sdc-ex-detail-head{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:center;margin-bottom:16px}
+.sdc-ex-detail-head h2{margin:3px 0 0;font-size:27px;line-height:1.05;letter-spacing:-.025em}
+.sdc-ex-detail-back{width:40px;height:40px;border:0;background:transparent;color:#fff;font-size:38px;line-height:1;padding:0}
+.sdc-ex-detail-card{border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(150deg,#1D2023,#171A1C);padding:18px;box-shadow:0 12px 28px rgba(0,0,0,.16)}
+.sdc-ex-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sdc-ex-detail-grid>div{min-height:86px;border-radius:16px;background:#24272A;border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px}
+.sdc-ex-detail-grid>div>span,.sdc-ex-detail-note>span{color:#898E92;font-size:9px;font-weight:900;letter-spacing:.12em}
+.sdc-ex-detail-grid strong{margin-top:7px;color:#F5F5F2;font-size:24px;line-height:1;font-weight:900}
+.sdc-ex-detail-grid label{display:flex!important;align-items:center!important;gap:6px!important;margin:7px 0 0!important;text-transform:none!important;letter-spacing:0!important}
+.sdc-ex-detail-grid label input{width:88px!important;height:42px!important;min-height:42px!important;border-radius:12px!important;text-align:center!important;font-size:20px!important;font-weight:900!important}
+.sdc-ex-detail-grid label em{font-style:normal;color:#BFC2C4;font-size:13px}
+.sdc-ex-detail-grid.circuit-detail{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sdc-ex-detail-note{margin-top:12px;padding:14px;border-radius:16px;background:#24272A;border:1px solid rgba(255,255,255,.07)}
+.sdc-ex-detail-note p{margin:7px 0 0;color:#E3E4E1;line-height:1.45;font-size:14px}
+.sdc-ex-detail-actions{margin-bottom:0!important}
+@media(max-width:480px){
+  .sdc-client-ex-meta{font-size:13.5px!important;gap:7px!important}
+  .sdc-client-ex-meta span{font-size:13.5px!important}
+  .sdc-client-ex-meta span b{font-size:15px!important}
+  .sdc-client-ex-meta input{width:58px!important;height:31px!important;min-height:31px!important;font-size:14px!important}
+  .sdc-client-ex-card{padding-right:43px!important}
+  .sdc-client-chevron{right:7px!important;width:32px!important;font-size:30px!important}
+}
+</style>
+
+<style id="sdc-active-days-manager-v1">
+/* Gestione giorni scheda: solo trainer + visibilità giorni cliente */
+.trainer-days-manager{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(58px,1fr))!important;gap:7px!important;align-items:stretch!important}
+.trainer-day-slot{position:relative;min-width:0}
+.trainer-day-slot .day-tab{width:100%!important;padding-right:20px!important}
+.trainer-day-remove{position:absolute;top:-6px;right:-5px;width:20px;height:20px;min-width:20px;padding:0;border-radius:50%;border:1px solid rgba(255,100,125,.45);background:#2A2023;color:#FFB5C0;font-size:12px;font-weight:900;line-height:18px;display:grid;place-items:center;z-index:5}
+.trainer-add-day{min-width:0!important;min-height:38px!important;border-radius:12px!important;border:1px dashed rgba(var(--theme-primary-rgb),.30)!important;background:rgba(var(--theme-primary-rgb),.045)!important;color:var(--theme-accent)!important;font-size:10px!important;font-weight:900!important}
+.client-active-days{grid-template-columns:repeat(var(--active-day-count,5),minmax(0,1fr))!important}
+@media(max-width:480px){
+  .trainer-days-manager{grid-template-columns:repeat(auto-fit,minmax(52px,1fr))!important;gap:6px!important}
+  .trainer-day-remove{top:-5px;right:-4px;width:19px;height:19px;min-width:19px;font-size:11px}
+  .trainer-add-day{min-height:36px!important;font-size:9px!important}
+}
+</style>
 </head>
 
 <body data-build="sessions-v1">
@@ -4066,11 +4133,51 @@ function trainerSetDayWorkoutTitle(cid,day,value){
   }
 }
 
+function getWorkoutActiveDays(items){
+  const set=new Set((items||[]).map(w=>w.day||'Giorno 1'));
+  return DAYS.filter(day=>set.has(day));
+}
+
+function trainerAddWorkoutDay(cid){
+  const rows=db.workouts.filter(w=>String(w.clientId)===String(cid));
+  const active=getWorkoutActiveDays(rows);
+  const day=DAYS.find(d=>!active.includes(d));
+  if(!day)return alert('Hai già attivato tutti e 5 i giorni.');
+  const sample=rows[0];
+  const circuit=rows.find(isCircuitWorkout);
+  const title=circuit?.title || sample?.title || 'Allenamento';
+  const item={
+    id:id('wo'),clientId:String(cid),supabaseUserId:sample?.supabaseUserId||'',title,day,exercise:'',
+    sets:circuit?'':'3',reps:circuit?'10 REP':'10',rest:circuit?'':'60',load:'',note:'',position:1
+  };
+  db.workouts.push(item);
+  window.__trainerClientDay=day;
+  openClient(cid,true);
+  setTimeout(()=>{
+    const el=document.querySelector(`[data-inline-name="${item.id}"]`);
+    if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}
+  },80);
+}
+
+function trainerRemoveWorkoutDay(cid,day){
+  const rows=db.workouts.filter(w=>String(w.clientId)===String(cid)&&(w.day||'Giorno 1')===day);
+  if(!rows.length)return;
+  const active=getWorkoutActiveDays(db.workouts.filter(w=>String(w.clientId)===String(cid)));
+  if(active.length<=1)return alert('La scheda deve avere almeno un giorno attivo.');
+  if(!confirm(`Rimuovere ${day} e tutti gli esercizi di questo giorno?`))return;
+  db.workouts=db.workouts.filter(w=>!(String(w.clientId)===String(cid)&&(w.day||'Giorno 1')===day));
+  const remaining=getWorkoutActiveDays(db.workouts.filter(w=>String(w.clientId)===String(cid)));
+  if(window.__trainerClientDay===day) window.__trainerClientDay=remaining[0]||'Giorno 1';
+  openClient(cid,true);
+}
+
 async function openClient(cid,skipSync=false){
   const c=db.clients.find(x=>x.id===cid); if(!c)return;
   if(!skipSync){try{await syncWorkoutsFromSupabase(cid);}catch(e){console.warn('Sync scheda trainer:',e);}}
   const w=db.workouts.filter(x=>x.clientId===cid).map(x=>({...x,day:x.day||'Giorno 1',load:x.load??''}));
-  const trainerDay=(window.__trainerClientDay&&DAYS.includes(window.__trainerClientDay))?window.__trainerClientDay:'Giorno 1';
+  const trainerActiveDays=getWorkoutActiveDays(w);
+  const trainerDay=(window.__trainerClientDay&&trainerActiveDays.includes(window.__trainerClientDay))?window.__trainerClientDay:(trainerActiveDays[0]||'Giorno 1');
+  window.__trainerClientDay=trainerDay;
   const dayExercises=w.filter(x=>x.day===trainerDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
   const circuitMeta=circuitDayMeta(w,trainerDay);
   const trainerDayTitle=circuitMeta?.label || dayExercises[0]?.title || 'Allenamento';
@@ -4101,7 +4208,7 @@ async function openClient(cid,skipSync=false){
       <label class="sdc-day-title-editor"><span>Nome allenamento</span><input value="${esc(trainerDayTitle)}" placeholder="Es. Petto · Spalle" oninput="trainerSetDayWorkoutTitle('${cid}','${trainerDay}',this.value)"></label>
     </section>
     <section class="scheme-hero ${circuitMeta?'circuit-hero':''} sdc-trainer-sheet-body" style="margin-top:12px">
-      <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day.replace('Giorno ','G')}</button>`).join('')}</div>
+      <div class="days-wrap trainer-days-manager">${trainerActiveDays.map(day=>`<div class="trainer-day-slot"><button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day.replace('Giorno ','G')}</button><button type="button" class="trainer-day-remove" aria-label="Rimuovi ${day}" onclick="event.stopPropagation();trainerRemoveWorkoutDay('${cid}','${day}')">×</button></div>`).join('')}${trainerActiveDays.length<DAYS.length?`<button type="button" class="trainer-add-day" onclick="trainerAddWorkoutDay('${cid}')">＋ Giorno</button>`:''}</div>
       ${circuitMeta?`<div class="circuit-topbar"><div><span>ROUND</span><strong>${circuitMeta.rounds}</strong></div><label>Numero round<input type="number" min="1" max="99" value="${circuitMeta.rounds}" oninput="updateCircuitRounds('${cid}','${trainerDay}',this.value);this.closest('.circuit-topbar').querySelector('strong').textContent=this.value"></label></div>`:''}
       <div class="trainer-live-sheet sdc-trainer-list ${circuitMeta?'circuit-table':''}">${head}${rows}</div>
       <button class="btn trainer-inline-add" onclick="addTrainerInlineExercise('${cid}','${trainerDay}')">＋ Aggiungi esercizio</button>
@@ -4570,8 +4677,10 @@ function client(){
   const completedAppointments=appointments.filter(isCompletedAppointment).slice().reverse();
   const weightList=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const latestWeight=weightList.length?weightList[weightList.length-1].weight:'—';
-  const currentDay=session.clientDay&&DAYS.includes(session.clientDay)?session.clientDay:'Giorno 1';
-  const dayExercises=workouts.filter(x=>x.day===currentDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
+  const activeDays=getWorkoutActiveDays(workouts.filter(x=>String(x.exercise||'').trim()));
+  const currentDay=session.clientDay&&activeDays.includes(session.clientDay)?session.clientDay:(activeDays[0]||'Giorno 1');
+  if(session.clientDay!==currentDay){session.clientDay=currentDay;saveSession();}
+  const dayExercises=workouts.filter(x=>x.day===currentDay&&String(x.exercise||'').trim()).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
   const progressCount=weightList.length;
 
   const dashboard=`
@@ -4605,12 +4714,12 @@ function client(){
   const sheetHeader=`
     <section class="sdc-client-sheet-head">
       <div class="sdc-sheet-nav"><button type="button" onclick="setPage('dashboard')" aria-label="Indietro">‹</button><h1>Scheda</h1><span></span></div>
-      <div class="sdc-program-tabs"><span class="${!circuitMeta?'active':''}">Scheda Classica</span><span class="${circuitMeta?'active':''}">Circuito / Hyrox</span></div>
+      <div class="sdc-program-tabs single"><span class="active">${circuitMeta?'Circuito / Hyrox':'Scheda Classica'}</span></div>
       <div class="sdc-program-title"><h2>${esc(currentProgram)}</h2><p>${esc(currentDay)}</p></div>
     </section>`;
   const scheda=circuitMeta?`${sheetHeader}
     <section class="scheme-hero circuit-hero sdc-sheet-body">
-      <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day.replace('Giorno ','G')}</button>`).join('')}</div>
+      <div class="days-wrap client-active-days" style="--active-day-count:${Math.max(1,activeDays.length)}">${activeDays.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day.replace('Giorno ','G')}</button>`).join('')}</div>
       <div class="circuit-client-rounds"><span>ROUND</span><strong>${circuitMeta.rounds}</strong></div>
       <div class="exercise-table circuit-table">
         <div class="exercise-head circuit-head"><div class="h-name">Esercizio</div><div>REP / MT</div><div>Peso</div></div>
@@ -4624,7 +4733,7 @@ function client(){
       <div class="circuit-result-card"><label>Tempo totale per completare tutti i round</label><input id="circuitTotalTimeInput" class="circuit-time-input" value="${esc(circuitMeta.totalTime||'')}" placeholder="Es. 18:42" onblur="saveCircuitTotalTime('${c.id}','${currentDay}',this.value)"></div>
     </section>`:`${sheetHeader}
     <section class="scheme-hero sdc-sheet-body">
-      <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day.replace('Giorno ','G')}</button>`).join('')}</div>
+      <div class="days-wrap client-active-days" style="--active-day-count:${Math.max(1,activeDays.length)}">${activeDays.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day.replace('Giorno ','G')}</button>`).join('')}</div>
       <div class="sdc-client-list">
         ${dayExercises.length?dayExercises.map(ex=>`
         <div class="sdc-client-ex-card">
@@ -4634,7 +4743,7 @@ function client(){
             <span>${fmtRest(ex.rest)}</span><i></i>
             <label><input aria-label="Peso" type="number" step="0.5" value="${esc(ex.load||'')}" oninput="queueExerciseLoadSave('${ex.id}',this.value)" onblur="updateExerciseLoad('${ex.id}',this.value)"><em>kg</em></label>
           </div>
-          <span class="sdc-client-chevron" aria-hidden="true">›</span>
+          <button type="button" class="sdc-client-chevron" aria-label="Apri dettaglio ${esc(ex.exercise)}" onclick="openExerciseDetail('${ex.id}')">›</button>
         </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${currentDay}.</div>`}
       </div>
     </section>
@@ -4677,6 +4786,38 @@ function client(){
     {key:'appuntamenti',label:'Appuntamenti',img:ICONS.appointments,action:"setPage('appuntamenti')"},
     {key:'altro',label:'Altro',img:ICONS.more,action:"setPage('altro')"}
   ],navActive);
+}
+
+// ===== DETTAGLIO ESERCIZIO CLIENTE =====
+function openExerciseDetail(exId){
+  if(session?.role!=='client') return;
+  const ex=db.workouts.find(x=>String(x.id)===String(exId)&&String(x.clientId)===String(session.userId));
+  if(!ex)return alert('Esercizio non trovato.');
+  const circuit=isCircuitWorkout(ex);
+  const note=String(ex.note||'').trim();
+  showSheetPage(`
+    <section class="sdc-ex-detail-head">
+      <button type="button" class="sdc-ex-detail-back" onclick="closeModal()" aria-label="Indietro">‹</button>
+      <div><div class="page-kicker">Dettaglio esercizio</div><h2>${esc(ex.exercise||'Esercizio')}</h2></div>
+    </section>
+    <section class="sdc-ex-detail-card">
+      <div class="sdc-ex-detail-grid ${circuit?'circuit-detail':''}">
+        ${circuit?`
+          <div><span>REP / MT</span><strong>${esc(ex.reps||'—')}</strong></div>
+          <div><span>PESO</span><label><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="queueExerciseLoadSave('${ex.id}',this.value)" onblur="updateExerciseLoad('${ex.id}',this.value)"><em>kg</em></label></div>
+        `:`
+          <div><span>SERIE</span><strong>${esc(ex.sets||'—')}</strong></div>
+          <div><span>RIPETIZIONI</span><strong>${esc(ex.reps||'—')}</strong></div>
+          <div><span>RECUPERO</span><strong>${fmtRest(ex.rest)}</strong></div>
+          <div><span>PESO</span><label><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="queueExerciseLoadSave('${ex.id}',this.value)" onblur="updateExerciseLoad('${ex.id}',this.value)"><em>kg</em></label></div>
+        `}
+      </div>
+      ${note?`<div class="sdc-ex-detail-note"><span>NOTA</span><p>${esc(note)}</p></div>`:''}
+      <div class="actions sdc-ex-detail-actions">
+        <button class="btn" onclick="closeModal()">Indietro</button>
+        <button class="btn blue" onclick="openExerciseNote('${ex.id}')">${note?'Modifica nota':'Aggiungi nota'}</button>
+      </div>
+    </section>`);
 }
 
 // ===== NOTE ESERCIZIO =====
