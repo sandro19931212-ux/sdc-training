@@ -1358,7 +1358,7 @@ input:focus,select:focus,textarea:focus{
 .photo-compare-result .compare-grid>div{position:relative}
 .photo-compare-result .compare-label{font-size:12px;color:#d7eaff;margin-top:7px}
 .photo-compare-badge{position:absolute;top:9px;left:9px;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.18);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff}
-.photo-full-view{width:100%;max-height:72vh;object-fit:contain;border-radius:22px;background:#000;border:1px solid rgba(var(--theme-accent-rgb),.30)}
+.photo-full-view{width:100%;max-height:72vh;object-fit:contain;border-radius:22px;background:#000;border:1px solid rgba(var(--theme-accent-rgb),.30)}\n.photo-upload-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}\n.photo-upload-side{padding:12px;border-radius:18px;border:1px solid rgba(var(--theme-accent-rgb),.24);background:rgba(var(--theme-accent-rgb),.055)}\n.photo-upload-side strong{display:block;margin-bottom:6px;font-size:14px}\n.photo-upload-side small{display:block;color:var(--muted);font-size:10px;margin-bottom:8px}\n.photo-check-list{display:grid;gap:12px}\n.photo-check-card{padding:14px;border-radius:22px;border:1px solid rgba(var(--theme-accent-rgb),.26);background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface))}\n.photo-check-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}\n.photo-check-head strong{font-size:16px}.photo-check-head small{display:block;color:var(--muted);font-size:11px;margin-top:3px}\n.photo-pair-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}\n.photo-pair-item{position:relative;min-width:0}\n.photo-pair-item img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;background:#05070a;border:1px solid rgba(var(--theme-accent-rgb),.22);display:block}\n.photo-pair-label{position:absolute;top:8px;left:8px;padding:5px 8px;border-radius:999px;background:rgba(0,0,0,.72);font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}\n.photo-missing{aspect-ratio:3/4;border:1px dashed rgba(var(--theme-accent-rgb),.30);border-radius:16px;display:grid;place-items:center;text-align:center;padding:12px;color:var(--muted);font-size:11px}\n.photo-compare-side-title{font-size:12px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;margin:14px 0 7px;color:var(--theme-accent)}\n.photo-four-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}\n@media(max-width:480px){.photo-upload-pair{grid-template-columns:1fr 1fr;gap:8px}.photo-upload-side{padding:9px}.photo-four-grid{gap:7px}}
 .weight-chart-card{margin:14px 0;padding:14px;border-radius:22px;border:1px solid rgba(var(--theme-accent-rgb),.28);background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface));overflow:hidden}
 .weight-chart-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .weight-chart-title strong{font-size:16px}.weight-chart-title span{font-size:11px;color:var(--muted)}
@@ -1995,7 +1995,7 @@ const ICONS={"home": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYA
 const TRAINER_CLIENT_ICON="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2096%2096%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%3Cstop%20stop-color%3D%22%237fe2ff%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%232698ff%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231554d8%22%2F%3E%0A%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%3Ccircle%20cx%3D%2248%22%20cy%3D%2231%22%20r%3D%2217%22%20fill%3D%22url%28%23g%29%22%2F%3E%0A%3Cpath%20d%3D%22M18%2082c2-21%2013-32%2030-32s28%2011%2030%2032c-8%204-18%206-30%206s-22-2-30-6z%22%20fill%3D%22url%28%23g%29%22%2F%3E%0A%3C%2Fsvg%3E";
 
 const APP_THEME_KEY="sdc_app_theme_v2";
-const DEFAULT_APP_THEME={accent:"#35a8ff",background:"#000000"};
+const DEFAULT_APP_THEME={accent:"#ffd400",background:"#343434"};
 
 function normalizeHexColor(value,fallback){
   const v=String(value||"").trim();
@@ -2024,10 +2024,10 @@ function rgbToHex(c){
 function getSavedAppTheme(){
   try{
     const saved=JSON.parse(localStorage.getItem(APP_THEME_KEY)||"null");
-    return {
-      accent:normalizeHexColor(saved?.accent,DEFAULT_APP_THEME.accent),
-      background:normalizeHexColor(saved?.background,DEFAULT_APP_THEME.background)
-    };
+    const accent=normalizeHexColor(saved?.accent,DEFAULT_APP_THEME.accent);
+    const background=normalizeHexColor(saved?.background,DEFAULT_APP_THEME.background);
+    if(accent.toLowerCase()==="#35a8ff" && background.toLowerCase()==="#000000") return {...DEFAULT_APP_THEME};
+    return {accent,background};
   }catch(e){
     return {...DEFAULT_APP_THEME};
   }
@@ -2139,6 +2139,7 @@ function ensureDataShape(){
 ensureDataShape();
 if(session && !session.page) session.page=session.role==="trainer"?"dashboard":"scheda";
 if(session && session.page==='progressi') session.page='appuntamenti';
+if(session && session.role==='client' && session.page==='pagamenti') session.page='dashboard';
 if(session && !session.clientDay) session.clientDay="Giorno 1";
 
 
@@ -2149,11 +2150,34 @@ async function getClientPhotos(clientId){
   for(const p of (data||[])){
     const {data:signed,error:signError}=await sb.storage.from('check-foto').createSignedUrl(p.photo_path,3600);
     if(signError) continue;
-    out.push({id:String(p.id),clientId:p.client_id,userId:p.user_id,path:p.photo_path,date:p.photo_date,note:p.note||'',dataUrl:signed.signedUrl});
+    const meta=parsePhotoMeta(p.note||'');
+    out.push({id:String(p.id),clientId:p.client_id,userId:p.user_id,path:p.photo_path,date:p.photo_date,note:meta.note,side:meta.side,dataUrl:signed.signedUrl});
   }
   return out;
 }
-async function addClientPhoto(clientId,file,date,note=''){
+function parsePhotoMeta(note=''){
+  const raw=String(note||'');
+  const m=raw.match(/^\[(FRONTE|PROFILO)\]\s*(.*)$/i);
+  if(!m)return {side:'',note:raw};
+  return {side:m[1].toLowerCase(),note:m[2]||''};
+}
+function encodePhotoMeta(side,note=''){
+  return `[${String(side||'').toUpperCase()}] ${String(note||'').trim()}`.trim();
+}
+function groupPhotosByDate(photos){
+  const map=new Map();
+  for(const p of photos){
+    const key=p.date||'';
+    if(!map.has(key)) map.set(key,{date:key,front:null,profile:null,other:[],note:''});
+    const g=map.get(key);
+    if(p.side==='fronte'&&!g.front) g.front=p;
+    else if(p.side==='profilo'&&!g.profile) g.profile=p;
+    else g.other.push(p);
+    if(!g.note&&p.note) g.note=p.note;
+  }
+  return [...map.values()].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+}
+async function addClientPhoto(clientId,file,date,note='',side=''){
   const c=db.clients.find(x=>String(x.id)===String(clientId));
   const ownerId=c?.supabaseUserId||session?.supabaseUserId;
   if(!ownerId) throw new Error('Cliente non collegato a Supabase.');
@@ -2162,7 +2186,7 @@ async function addClientPhoto(clientId,file,date,note=''){
   const path=`${ownerId}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
   const {error:uploadError}=await sb.storage.from('check-foto').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type||undefined});
   if(uploadError) throw uploadError;
-  const payload={client_id:String(clientId),user_id:ownerId,photo_path:path,photo_date:date||new Date().toISOString().slice(0,10),note:note||''};
+  const payload={client_id:String(clientId),user_id:ownerId,photo_path:path,photo_date:date||new Date().toISOString().slice(0,10),note:side?encodePhotoMeta(side,note):note||''};
   const {data,error}=await sb.from('check_photos').insert(payload).select().single();
   if(error){await sb.storage.from('check-foto').remove([path]);throw error;}
   return data;
@@ -2181,49 +2205,75 @@ function checkFotoPicker(){
     showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>Clienti</h2><div class="page-sub">Non ci sono ancora clienti.</div></div></div><div class="card empty">Aggiungi prima un cliente.</div><div class="actions"><button class="btn" onclick="closeModal()">Chiudi</button></div>`);
     return;
   }
-  showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>Progressi fotografici</h2><div class="page-sub">Seleziona un cliente per aprire il suo storico fotografico.</div></div><div class="photo-page-actions"><button class="btn" onclick="closeModal()">Chiudi</button></div></div>
+  showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>Progressi fotografici</h2><div class="page-sub">Seleziona un cliente per aprire i suoi check Fronte + Profilo.</div></div><div class="photo-page-actions"><button class="btn" onclick="closeModal()">Chiudi</button></div></div>
     <div class="list">${db.clients.map(c=>`<button class="row" style="width:100%;color:inherit;text-align:left" onclick="openPhotoHistory('${c.id}',true)"><div><strong>${esc(c.name)}</strong><small>${esc(c.email)}</small></div><span class="badge">Apri</span></button>`).join('')}</div>`);
 }
 async function openPhotoHistory(clientId,trainerMode=false){
   const c=db.clients.find(x=>String(x.id)===String(clientId));if(!c)return;
   let photos=[];try{photos=await getClientPhotos(clientId)}catch(e){alert('Non riesco a leggere lo storico foto: '+(e.message||e));return;}
-  const options=photos.map(p=>`<option value="${p.id}">${fmtDate(p.date)}${p.note?' · '+esc(p.note):''}</option>`).join('');
-  const newest=photos[0]?.id||'';
-  const oldest=photos.length?photos[photos.length-1].id:'';
-  showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>${esc(c.name)}</h2><div class="page-sub">Storico fotografico e confronto prima/dopo.</div></div><div class="photo-page-actions"><button class="btn" onclick="${trainerMode?'checkFotoPicker()':'closeModal()'}">Indietro</button></div></div>
+  const checks=groupPhotosByDate(photos);
+  const pairChecks=checks.filter(g=>g.front||g.profile);
+  const options=pairChecks.map(g=>`<option value="${esc(g.date)}">${fmtDate(g.date)}${g.note?' · '+esc(g.note):''}</option>`).join('');
+  const newest=pairChecks[0]?.date||'';
+  const oldest=pairChecks.length?pairChecks[pairChecks.length-1].date:'';
+  const oldPhotos=photos.filter(p=>!p.side);
+  showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>${esc(c.name)}</h2><div class="page-sub">Carica Fronte e Profilo nella stessa data e confronta i check nel tempo.</div></div><div class="photo-page-actions"><button class="btn" onclick="${trainerMode?'checkFotoPicker()':'closeModal()'}">Indietro</button></div></div>
     <div class="photo-upload photo-page-upload">
-      <label>Data foto</label><input id="photoDate" type="date" value="${new Date().toISOString().slice(0,10)}">
-      <label>Nota facoltativa</label><input id="photoNote" placeholder="Es. check mensile, frontale...">
-      <label>Foto</label><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp">
-      <button class="btn blue" style="margin-top:10px;width:100%" onclick="savePhotoUpload('${clientId}',${trainerMode})">＋ Carica foto</button>
+      <label>Data check</label><input id="photoDate" type="date" value="${new Date().toISOString().slice(0,10)}">
+      <label>Nota facoltativa</label><input id="photoNote" placeholder="Es. check mensile">
+      <div class="photo-upload-pair">
+        <div class="photo-upload-side"><strong>Fronte</strong><small>Foto frontale</small><input id="photoFrontFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+        <div class="photo-upload-side"><strong>Profilo</strong><small>Foto laterale</small><input id="photoProfileFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+      </div>
+      <button class="btn blue" style="margin-top:10px;width:100%" onclick="savePhotoPairUpload('${clientId}',${trainerMode})">＋ Salva check Fronte + Profilo</button>
     </div>
-    ${photos.length>=2?`<div class="photo-compare-card"><div class="photo-compare-title"><strong>Prima / Dopo</strong><span class="badge">${photos.length} foto</span></div><div class="formgrid"><div><label>Prima</label><select id="compareA">${options}</select></div><div><label>Dopo</label><select id="compareB">${options}</select></div></div><button class="btn blue" style="margin-top:10px;width:100%" onclick="comparePhotos('${clientId}')">Confronta foto</button><div id="compareResult" class="photo-compare-result"></div></div>`:''}
-    <div class="sectionhead"><h2>Storico</h2><span class="badge">${photos.length} ${photos.length===1?'foto':'foto'}</span></div>
-    <div class="photo-grid">${photos.length?photos.map(p=>`<div class="photo-card"><img src="${p.dataUrl}" alt="Foto progresso ${fmtDate(p.date)}" onclick="viewProgressPhoto('${clientId}','${p.id}',${trainerMode})" style="cursor:pointer"><div class="photo-meta"><div><div class="photo-date">${fmtDate(p.date)}</div>${p.note?`<div class="photo-note">${esc(p.note)}</div>`:''}</div><div class="photo-actions"><button class="mini-btn blue" onclick="viewProgressPhoto('${clientId}','${p.id}',${trainerMode})">Vedi</button><button class="mini-btn red" onclick="deleteProgressPhoto('${clientId}','${p.id}',${trainerMode})">Elimina</button></div></div></div>`).join(''):`<div class="card empty" style="grid-column:1/-1">Nessuna foto caricata.</div>`}</div>`);
+    ${pairChecks.length>=2?`<div class="photo-compare-card"><div class="photo-compare-title"><strong>Confronta progressi</strong><span class="badge">${pairChecks.length} check</span></div><div class="formgrid"><div><label>Prima</label><select id="compareA">${options}</select></div><div><label>Dopo</label><select id="compareB">${options}</select></div></div><button class="btn blue" style="margin-top:10px;width:100%" onclick="comparePhotoChecks('${clientId}')">Confronta check</button><div id="compareResult" class="photo-compare-result"></div></div>`:''}
+    <div class="sectionhead"><h2>Storico check</h2><span class="badge">${pairChecks.length} ${pairChecks.length===1?'check':'check'}</span></div>
+    <div class="photo-check-list">${pairChecks.length?pairChecks.map(g=>`<div class="photo-check-card"><div class="photo-check-head"><div><strong>${fmtDate(g.date)}</strong>${g.note?`<small>${esc(g.note)}</small>`:''}</div><button class="mini-btn red" onclick="deletePhotoCheck('${clientId}','${g.date}',${trainerMode})">Elimina</button></div><div class="photo-pair-grid">${photoPairItem(g.front,'Fronte',clientId,trainerMode)}${photoPairItem(g.profile,'Profilo',clientId,trainerMode)}</div></div>`).join(''):`<div class="card empty">Nessun check Fronte + Profilo caricato.</div>`}</div>
+    ${oldPhotos.length?`<div class="section" style="margin-top:18px"><div class="sectionhead"><h2>Foto precedenti</h2><span class="badge">${oldPhotos.length}</span></div><div class="photo-grid">${oldPhotos.map(p=>`<div class="photo-card"><img src="${p.dataUrl}" alt="Foto progresso ${fmtDate(p.date)}" onclick="viewProgressPhoto('${clientId}','${p.id}',${trainerMode})" style="cursor:pointer"><div class="photo-meta"><div><div class="photo-date">${fmtDate(p.date)}</div>${p.note?`<div class="photo-note">${esc(p.note)}</div>`:''}</div><div class="photo-actions"><button class="mini-btn blue" onclick="viewProgressPhoto('${clientId}','${p.id}',${trainerMode})">Vedi</button><button class="mini-btn red" onclick="deleteProgressPhoto('${clientId}','${p.id}',${trainerMode})">Elimina</button></div></div></div>`).join('')}</div></div>`:''}`);
   setTimeout(()=>{
     const a=document.getElementById('compareA'),b=document.getElementById('compareB');
-    if(a&&oldest)a.value=oldest;
-    if(b&&newest)b.value=newest;
-    if(a&&b&&a.value&&b.value&&a.value!==b.value) comparePhotos(clientId);
+    if(a&&oldest)a.value=oldest;if(b&&newest)b.value=newest;
+    if(a&&b&&a.value&&b.value&&a.value!==b.value) comparePhotoChecks(clientId);
   },30);
 }
-async function savePhotoUpload(clientId,trainerMode=false){
-  const f=document.getElementById('photoFile')?.files?.[0];const d=document.getElementById('photoDate')?.value;const n=document.getElementById('photoNote')?.value||'';
-  if(!f)return alert('Seleziona una foto.');
-  if(f.size>5*1024*1024)return alert('La foto è troppo grande. Usa un file sotto 5 MB.');
-  if(!['image/jpeg','image/png','image/webp'].includes(f.type))return alert('Formato non supportato. Usa JPG, PNG o WEBP.');
-  try{await addClientPhoto(clientId,f,d,n);await openPhotoHistory(clientId,trainerMode)}catch(e){alert('Errore caricamento foto: '+(e.message||e));}
+function photoPairItem(p,label,clientId,trainerMode){
+  if(!p)return `<div class="photo-missing">${label}<br>non caricata</div>`;
+  return `<div class="photo-pair-item"><span class="photo-pair-label">${label}</span><img src="${p.dataUrl}" alt="${label} ${fmtDate(p.date)}" onclick="viewProgressPhoto('${clientId}','${p.id}',${trainerMode})" style="cursor:pointer"></div>`;
+}
+function validateProgressPhoto(file,label){
+  if(!file) return `${label}: seleziona una foto.`;
+  if(file.size>5*1024*1024) return `${label}: la foto è troppo grande. Usa un file sotto 5 MB.`;
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)) return `${label}: formato non supportato. Usa JPG, PNG o WEBP.`;
+  return '';
+}
+async function savePhotoPairUpload(clientId,trainerMode=false){
+  const front=document.getElementById('photoFrontFile')?.files?.[0];
+  const profile=document.getElementById('photoProfileFile')?.files?.[0];
+  const d=document.getElementById('photoDate')?.value;const n=document.getElementById('photoNote')?.value||'';
+  const e1=validateProgressPhoto(front,'Fronte'),e2=validateProgressPhoto(profile,'Profilo');if(e1||e2)return alert(e1||e2);
+  try{
+    await addClientPhoto(clientId,front,d,n,'fronte');
+    try{await addClientPhoto(clientId,profile,d,n,'profilo');}catch(e){alert('La foto Fronte è stata salvata, ma il Profilo no: '+(e.message||e));}
+    await openPhotoHistory(clientId,trainerMode);
+  }catch(e){alert('Errore caricamento check foto: '+(e.message||e));}
+}
+async function deletePhotoCheck(clientId,date,trainerMode=false){
+  if(!confirm(`Eliminare Fronte e Profilo del check del ${fmtDate(date)}?`))return;
+  try{const arr=await getClientPhotos(clientId);const targets=arr.filter(p=>p.date===date&&p.side);for(const p of targets)await removeClientPhoto(p.id);await openPhotoHistory(clientId,trainerMode)}catch(e){alert('Errore eliminazione check: '+(e.message||e));}
 }
 async function deleteProgressPhoto(clientId,photoId,trainerMode=false){if(!confirm('Eliminare questa foto dallo storico?'))return;try{await removeClientPhoto(photoId);await openPhotoHistory(clientId,trainerMode)}catch(e){alert('Errore eliminazione foto: '+(e.message||e));}}
 async function viewProgressPhoto(clientId,photoId,trainerMode=false){
   const arr=await getClientPhotos(clientId);const p=arr.find(x=>String(x.id)===String(photoId));if(!p)return;
   const c=db.clients.find(x=>String(x.id)===String(clientId));
-  showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>${fmtDate(p.date)}</h2><div class="page-sub">${p.note?esc(p.note):esc(c?.name||'Foto progresso')}</div></div><div class="photo-page-actions"><button class="btn" onclick="openPhotoHistory('${clientId}',${trainerMode})">Indietro</button></div></div><img src="${p.dataUrl}" class="photo-full-view" alt="Foto progresso ${fmtDate(p.date)}">`);
+  const side=p.side?` · ${p.side==='fronte'?'Fronte':'Profilo'}`:'';
+  showSheetPage(`<div class="photo-page-head"><div><div class="page-kicker">Check Foto</div><h2>${fmtDate(p.date)}${side}</h2><div class="page-sub">${p.note?esc(p.note):esc(c?.name||'Foto progresso')}</div></div><div class="photo-page-actions"><button class="btn" onclick="openPhotoHistory('${clientId}',${trainerMode})">Indietro</button></div></div><img src="${p.dataUrl}" class="photo-full-view" alt="Foto progresso ${fmtDate(p.date)}">`);
 }
-async function comparePhotos(clientId){
-  const a=document.getElementById('compareA')?.value,b=document.getElementById('compareB')?.value;if(!a||!b||a===b)return alert('Seleziona due foto diverse.');
-  const arr=await getClientPhotos(clientId);const pa=arr.find(x=>String(x.id)===String(a)),pb=arr.find(x=>String(x.id)===String(b));const box=document.getElementById('compareResult');if(!pa||!pb||!box)return;
-  box.innerHTML=`<div class="compare-grid"><div><span class="photo-compare-badge">Prima</span><img src="${pa.dataUrl}"><div class="compare-label">${fmtDate(pa.date)}${pa.note?' · '+esc(pa.note):''}</div></div><div><span class="photo-compare-badge">Dopo</span><img src="${pb.dataUrl}"><div class="compare-label">${fmtDate(pb.date)}${pb.note?' · '+esc(pb.note):''}</div></div></div>`;
+async function comparePhotoChecks(clientId){
+  const a=document.getElementById('compareA')?.value,b=document.getElementById('compareB')?.value;if(!a||!b||a===b)return alert('Seleziona due check di date diverse.');
+  const arr=await getClientPhotos(clientId),groups=groupPhotosByDate(arr);const pa=groups.find(x=>x.date===a),pb=groups.find(x=>x.date===b),box=document.getElementById('compareResult');if(!pa||!pb||!box)return;
+  const comp=(p,label,when)=>p?`<div class="photo-pair-item"><span class="photo-compare-badge">${when}</span><img src="${p.dataUrl}" alt="${label} ${when}"><div class="compare-label">${fmtDate(p.date)}</div></div>`:`<div class="photo-missing">${label} ${when}<br>non disponibile</div>`;
+  box.innerHTML=`<div class="photo-compare-side-title">Fronte</div><div class="photo-four-grid">${comp(pa.front,'Fronte','Prima')}${comp(pb.front,'Fronte','Dopo')}</div><div class="photo-compare-side-title">Profilo</div><div class="photo-four-grid">${comp(pa.profile,'Profilo','Prima')}${comp(pb.profile,'Profilo','Dopo')}</div>`;
 }
 
 async function syncClientsFromSupabase(){
@@ -2545,6 +2595,7 @@ document.getElementById("username")?.addEventListener("keydown",e=>{if(e.key==="
 document.getElementById("password")?.addEventListener("keydown",e=>{if(e.key==="Enter")login()});
 function logout(){session=null;localStorage.removeItem(SESSION_KEY);localStorage.removeItem("sdc_session_v5");render()}
 async function setPage(page){
+  if(session?.role==='client'&&page==='pagamenti') page='dashboard';
   session.page=page;saveSession();
   if(page==='pagamenti'){
     try{await syncPaymentsFromSupabase();}catch(e){console.warn('Sync pagamenti:',e);}
@@ -2926,6 +2977,63 @@ async function archiveCurrentWorkout(cid,reason='Nuova scheda'){
   return archive;
 }
 
+const CIRCUIT_TITLE_PREFIX='__SDC_CIRCUIT__';
+function circuitMetaFromTitle(title){
+  const raw=String(title||'');
+  if(!raw.startsWith(CIRCUIT_TITLE_PREFIX)) return null;
+  try{
+    const data=JSON.parse(decodeURIComponent(raw.slice(CIRCUIT_TITLE_PREFIX.length)));
+    return {rounds:Math.max(1,Number(data.rounds)||4),totalTime:String(data.totalTime||''),label:String(data.label||'Circuito')};
+  }catch(e){return {rounds:4,totalTime:'',label:'Circuito'};}
+}
+function makeCircuitTitle(rounds=4,totalTime='',label='Circuito'){
+  return CIRCUIT_TITLE_PREFIX+encodeURIComponent(JSON.stringify({rounds:Math.max(1,Number(rounds)||4),totalTime:String(totalTime||''),label:String(label||'Circuito')}));
+}
+function isCircuitWorkout(w){return !!circuitMetaFromTitle(w?.title);}
+function circuitDayMeta(items,day){
+  const w=(items||[]).find(x=>(x.day||'Giorno 1')===day && isCircuitWorkout(x));
+  return circuitMetaFromTitle(w?.title)||null;
+}
+function setCircuitDayMeta(cid,day,patch={}){
+  const rows=db.workouts.filter(x=>String(x.clientId)===String(cid)&&(x.day||'Giorno 1')===day);
+  const current=circuitMetaFromTitle(rows.find(isCircuitWorkout)?.title)||{rounds:4,totalTime:'',label:'Circuito'};
+  const next={...current,...patch};
+  const title=makeCircuitTitle(next.rounds,next.totalTime,next.label);
+  rows.forEach(w=>w.title=title);
+  save();
+  return next;
+}
+function buildCircuitClientWorkouts(client,rounds=4){
+  const rows=[];
+  DAYS.forEach(day=>{
+    for(let i=1;i<=6;i++) rows.push({
+      id:id('wo'),clientId:String(client.id),supabaseUserId:client.supabaseUserId||'',
+      title:makeCircuitTitle(rounds,'','Circuito'),day,exercise:`Esercizio ${i}`,
+      sets:'',reps:'10 REP',rest:'',load:'',note:'',position:i
+    });
+  });
+  return rows;
+}
+async function saveCircuitTotalTime(cid,day,value){
+  const clean=String(value||'').trim();
+  setCircuitDayMeta(cid,day,{totalTime:clean});
+  const c=db.clients.find(x=>String(x.id)===String(cid));
+  if(!c?.supabaseUserId)return;
+  const rows=db.workouts.filter(x=>String(x.clientId)===String(cid)&&(x.day||'Giorno 1')===day&&isCircuitWorkout(x));
+  if(!rows.length)return;
+  const meta=circuitMetaFromTitle(rows[0].title)||{rounds:4,label:'Circuito'};
+  const title=makeCircuitTitle(meta.rounds,clean,meta.label);
+  try{
+    const ids=rows.map(x=>String(x.id));
+    const {error}=await sb.from('workouts').update({title,updated_at:new Date().toISOString()}).in('id',ids);
+    if(error) throw error;
+  }catch(err){alert('Errore salvataggio tempo: '+(err.message||err));}
+}
+function updateCircuitRounds(cid,day,value){
+  const rounds=Math.max(1,Math.min(99,Number(value)||1));
+  setCircuitDayMeta(cid,day,{rounds});
+}
+
 function makeDefaultWorkoutSet(c,title='Allenamento'){
   return buildDefaultClientWorkouts(c).map(w=>({...w,title}));
 }
@@ -2933,21 +3041,33 @@ function makeDefaultWorkoutSet(c,title='Allenamento'){
 async function createNewClientWorkout(cid){
   const c=db.clients.find(x=>String(x.id)===String(cid));
   if(!c)return alert('Cliente non trovato.');
-  if(!confirm(`Creare una nuova scheda per ${c.name}? La scheda attuale verrà salvata in Vecchie schede.`))return;
+  show(`
+    <div class="sectionhead"><div><div class="page-kicker">Nuova scheda</div><h2>${esc(c.name)}</h2><div class="page-sub">Scegli il tipo di allenamento da creare. La scheda attuale verrà archiviata.</div></div></div>
+    <div class="workout-type-grid">
+      <button class="workout-type-card" onclick="createClientWorkoutByType('${cid}','classic')"><strong>Scheda classica</strong><span>Serie, ripetizioni, recupero e peso.</span></button>
+      <button class="workout-type-card circuit-choice" onclick="createClientWorkoutByType('${cid}','circuit')"><strong>Circuito / Hyrox</strong><span>Round, REP o MT, peso e tempo totale.</span></button>
+    </div>
+    <div class="circuit-round-choice"><label>Round iniziali per il circuito</label><input id="newCircuitRounds" type="number" min="1" max="99" value="4"></div>
+    <div class="actions"><button class="btn" onclick="openClient('${cid}',true)">Annulla</button></div>`);
+}
+async function createClientWorkoutByType(cid,type){
+  const c=db.clients.find(x=>String(x.id)===String(cid));
+  if(!c)return alert('Cliente non trovato.');
   try{
     const invalid=db.workouts.find(x=>String(x.clientId)===String(cid)&&!String(x.exercise||'').trim());
     if(invalid)return alert('Completa o elimina gli esercizi senza nome prima di creare una nuova scheda.');
     await saveWorkoutsToSupabase(cid);
     await archiveCurrentWorkout(cid,'Nuova scheda');
-    const fresh=makeDefaultWorkoutSet(c,'Allenamento');
+    const rounds=Math.max(1,Math.min(99,Number(document.getElementById('newCircuitRounds')?.value||4)));
+    const fresh=type==='circuit'?buildCircuitClientWorkouts(c,rounds):makeDefaultWorkoutSet(c,'Allenamento');
     db.workouts=[...db.workouts.filter(w=>String(w.clientId)!==String(cid)),...fresh];
     save();
     await saveWorkoutsToSupabase(cid);
     window.__trainerClientDay='Giorno 1';
-    alert('Nuova scheda creata. La precedente è stata archiviata.');
+    alert(type==='circuit'?'Nuova scheda circuito creata.':'Nuova scheda classica creata.');
     await openClient(cid,true);
   }catch(err){
-    alert('Errore creazione nuova scheda: '+(err.message||err)+"\n\nSe è la prima volta che usi lo storico schede, verifica di aver creato la tabella workout_archives in Supabase.");
+    alert('Errore creazione nuova scheda: '+(err.message||err)+"\\n\\nSe è la prima volta che usi lo storico schede, verifica di aver creato la tabella workout_archives in Supabase.");
   }
 }
 
@@ -3194,7 +3314,9 @@ function addTrainerInlineExercise(cid,day){
   const targetDay=day||'Giorno 1';
   const sameDay=db.workouts.filter(w=>String(w.clientId)===String(cid)&&(w.day||'Giorno 1')===targetDay);
   const nextPosition=Math.max(0,...sameDay.map(w=>Number(w.position)||0))+1;
-  const item={id:id('wo'),clientId:cid,title:'Allenamento',exercise:'',day:targetDay,load:'',sets:'3',reps:'10',rest:'60',note:'',position:nextPosition};
+  const circuit=sameDay.find(isCircuitWorkout);
+  const title=circuit?.title||'Allenamento';
+  const item={id:id('wo'),clientId:cid,title,exercise:'',day:targetDay,load:'',sets:circuit?'':'3',reps:circuit?'10 REP':'10',rest:circuit?'':'60',note:'',position:nextPosition};
   db.workouts.push(item);
   openClient(cid,true);
   setTimeout(()=>{
@@ -3202,6 +3324,7 @@ function addTrainerInlineExercise(cid,day){
     if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}
   },80);
 }
+
 function deleteTrainerInlineExercise(cid,wid){
   const w=db.workouts.find(x=>String(x.id)===String(wid)&&String(x.clientId)===String(cid));
   if(!w)return;
@@ -3258,17 +3381,19 @@ async function openClient(cid,skipSync=false){
   const c=db.clients.find(x=>x.id===cid); if(!c)return;
   if(!skipSync){try{await syncWorkoutsFromSupabase(cid);}catch(e){console.warn('Sync scheda trainer:',e);}}
   const w=db.workouts.filter(x=>x.clientId===cid).map(x=>({...x,day:x.day||'Giorno 1',load:x.load??''}));
-  const wt=db.weights.filter(x=>x.clientId===cid);
-  const appList=db.appointments.filter(x=>x.clientId===cid);
-  const pay=db.payments.filter(x=>x.clientId===cid);
   const trainerDay=(window.__trainerClientDay&&DAYS.includes(window.__trainerClientDay))?window.__trainerClientDay:'Giorno 1';
   const dayExercises=w.filter(x=>x.day===trainerDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
-  showSheetPage(`<div class="sectionhead"><div><div class="page-kicker">Scheda cliente</div><h2>${esc(c.name)}</h2><div class="page-sub">${esc(c.email)}</div></div></div>
-    <section class="scheme-hero" style="margin-top:12px">
-      <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day}</button>`).join('')}</div>
-      <div class="exercise-table trainer-live-sheet">
-        <div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>
-        ${dayExercises.length?dayExercises.map(ex=>`<div class="exercise-row trainer-inline-row" data-workout-id="${ex.id}">
+  const circuitMeta=circuitDayMeta(w,trainerDay);
+  const head=circuitMeta
+    ? `<div class="exercise-head circuit-head"><div class="h-name">Esercizio</div><div>REP / MT</div><div>Peso</div></div>`
+    : `<div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>`;
+  const rows=dayExercises.length?dayExercises.map(ex=>circuitMeta?`<div class="exercise-row trainer-inline-row circuit-row" data-workout-id="${ex.id}">
+          <button class="trainer-drag-handle" type="button" aria-label="Sposta esercizio" title="Trascina per spostare" onpointerdown="trainerDragStart(event,'${cid}','${trainerDay}','${ex.id}')">≡</button>
+          <button class="mini-btn red trainer-inline-delete" onclick="deleteTrainerInlineExercise('${cid}','${ex.id}')" aria-label="Elimina">×</button>
+          <div class="ex-name inline-name"><textarea rows="2" data-inline-name="${ex.id}" oninput="trainerInlineEdit('${ex.id}','exercise',this.value)">${esc(ex.exercise)}</textarea></div>
+          <div class="ex-cell circuit-repmt"><input value="${esc(ex.reps)}" placeholder="10 REP / 500 MT" oninput="trainerInlineEdit('${ex.id}','reps',this.value)"></div>
+          <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="trainerInlineEdit('${ex.id}','load',this.value)"></div>
+        </div>`:`<div class="exercise-row trainer-inline-row" data-workout-id="${ex.id}">
           <button class="trainer-drag-handle" type="button" aria-label="Sposta esercizio" title="Trascina per spostare" onpointerdown="trainerDragStart(event,'${cid}','${trainerDay}','${ex.id}')">≡</button>
           <button class="mini-btn red trainer-inline-delete" onclick="deleteTrainerInlineExercise('${cid}','${ex.id}')" aria-label="Elimina">×</button>
           <div class="ex-name inline-name"><textarea rows="2" data-inline-name="${ex.id}" oninput="trainerInlineEdit('${ex.id}','exercise',this.value)">${esc(ex.exercise)}</textarea></div>
@@ -3276,17 +3401,20 @@ async function openClient(cid,skipSync=false){
           <div class="ex-cell reps-cell"><input class="trainer-reps-input" value="${esc(ex.reps)}" oninput="trainerInlineEdit('${ex.id}','reps',this.value)"></div>
           <div class="ex-cell"><input value="${esc(ex.rest)}" oninput="trainerInlineEdit('${ex.id}','rest',this.value)"></div>
           <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="trainerInlineEdit('${ex.id}','load',this.value)"></div>
-        </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${trainerDay}.</div>`}
-      </div>
+        </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${trainerDay}.</div>`;
+  showSheetPage(`<div class="sectionhead"><div><div class="page-kicker">${circuitMeta?'Circuito cliente':'Scheda cliente'}</div><h2>${esc(c.name)}</h2><div class="page-sub">${esc(c.email)}</div></div></div>
+    <section class="scheme-hero ${circuitMeta?'circuit-hero':''}" style="margin-top:12px">
+      <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day}</button>`).join('')}</div>
+      ${circuitMeta?`<div class="circuit-topbar"><div><span>ROUND</span><strong>${circuitMeta.rounds}</strong></div><label>Numero round<input type="number" min="1" max="99" value="${circuitMeta.rounds}" oninput="updateCircuitRounds('${cid}','${trainerDay}',this.value);this.closest('.circuit-topbar').querySelector('strong').textContent=this.value"></label></div>`:''}
+      <div class="exercise-table trainer-live-sheet ${circuitMeta?'circuit-table':''}">${head}${rows}</div>
       <button class="btn trainer-inline-add" onclick="addTrainerInlineExercise('${cid}','${trainerDay}')">＋ Aggiungi esercizio</button>
-      <div class="trainer-inline-hint">Tocca un campo per modificarlo. Tieni premuto ≡ e trascina per cambiare l’ordine. Premi Salva quando hai finito.</div>
+      <div class="trainer-inline-hint">${circuitMeta?'Scrivi per esempio 12 REP oppure 500 MT.':'Tocca un campo per modificarlo.'} Tieni premuto ≡ e trascina per cambiare l’ordine. Premi Salva quando hai finito.</div>
     </section>
     <div class="trainer-bottom-actions direct-edit trainer-save-exit">
       <button class="btn blue trainer-save-btn" onclick="saveTrainerClientSheet('${cid}')">Salva</button>
       <button class="btn" onclick="createNewClientWorkout('${cid}')">＋ Nuova scheda</button>
       <button class="btn trainer-exit-btn" onclick="exitTrainerClientSheet('${cid}')">Esci</button>
-    </div>
-    `);
+    </div>`);
 }
 
 
@@ -3560,7 +3688,7 @@ async function savePayment(){
     closeModal();
     try{await syncPaymentsFromSupabase();}catch(e){console.warn(e);}
     setTrainerPage('payments');
-    alert('Pagamento salvato. Il cliente lo vedrà nella sua sezione Pagamenti.');
+    alert('Pagamento salvato. La sezione Pagamenti è visibile solo al trainer.');
   }catch(err){
     alert('Errore salvataggio pagamento: '+(err.message||err));
   }
@@ -3741,7 +3869,6 @@ function client(){
   if(appEl) appEl.classList.toggle("scheda-focus", session.page==='scheda');
   const workouts=db.workouts.filter(x=>x.clientId===c.id).map(x=>({...x,day:x.day||'Giorno 1',load:x.load??''}));
   const appointments=db.appointments.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-  const payments=db.payments.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const weightList=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const latestWeight=weightList.length?weightList[weightList.length-1].weight:'—';
   const currentDay=session.clientDay&&DAYS.includes(session.clientDay)?session.clientDay:'Giorno 1';
@@ -3758,7 +3885,7 @@ function client(){
         <div class="metric-box photo-quick" onclick="openPhotoHistory('${c.id}',false)"><b>▣</b><span>Check Foto</span></div>
         <div class="metric-box" onclick="setPage('appuntamenti')"><b>${appointments.length}</b><span>Appuntamenti</span></div>
         <div class="metric-box" onclick="clientWeightHistory()" style="cursor:pointer"><b>${esc(latestWeight)}</b><span>Ultimo peso (kg)</span></div>
-        <div class="metric-box" onclick="setPage('pagamenti')"><b>${payments.filter(x=>String(x.status).toLowerCase()==='pagato').length}</b><span>Pagamenti</span></div>
+        <div class="metric-box" onclick="openPhotoHistory('${c.id}',false)"><b>↔</b><span>Confronta foto</span></div>
       </div>
     </section>
     ${appointments[0]?`<section class="section client-dashboard-next"><div class="sectionhead"><h2>Prossimo appuntamento</h2></div><div class="card" onclick="setPage('appuntamenti')" style="cursor:pointer"><strong>${fmtDate(appointments[0].date)} · ${esc(appointments[0].time)}</strong><div class="page-sub" style="margin-top:6px">${esc(appointments[0].note||'Allenamento')}</div></div></section>`:''}`;
@@ -3767,10 +3894,23 @@ function client(){
     <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Consulta rapidamente i tuoi prossimi appuntamenti.</div></section>
     <section class="section"><div class="sectionhead"><h2>Calendario</h2><div class="subtle-note">Appuntamenti totali: ${appointments.length}</div></div><div class="list">${appointments.length?appointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)}</strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessun appuntamento.</div>`}</div></section>`;
 
-  const scheda=`
+  const circuitMeta=circuitDayMeta(workouts,currentDay);
+  const scheda=circuitMeta?`
+    <section class="scheme-hero circuit-hero">
+      <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day}</button>`).join('')}</div>
+      <div class="circuit-client-rounds"><span>ROUND</span><strong>${circuitMeta.rounds}</strong></div>
+      <div class="exercise-table circuit-table">
+        <div class="exercise-head circuit-head"><div class="h-name">Esercizio</div><div>REP / MT</div><div>Peso</div></div>
+        ${dayExercises.length?dayExercises.map(ex=>`<div class="exercise-row circuit-row">
+          <div class="ex-name"><button type="button" class="exercise-name-button" onclick="openExerciseNote('${ex.id}')"><span>${esc(ex.exercise)}</span>${ex.note?'<span class="exercise-note-dot" title="Nota presente"></span>':''}</button></div>
+          <div class="ex-cell">${esc(ex.reps||'—')}</div>
+          <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="queueExerciseLoadSave('${ex.id}',this.value)" onblur="updateExerciseLoad('${ex.id}',this.value)"></div>
+        </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${currentDay}.</div>`}
+      </div>
+      <div class="circuit-result-card"><label>Tempo totale per completare tutti i round</label><input class="circuit-time-input" value="${esc(circuitMeta.totalTime||'')}" placeholder="Es. 18:42" onblur="saveCircuitTotalTime('${c.id}','${currentDay}',this.value)"></div>
+    </section>`:`
     <section class="scheme-hero">
       <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day}</button>`).join('')}</div>
-      
       <div class="exercise-table">
         <div class="exercise-head"><div class="h-name">Esercizio</div><div>Serie</div><div>Rip</div><div>Rec</div><div>Peso</div></div>
         ${dayExercises.length?dayExercises.map(ex=>`
@@ -3785,9 +3925,6 @@ function client(){
     </section>
     ${workoutTimerMarkup()}`;
 
-  const pagamenti=`
-    <section class="page-head"><div class="page-kicker">Pagamenti</div><h1>I tuoi pagamenti</h1><div class="page-sub">Storico e stato aggiornato dei tuoi pagamenti.</div></section>
-    <section class="section"><div class="list">${payments.length?payments.map(x=>`<div class="row"><div><strong>€ ${esc(x.amount)}</strong><small>${fmtDate(x.date)} · ${esc(x.method||'')}</small></div><div><span class="badge ${String(x.status).toLowerCase()==='pagato'?'ok':'due'}">${esc(x.status)}</span></div></div>`).join(''):`<div class="card empty">Nessun pagamento.</div>`}</div></section>`;
 
   const altro=`
     <section class="page-head"><div class="page-kicker">Altro</div><h1>Profilo e impostazioni</h1><div class="page-sub">Profilo, appuntamenti e personalizzazione della tua app.</div></section>
@@ -3815,11 +3952,10 @@ function client(){
     <div class="client-page ${session.page==='dashboard'?'active':''}" id="page-dashboard">${dashboard}</div>
     <div class="client-page ${session.page==='appuntamenti'?'active':''}" id="page-appuntamenti">${appuntamentiPage}</div>
     <div class="client-page ${session.page==='scheda'?'active':''}" id="page-scheda">${scheda}</div>
-    <div class="client-page ${session.page==='pagamenti'?'active':''}" id="page-pagamenti">${pagamenti}</div>
     <div class="client-page ${session.page==='altro'?'active':''}" id="page-altro">${altro}</div>
   </div>`;
 
-  const navActive=(session.page==='pagamenti'?'dashboard':(session.page||'scheda'));
+  const navActive=(session.page||'scheda');
   setNav([
     {key:'dashboard',label:'Dashboard',img:ICONS.home,action:"setPage('dashboard')"},
     {key:'appuntamenti',label:'Appunt.',img:ICONS.appointments,action:"setPage('appuntamenti')"},
@@ -4101,6 +4237,26 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 .workout-timer-stop{width:100%;height:50px;font-size:16px;font-weight:900;letter-spacing:.08em}
 .workout-timer-card.timer-finished{box-shadow:0 0 0 1px rgba(var(--theme-accent-rgb),.35),0 0 28px rgba(var(--theme-accent-rgb),.18)}
 @media(max-width:390px){.workout-timer-display{font-size:27px}.workout-timer-card{padding:14px}.workout-timer-inputrow{grid-template-columns:minmax(0,1fr) 104px}}
+</style>
+
+
+<style>
+/* ===== CIRCUITO / HYROX ===== */
+.workout-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.workout-type-card{min-height:118px;padding:18px;border-radius:22px;border:1px solid rgba(var(--theme-accent-rgb),.30);background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface));color:#fff;text-align:left}
+.workout-type-card strong{display:block;font-size:19px;margin-bottom:7px}.workout-type-card span{display:block;color:#aab3bf;font-size:12px;line-height:1.45}
+.workout-type-card.circuit-choice{border-color:rgba(var(--theme-accent-rgb),.68);box-shadow:0 0 22px rgba(var(--theme-accent-rgb),.12)}
+.circuit-round-choice{padding:14px;border-radius:18px;border:1px solid rgba(var(--theme-accent-rgb),.22);background:rgba(var(--theme-surface-rgb),.72)}
+.circuit-round-choice label{margin-top:0}.circuit-round-choice input{max-width:150px}
+.circuit-topbar{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:4px 0 16px;padding:14px 16px;border-radius:22px;border:1px solid rgba(var(--theme-accent-rgb),.5);background:rgba(var(--theme-accent-rgb),.08)}
+.circuit-topbar>div span,.circuit-client-rounds span{display:block;font-size:10px;letter-spacing:.22em;color:var(--theme-accent);font-weight:900}.circuit-topbar>div strong,.circuit-client-rounds strong{display:block;font-size:36px;line-height:1;color:#fff;margin-top:4px}.circuit-topbar label{margin:0;min-width:120px}.circuit-topbar input{height:42px;margin-top:6px;text-align:center;font-weight:900}
+.circuit-client-rounds{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px 0 16px;padding:13px 16px;border-radius:20px;border:1px solid rgba(var(--theme-accent-rgb),.5);background:rgba(var(--theme-accent-rgb),.08)}.circuit-client-rounds span{margin-top:4px}.circuit-client-rounds strong{font-size:34px;margin:0}
+.circuit-table .circuit-head,.circuit-table .circuit-row{grid-template-columns:minmax(0,2.6fr) minmax(92px,.8fr) 78px!important}.circuit-table .circuit-head>div:not(:first-child),.circuit-table .circuit-row>div:not(:first-child){border-left:1px solid rgba(var(--theme-accent-rgb),.28)}
+.circuit-row .circuit-repmt input{width:100%;min-width:0;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center;color:#fff;font-weight:900;padding:4px}
+.circuit-result-card{margin-top:16px;padding:15px;border-radius:20px;border:1px solid rgba(var(--theme-accent-rgb),.32);background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface))}.circuit-result-card label{margin-top:0;color:#cbd0d7;letter-spacing:.08em}.circuit-time-input{height:50px;text-align:center;font-size:22px;font-weight:900;letter-spacing:.08em;border-color:rgba(var(--theme-accent-rgb),.54)!important}
+@media(max-width:480px){.workout-type-grid{grid-template-columns:1fr}.circuit-topbar{padding:12px}.circuit-topbar>div strong{font-size:31px}.circuit-table .circuit-head,.circuit-table .circuit-row{grid-template-columns:minmax(0,2.25fr) 90px 62px!important}.circuit-row .ex-name{font-size:13px}.circuit-row .ex-cell{font-size:12px}.circuit-result-card{padding:12px}.circuit-time-input{font-size:19px}}
+/* nuovo default: grigio + giallo */
+:root{--theme-accent:#ffd400;--theme-accent-rgb:255,212,0;--theme-background:#343434;--theme-surface:#3b3b3b;--theme-surface-2:#454545;--theme-surface-rgb:59,59,59}
 </style>
 
 </body>
