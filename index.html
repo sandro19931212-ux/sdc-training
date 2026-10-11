@@ -1933,8 +1933,102 @@ input::placeholder,textarea::placeholder{color:#65758b}
 }
 </style>
 
+
+<style id="sdc-appointments-today-v1">
+.appointments-top-actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.today-filter-btn{
+  display:inline-flex!important;
+  align-items:center;
+  gap:9px;
+  min-height:48px;
+  padding:11px 17px!important;
+}
+.today-filter-btn .today-filter-ico{
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  color:var(--theme-accent);
+  flex:0 0 24px;
+}
+.today-filter-btn .today-filter-ico svg{
+  width:24px;
+  height:24px;
+  display:block;
+}
+.today-back-row{
+  margin:0 0 14px;
+}
+.today-back-btn{
+  display:inline-flex!important;
+  align-items:center;
+  gap:8px;
+  min-height:44px;
+  padding:10px 16px!important;
+  font-weight:800;
+}
+.today-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:4px 0 12px;
+  padding:11px 14px;
+  border:1px solid rgba(var(--theme-accent-rgb),.28);
+  border-radius:17px;
+  background:rgba(var(--theme-accent-rgb),.07);
+}
+.today-summary strong{
+  font-size:15px;
+}
+.today-summary span{
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+@media(max-width:480px){
+  .appointments-top-actions{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+  }
+  .appointments-top-actions .btn.blue{
+    min-width:0;
+    padding-left:13px;
+    padding-right:13px;
+  }
+  .today-filter-btn{
+    min-width:100px;
+    justify-content:center;
+    padding:10px 13px!important;
+  }
+  .today-summary{
+    padding:10px 12px;
+  }
+  .today-summary strong{font-size:14px}
+  .today-summary span{font-size:11px}
+}
+</style>
+
 </head>
-<body data-build="appointments-v8">
+
+<style id="sdc-session-counter-v1">
+.session-count-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(var(--theme-accent-rgb),.30);background:rgba(var(--theme-accent-rgb),.10);color:var(--theme-accent);font-size:11px;font-weight:800}
+.session-history{margin-top:22px}
+.session-history .row{opacity:.78}
+.session-history .badge{margin-left:8px}
+.session-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 16px}
+.session-summary-card{padding:14px;border-radius:18px;border:1px solid rgba(var(--theme-accent-rgb),.26);background:rgba(var(--theme-surface-rgb),.78)}
+.session-summary-card b{display:block;font-size:25px;line-height:1.05;margin-bottom:5px}
+.session-summary-card span{font-size:11px;color:var(--muted)}
+@media(max-width:480px){.session-summary-grid{gap:8px}.session-summary-card{padding:12px}.session-summary-card b{font-size:22px}}
+</style>
+<body data-build="sessions-v1">
 <section id="login" class="login">
   <div class="loginbox">
     <div class="login-logo-wrap">
@@ -2654,6 +2748,7 @@ function jumpToTrainerSection(target){
 
 async function setTrainerPage(page){
   session.page=page;
+  if(page!=='appointments') session.appointmentsTodayOnly=false;
   saveSession();
   if(page==='appointments'){
     try{await syncAppointmentsFromSupabase();}catch(e){console.warn('Sync appuntamenti trainer:',e);}
@@ -2668,6 +2763,41 @@ async function setTrainerPage(page){
   render();
 }
 
+
+function localTodayISO(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+// Una seduta diventa svolta automaticamente dal giorno successivo.
+// In questo modo l'appuntamento resta nello storico e non viene eliminato.
+function isCompletedAppointment(a){
+  const date=String(a?.date||'');
+  return !!date && date<localTodayISO();
+}
+function clientSessionStats(clientId){
+  const all=db.appointments.filter(a=>String(a.clientId)===String(clientId));
+  return {
+    remaining:all.filter(a=>!isCompletedAppointment(a)).length,
+    completed:all.filter(isCompletedAppointment).length
+  };
+}
+
+function openTodayAppointments(){
+  session.appointmentsTodayOnly=true;
+  saveSession();
+  render();
+}
+
+function closeTodayAppointments(){
+  session.appointmentsTodayOnly=false;
+  saveSession();
+  render();
+}
+
 function trainer(){
   const whoEl=document.getElementById("who");
   const clientViewEl=document.getElementById("clientView");
@@ -2678,6 +2808,12 @@ function trainer(){
 
   const trainerPage=session.page||"dashboard";
   const appointmentsSorted=db.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const todayISO=localTodayISO();
+  const appointmentsUpcoming=appointmentsSorted.filter(a=>!isCompletedAppointment(a));
+  const appointmentsCompleted=appointmentsSorted.filter(isCompletedAppointment).slice().reverse();
+  const appointmentsToday=appointmentsUpcoming.filter(a=>String(a.date||'')===todayISO);
+  const appointmentsTodayOnly=!!session.appointmentsTodayOnly;
+  const appointmentsVisible=appointmentsTodayOnly?appointmentsToday:appointmentsUpcoming;
   const paymentsSorted=db.payments.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const paymentMonths=paymentMonthlyStats();
   const currentMonthKey=currentPaymentMonthKey();
@@ -2695,7 +2831,7 @@ function trainer(){
       <div class="grid">
         <div class="card stat action-card" onclick="setTrainerPage('clients')"><b>${db.clients.length}</b><span>Clienti</span></div>
         <div class="card stat photo-quick action-card icon-card" onclick="jumpToTrainerSection('checkfoto')"><b>▣</b><span>Check Foto</span></div>
-        <div class="card stat action-card" onclick="setTrainerPage('appointments')"><b>${db.appointments.length}</b><span>Appuntamenti</span></div>
+        <div class="card stat action-card" onclick="setTrainerPage('appointments')"><b>${appointmentsUpcoming.length}</b><span>Sedute residue</span></div>
         <div class="card stat action-card" onclick="setTrainerPage('payments')"><b>${db.payments.length}</b><span>Pagamenti</span></div>
       </div>
 
@@ -2706,7 +2842,7 @@ function trainer(){
 
       <section class="section">
         <div class="sectionhead"><h2>Prossimi appuntamenti</h2></div>
-        <div class="list">${appointmentsSorted.length?appointmentsSorted.slice(0,3).map(a=>`
+        <div class="list">${appointmentsUpcoming.length?appointmentsUpcoming.slice(0,3).map(a=>`
           <div class="row">
             <div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")}</small></div>
           </div>`).join(""):`<div class="card empty">Nessun appuntamento.</div>`}
@@ -2730,9 +2866,10 @@ function trainer(){
         <div class="list">${db.clients.length?db.clients.map(c=>{
           const cw=db.weights.filter(w=>String(w.clientId)===String(c.id)).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
           const lastWeight=cw.length?cw[cw.length-1].weight:null;
+          const sessionStats=clientSessionStats(c.id);
           return `
           <div class="row">
-            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}</small></div>
+            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Sedute residue: ${sessionStats.remaining} · Svolte: ${sessionStats.completed}</small></div>
             <div class="actions" style="margin:0">
               <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>
               <button class="mini-btn red" onclick="delClient('${c.id}')">Elimina</button>
@@ -2745,18 +2882,38 @@ function trainer(){
 
   const appointmentsPage=`
     <div class="trainer-layout">
+      ${appointmentsTodayOnly?`
+      <div class="today-back-row">
+        <button class="btn today-back-btn" onclick="closeTodayAppointments()">← Indietro</button>
+      </div>`:''}
+
       <section class="page-head">
-        <div class="page-kicker">Appuntamenti</div>
-        <h1>Agenda</h1>
-        <div class="page-sub">Visualizza, aggiungi ed elimina gli appuntamenti da un'unica pagina.</div>
+        <div class="page-kicker">${appointmentsTodayOnly?'Oggi':'Appuntamenti'}</div>
+        <h1>${appointmentsTodayOnly?'Appuntamenti di oggi':'Agenda'}</h1>
+        <div class="page-sub">${appointmentsTodayOnly?`${fmtDate(todayISO)} · Visualizzi solo gli appuntamenti della giornata.`:'Visualizza, aggiungi ed elimina gli appuntamenti da un’unica pagina.'}</div>
       </section>
 
-      <div class="actions">
+      ${!appointmentsTodayOnly?`
+      <div class="session-summary-grid">
+        <div class="session-summary-card"><b>${appointmentsUpcoming.length}</b><span>Sedute ancora da svolgere</span></div>
+        <div class="session-summary-card"><b>${appointmentsCompleted.length}</b><span>Sedute svolte</span></div>
+      </div>`:''}
+
+      ${appointmentsTodayOnly?`
+      <div class="today-summary">
+        <strong>${appointmentsToday.length} ${appointmentsToday.length===1?'appuntamento':'appuntamenti'}</strong>
+        <span>${fmtDate(todayISO)}</span>
+      </div>`:`
+      <div class="actions appointments-top-actions">
         <button class="btn blue" onclick="appointmentForm()">＋ Aggiungi appuntamento</button>
-      </div>
+        <button class="btn today-filter-btn" onclick="openTodayAppointments()" aria-label="Mostra gli appuntamenti di oggi">
+          <span class="today-filter-ico">${NAV_SVGS.appointments}</span>
+          <span>Oggi</span>
+        </button>
+      </div>`}
 
       <section class="section">
-        <div class="list">${appointmentsSorted.length?appointmentsSorted.map(a=>`
+        <div class="list">${appointmentsVisible.length?appointmentsVisible.map(a=>`
           <div class="row">
             <div>
               <strong>${fmtDate(a.date)} · ${esc(a.time)}</strong>
@@ -2765,9 +2922,17 @@ function trainer(){
             <div class="actions" style="margin:0">
               <button class="mini-btn red" onclick="deleteAppointment('${a.id}')">Elimina</button>
             </div>
-          </div>`).join(""):`<div class="card empty">Nessun appuntamento.</div>`}
+          </div>`).join(""):`<div class="card empty">${appointmentsTodayOnly?'Nessun appuntamento per oggi.':'Nessuna seduta futura.'}</div>`}
         </div>
       </section>
+
+      ${!appointmentsTodayOnly?`<section class="section session-history">
+        <div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">Svolte: ${appointmentsCompleted.length}</div></div>
+        <div class="list">${appointmentsCompleted.length?appointmentsCompleted.map(a=>`
+          <div class="row">
+            <div><strong>${fmtDate(a.date)} · ${esc(a.time)} <span class="badge ok">Svolta</span></strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")}</small></div>
+          </div>`).join(''):`<div class="card empty">Nessuna seduta svolta ancora.</div>`}</div>
+      </section>`:''}
     </div>`;
 
   const paymentsPage=`
@@ -3869,6 +4034,8 @@ function client(){
   if(appEl) appEl.classList.toggle("scheda-focus", session.page==='scheda');
   const workouts=db.workouts.filter(x=>x.clientId===c.id).map(x=>({...x,day:x.day||'Giorno 1',load:x.load??''}));
   const appointments=db.appointments.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const upcomingAppointments=appointments.filter(a=>!isCompletedAppointment(a));
+  const completedAppointments=appointments.filter(isCompletedAppointment).slice().reverse();
   const weightList=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const latestWeight=weightList.length?weightList[weightList.length-1].weight:'—';
   const currentDay=session.clientDay&&DAYS.includes(session.clientDay)?session.clientDay:'Giorno 1';
@@ -3883,16 +4050,21 @@ function client(){
       <div class="page-sub">Il tuo percorso, i tuoi appuntamenti e i tuoi progressi in un solo posto.</div>
       <div class="metric-board client-dashboard-metrics">
         <div class="metric-box photo-quick" onclick="openPhotoHistory('${c.id}',false)"><b>▣</b><span>Check Foto</span></div>
-        <div class="metric-box" onclick="setPage('appuntamenti')"><b>${appointments.length}</b><span>Appuntamenti</span></div>
+        <div class="metric-box" onclick="setPage('appuntamenti')"><b>${upcomingAppointments.length}</b><span>Sedute residue</span></div>
         <div class="metric-box" onclick="clientWeightHistory()" style="cursor:pointer"><b>${esc(latestWeight)}</b><span>Ultimo peso (kg)</span></div>
         <div class="metric-box" onclick="openPhotoHistory('${c.id}',false)"><b>↔</b><span>Confronta foto</span></div>
       </div>
     </section>
-    ${appointments[0]?`<section class="section client-dashboard-next"><div class="sectionhead"><h2>Prossimo appuntamento</h2></div><div class="card" onclick="setPage('appuntamenti')" style="cursor:pointer"><strong>${fmtDate(appointments[0].date)} · ${esc(appointments[0].time)}</strong><div class="page-sub" style="margin-top:6px">${esc(appointments[0].note||'Allenamento')}</div></div></section>`:''}`;
+    ${upcomingAppointments[0]?`<section class="section client-dashboard-next"><div class="sectionhead"><h2>Prossimo appuntamento</h2></div><div class="card" onclick="setPage('appuntamenti')" style="cursor:pointer"><strong>${fmtDate(upcomingAppointments[0].date)} · ${esc(upcomingAppointments[0].time)}</strong><div class="page-sub" style="margin-top:6px">${esc(upcomingAppointments[0].note||'Allenamento')}</div></div></section>`:''}`;
 
   const appuntamentiPage=`
-    <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Consulta rapidamente i tuoi prossimi appuntamenti.</div></section>
-    <section class="section"><div class="sectionhead"><h2>Calendario</h2><div class="subtle-note">Appuntamenti totali: ${appointments.length}</div></div><div class="list">${appointments.length?appointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)}</strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessun appuntamento.</div>`}</div></section>`;
+    <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Le sedute passate vengono archiviate automaticamente e quelle future restano come sedute residue.</div></section>
+    <div class="session-summary-grid">
+      <div class="session-summary-card"><b>${upcomingAppointments.length}</b><span>Sedute residue</span></div>
+      <div class="session-summary-card"><b>${completedAppointments.length}</b><span>Sedute svolte</span></div>
+    </div>
+    <section class="section"><div class="sectionhead"><h2>Prossime sedute</h2><div class="subtle-note">Residue: ${upcomingAppointments.length}</div></div><div class="list">${upcomingAppointments.length?upcomingAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)}</strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta futura.</div>`}</div></section>
+    <section class="section session-history"><div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">Svolte: ${completedAppointments.length}</div></div><div class="list">${completedAppointments.length?completedAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)} <span class="badge ok">Svolta</span></strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta svolta ancora.</div>`}</div></section>`;
 
   const circuitMeta=circuitDayMeta(workouts,currentDay);
   const scheda=circuitMeta?`
@@ -3907,7 +4079,8 @@ function client(){
           <div class="ex-load-inline"><input type="number" step="0.5" value="${esc(ex.load||'')}" oninput="queueExerciseLoadSave('${ex.id}',this.value)" onblur="updateExerciseLoad('${ex.id}',this.value)"></div>
         </div>`).join(''):`<div class="card empty">Nessun esercizio assegnato per ${currentDay}.</div>`}
       </div>
-      <div class="circuit-result-card"><label>Tempo totale per completare tutti i round</label><input class="circuit-time-input" value="${esc(circuitMeta.totalTime||'')}" placeholder="Es. 18:42" onblur="saveCircuitTotalTime('${c.id}','${currentDay}',this.value)"></div>
+      ${circuitStopwatchMarkup(c.id,currentDay)}
+      <div class="circuit-result-card"><label>Tempo totale per completare tutti i round</label><input id="circuitTotalTimeInput" class="circuit-time-input" value="${esc(circuitMeta.totalTime||'')}" placeholder="Es. 18:42" onblur="saveCircuitTotalTime('${c.id}','${currentDay}',this.value)"></div>
     </section>`:`
     <section class="scheme-hero">
       <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===currentDay?'active':''}" onclick="setClientDay('${day}')">${day}</button>`).join('')}</div>
@@ -3999,6 +4172,57 @@ async function saveExerciseNote(exId){
     alert('Errore salvataggio nota: '+(err.message||err));
   }
 }
+
+/* ===== CRONOMETRO CIRCUITO / HYROX ===== */
+let circuitStopwatchInterval=null;
+function circuitStopwatchKey(cid,day){
+  return 'sdc_circuit_stopwatch_'+String(cid||'guest')+'_'+String(day||'Giorno 1').replace(/\s+/g,'_');
+}
+function readCircuitStopwatch(cid,day){
+  try{
+    const raw=JSON.parse(localStorage.getItem(circuitStopwatchKey(cid,day))||'null');
+    if(raw&&typeof raw==='object') return {running:!!raw.running,startedAt:Number(raw.startedAt)||0,elapsed:Number(raw.elapsed)||0};
+  }catch(e){}
+  return {running:false,startedAt:0,elapsed:0};
+}
+function writeCircuitStopwatch(cid,day,state){localStorage.setItem(circuitStopwatchKey(cid,day),JSON.stringify(state));}
+function circuitStopwatchElapsed(state){return Math.max(0,(Number(state?.elapsed)||0)+(state?.running&&state?.startedAt?Date.now()-Number(state.startedAt):0));}
+function formatCircuitStopwatch(ms){
+  const total=Math.floor(Math.max(0,ms)/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),sec=total%60;
+  return h>0?`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function circuitStopwatchMarkup(cid,day){
+  const s=readCircuitStopwatch(cid,day);
+  return `<div class="circuit-stopwatch-card" data-cid="${esc(cid)}" data-day="${esc(day)}">
+    <div class="circuit-stopwatch-label">CRONOMETRO</div>
+    <div id="circuitStopwatchDisplay" class="circuit-stopwatch-display">${formatCircuitStopwatch(circuitStopwatchElapsed(s))}</div>
+    <div class="circuit-stopwatch-actions">
+      <button id="circuitStopwatchStart" class="btn blue" type="button" onclick="startCircuitStopwatch('${cid}','${day}')" ${s.running?'disabled':''}>Start</button>
+      <button id="circuitStopwatchStop" class="btn red" type="button" onclick="stopCircuitStopwatch('${cid}','${day}')" ${s.running?'':'disabled'}>Stop</button>
+    </div>
+    <div class="circuit-stopwatch-note">Premi Start quando inizi il primo round e Stop appena completi l’ultimo.</div>
+  </div>`;
+}
+function refreshCircuitStopwatch(){
+  const card=document.querySelector('.circuit-stopwatch-card'); if(!card)return;
+  const cid=card.dataset.cid,day=card.dataset.day,s=readCircuitStopwatch(cid,day);
+  const display=document.getElementById('circuitStopwatchDisplay'); if(display)display.textContent=formatCircuitStopwatch(circuitStopwatchElapsed(s));
+  const start=document.getElementById('circuitStopwatchStart'),stop=document.getElementById('circuitStopwatchStop');
+  if(start)start.disabled=s.running; if(stop)stop.disabled=!s.running;
+}
+function startCircuitStopwatch(cid,day){
+  writeCircuitStopwatch(cid,day,{running:true,startedAt:Date.now(),elapsed:0});
+  refreshCircuitStopwatch();
+}
+async function stopCircuitStopwatch(cid,day){
+  const current=readCircuitStopwatch(cid,day); if(!current.running)return;
+  const elapsed=circuitStopwatchElapsed(current),formatted=formatCircuitStopwatch(elapsed);
+  writeCircuitStopwatch(cid,day,{running:false,startedAt:0,elapsed});
+  const input=document.getElementById('circuitTotalTimeInput'); if(input)input.value=formatted;
+  await saveCircuitTotalTime(cid,day,formatted);
+  refreshCircuitStopwatch();
+}
+if(!circuitStopwatchInterval)circuitStopwatchInterval=setInterval(refreshCircuitStopwatch,250);
 
 // ===== TIMER RECUPERO SCHEDA =====
 let workoutTimerInterval=null;
@@ -4253,6 +4477,12 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 .circuit-client-rounds{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px 0 16px;padding:13px 16px;border-radius:20px;border:1px solid rgba(var(--theme-accent-rgb),.5);background:rgba(var(--theme-accent-rgb),.08)}.circuit-client-rounds span{margin-top:4px}.circuit-client-rounds strong{font-size:34px;margin:0}
 .circuit-table .circuit-head,.circuit-table .circuit-row{grid-template-columns:minmax(0,2.6fr) minmax(92px,.8fr) 78px!important}.circuit-table .circuit-head>div:not(:first-child),.circuit-table .circuit-row>div:not(:first-child){border-left:1px solid rgba(var(--theme-accent-rgb),.28)}
 .circuit-row .circuit-repmt input{width:100%;min-width:0;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center;color:#fff;font-weight:900;padding:4px}
+
+.circuit-stopwatch-card{margin-top:16px;padding:16px;border-radius:22px;border:1px solid rgba(var(--theme-accent-rgb),.50);background:rgba(var(--theme-accent-rgb),.07);box-shadow:0 0 22px rgba(var(--theme-accent-rgb),.10)}
+.circuit-stopwatch-label{text-align:center;font-size:10px;letter-spacing:.22em;font-weight:900;color:var(--theme-accent);margin-bottom:6px}
+.circuit-stopwatch-display{text-align:center;font-variant-numeric:tabular-nums;font-size:38px;line-height:1.05;font-weight:900;letter-spacing:.06em;color:#fff;text-shadow:0 0 18px rgba(var(--theme-accent-rgb),.20);margin:4px 0 14px}
+.circuit-stopwatch-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.circuit-stopwatch-actions .btn{width:100%;min-height:48px;margin:0;font-weight:900}.circuit-stopwatch-actions .btn:disabled{opacity:.48;cursor:default;transform:none}
+.circuit-stopwatch-note{text-align:center;color:#aab3bf;font-size:10px;line-height:1.35;margin-top:10px}
 .circuit-result-card{margin-top:16px;padding:15px;border-radius:20px;border:1px solid rgba(var(--theme-accent-rgb),.32);background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface))}.circuit-result-card label{margin-top:0;color:#cbd0d7;letter-spacing:.08em}.circuit-time-input{height:50px;text-align:center;font-size:22px;font-weight:900;letter-spacing:.08em;border-color:rgba(var(--theme-accent-rgb),.54)!important}
 @media(max-width:480px){.workout-type-grid{grid-template-columns:1fr}.circuit-topbar{padding:12px}.circuit-topbar>div strong{font-size:31px}.circuit-table .circuit-head,.circuit-table .circuit-row{grid-template-columns:minmax(0,2.25fr) 90px 62px!important}.circuit-row .ex-name{font-size:13px}.circuit-row .ex-cell{font-size:12px}.circuit-result-card{padding:12px}.circuit-time-input{font-size:19px}}
 /* nuovo default: grigio + giallo */
