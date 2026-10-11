@@ -1750,8 +1750,130 @@ input::placeholder,textarea::placeholder{color:#65758b}
 }
 </style>
 
+
+<style id="sdc-exercise-width-fix-v6">
+/* ESERCIZIO più largo su mobile, REC più stretto */
+@media (max-width:480px){
+  .exercise-head,
+  .exercise-row,
+  .app.scheda-focus .exercise-head,
+  .app.scheda-focus .exercise-row{
+    grid-template-columns:minmax(0,1.22fr) 52px 70px 40px 60px!important;
+  }
+
+  .exercise-head{
+    padding:0 4px!important;
+    font-size:8px!important;
+  }
+
+  .exercise-head div{
+    padding:0 2px!important;
+  }
+
+  .ex-name{
+    padding:0 6px!important;
+    font-size:13px!important;
+    line-height:1.05!important;
+  }
+
+  .trainer-inline-row .inline-name textarea{
+    padding:3px 6px!important;
+    font-size:12.5px!important;
+    line-height:1.1!important;
+  }
+
+  .exercise-row > .ex-cell:nth-of-type(4),
+  .trainer-inline-row > .rec-cell{
+    padding-left:1px!important;
+    padding-right:1px!important;
+  }
+}
+</style>
+
+
+<style id="sdc-payments-v7">
+/* ===== PAGAMENTI V7: stato modificabile + incasso mensile + storico ===== */
+.payment-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0 20px;
+}
+.payment-total-card{
+  padding:18px;
+  border-radius:22px;
+  border:1px solid rgba(var(--theme-accent-rgb),.34);
+  background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface));
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.payment-total-card span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+.payment-total-card b{
+  display:block;
+  font-size:28px;
+  line-height:1;
+  color:#fff;
+}
+.payment-total-card small{
+  display:block;
+  margin-top:8px;
+  color:var(--muted);
+  font-size:11px;
+}
+.payment-month-history{display:grid;gap:8px}
+.payment-month-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:13px 14px;
+  border-radius:17px;
+  border:1px solid rgba(var(--theme-accent-rgb),.23);
+  background:linear-gradient(145deg,var(--theme-surface-2),var(--theme-surface));
+}
+.payment-month-row strong{display:block;font-size:14px}
+.payment-month-row small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.payment-month-row b{font-size:17px;white-space:nowrap}
+.payment-status-toggle{
+  min-width:92px;
+  padding:8px 10px!important;
+  border-radius:999px!important;
+  font-size:10px!important;
+  line-height:1.05!important;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-weight:900!important;
+}
+.payment-status-toggle.is-paid{
+  border-color:rgba(73,214,138,.48)!important;
+  color:#8ef0b6!important;
+  background:rgba(34,128,80,.14)!important;
+}
+.payment-status-toggle.is-due{
+  border-color:rgba(var(--theme-accent-rgb),.55)!important;
+  color:var(--theme-secondary)!important;
+  background:rgba(var(--theme-accent-rgb),.10)!important;
+}
+.payment-row-actions{display:flex;align-items:center;gap:8px}
+.payment-amount-block{text-align:right;min-width:92px}
+@media(max-width:480px){
+  .payment-summary-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .payment-total-card{padding:14px 12px;border-radius:18px}
+  .payment-total-card b{font-size:23px}
+  .payment-row-actions{gap:6px}
+  .payment-status-toggle{min-width:82px;padding:7px 8px!important;font-size:9px!important}
+}
+</style>
+
 </head>
-<body data-build="rip-v5">
+<body data-build="payments-v7">
 <section id="login" class="login">
   <div class="loginbox">
     <div class="login-logo-wrap">
@@ -2174,6 +2296,68 @@ async function syncPaymentsFromSupabase(){
   return remote;
 }
 
+
+function localISODate(d=new Date()){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function currentPaymentMonthKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function paymentMonthKey(date){
+  const s=String(date||'');
+  return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.slice(0,7):'';
+}
+function paymentMonthLabel(key){
+  if(!/^\d{4}-\d{2}$/.test(String(key||'')))return '—';
+  const [y,m]=key.split('-').map(Number);
+  const label=new Date(y,m-1,1).toLocaleDateString('it-IT',{month:'long',year:'numeric'});
+  return label.charAt(0).toUpperCase()+label.slice(1);
+}
+function euro(value){
+  const n=Number(value)||0;
+  return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:2}).format(n);
+}
+function paymentMonthlyStats(){
+  const map=new Map();
+  (db.payments||[]).forEach(p=>{
+    if(String(p.status||'').trim().toLowerCase()!=='pagato')return;
+    const key=paymentMonthKey(p.date);
+    if(!key)return;
+    const prev=map.get(key)||{key,total:0,count:0};
+    prev.total+=Number(p.amount)||0;
+    prev.count+=1;
+    map.set(key,prev);
+  });
+  return [...map.values()].sort((a,b)=>b.key.localeCompare(a.key));
+}
+function outstandingTotal(){
+  return (db.payments||[]).reduce((sum,p)=>String(p.status||'').trim().toLowerCase()==='pagato'?sum:sum+(Number(p.amount)||0),0);
+}
+async function togglePaymentStatus(pid){
+  const p=db.payments.find(x=>String(x.id)===String(pid));
+  if(!p)return alert('Pagamento non trovato.');
+  const isPaid=String(p.status||'').trim().toLowerCase()==='pagato';
+  const nextStatus=isPaid?'da pagare':'pagato';
+  const updates={status:nextStatus};
+  // Quando passa a PAGATO, la data diventa la data reale di incasso:
+  // in questo modo il totale mensile finisce automaticamente nel mese corretto.
+  if(!isPaid) updates.payment_date=localISODate();
+  try{
+    const {error}=await sb.from('payments').update(updates).eq('id',pid);
+    if(error) throw error;
+    p.status=nextStatus;
+    if(!isPaid)p.date=updates.payment_date;
+    save();
+    await setTrainerPage('payments');
+  }catch(err){
+    alert('Errore aggiornamento stato: '+(err.message||err));
+  }
+}
+
 async function deletePayment(pid){
   const p=db.payments.find(x=>String(x.id)===String(pid));
   if(!p)return alert('Pagamento non trovato.');
@@ -2383,6 +2567,10 @@ function trainer(){
   const trainerPage=session.page||"dashboard";
   const appointmentsSorted=db.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   const paymentsSorted=db.payments.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const paymentMonths=paymentMonthlyStats();
+  const currentMonthKey=currentPaymentMonthKey();
+  const currentMonth=paymentMonths.find(x=>x.key===currentMonthKey)||{key:currentMonthKey,total:0,count:0};
+  const totalDue=outstandingTotal();
 
   const dashboard=`
     <div class="trainer-layout">
@@ -2475,28 +2663,57 @@ function trainer(){
       <section class="page-head">
         <div class="page-kicker">Pagamenti</div>
         <h1>Pagamenti</h1>
-        <div class="page-sub">Registra i pagamenti e rendili disponibili direttamente al cliente interessato.</div>
+        <div class="page-sub">Registra gli incassi, aggiorna lo stato e controlla l'andamento mese per mese.</div>
       </section>
+
+      <div class="payment-summary-grid">
+        <div class="payment-total-card">
+          <span>Incasso ${esc(paymentMonthLabel(currentMonthKey))}</span>
+          <b>${esc(euro(currentMonth.total))}</b>
+          <small>${currentMonth.count} ${currentMonth.count===1?'pagamento incassato':'pagamenti incassati'} dal 1° a oggi</small>
+        </div>
+        <div class="payment-total-card">
+          <span>Totale da incassare</span>
+          <b>${esc(euro(totalDue))}</b>
+          <small>${db.payments.filter(p=>String(p.status||'').trim().toLowerCase()!=='pagato').length} pagamenti ancora da pagare</small>
+        </div>
+      </div>
 
       <div class="actions">
         <button class="btn blue" onclick="paymentForm()">＋ Aggiungi pagamento</button>
       </div>
 
       <section class="section">
-        <div class="list">${paymentsSorted.length?paymentsSorted.map(p=>`
+        <div class="sectionhead"><h2>Pagamenti</h2><div class="subtle-note">Tocca lo stato per modificarlo</div></div>
+        <div class="list">${paymentsSorted.length?paymentsSorted.map(p=>{
+          const paid=String(p.status||'').trim().toLowerCase()==='pagato';
+          return `
           <div class="row">
             <div>
               <strong>${esc(cname(p.clientId))}</strong>
               <small>${fmtDate(p.date)} · ${esc(p.method||'Metodo non indicato')}</small>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="text-align:right">
-                <strong>€ ${esc(p.amount)}</strong>
-                <div style="margin-top:4px"><span class="badge ${String(p.status).toLowerCase()==='pagato'?'ok':'due'}">${esc(p.status)}</span></div>
+            <div class="payment-row-actions">
+              <div class="payment-amount-block">
+                <strong>${esc(euro(p.amount))}</strong>
+                <div style="margin-top:5px">
+                  <button class="mini-btn payment-status-toggle ${paid?'is-paid':'is-due'}" onclick="togglePaymentStatus('${p.id}')">${paid?'PAGATO':'DA PAGARE'}</button>
+                </div>
               </div>
               <button class="mini-btn red" onclick="deletePayment('${p.id}')">Elimina</button>
             </div>
-          </div>`).join(""):`<div class="card empty">Nessun pagamento registrato.</div>`}
+          </div>`;
+        }).join(""):`<div class="card empty">Nessun pagamento registrato.</div>`}
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="sectionhead"><h2>Storico incassi mensili</h2><div class="subtle-note">Solo pagamenti con stato PAGATO</div></div>
+        <div class="payment-month-history">${paymentMonths.length?paymentMonths.map(m=>`
+          <div class="payment-month-row">
+            <div><strong>${esc(paymentMonthLabel(m.key))}</strong><small>${m.count} ${m.count===1?'pagamento':'pagamenti'}</small></div>
+            <b>${esc(euro(m.total))}</b>
+          </div>`).join(''):`<div class="card empty">Lo storico comparirà dopo il primo pagamento segnato come pagato.</div>`}
         </div>
       </section>
     </div>`;
