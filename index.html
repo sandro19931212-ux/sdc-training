@@ -1872,8 +1872,69 @@ input::placeholder,textarea::placeholder{color:#65758b}
 }
 </style>
 
+
+<style id="sdc-appointments-batch-v8">
+.appointment-batch-note{
+  margin:8px 0 12px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+}
+.appointment-slots{
+  display:grid;
+  gap:10px;
+  margin:10px 0 16px;
+}
+.appointment-slot{
+  display:grid;
+  grid-template-columns:36px minmax(0,1fr) minmax(0,.72fr);
+  gap:8px;
+  align-items:end;
+  padding:10px;
+  border:1px solid rgba(var(--theme-accent-rgb),.28);
+  border-radius:16px;
+  background:linear-gradient(155deg,var(--theme-surface-2),var(--theme-surface));
+}
+.appointment-slot-number{
+  width:32px;
+  height:42px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color:var(--theme-primary);
+  border:1px solid rgba(var(--theme-accent-rgb),.35);
+  background:rgba(var(--theme-accent-rgb),.08);
+}
+.appointment-slot label{
+  margin-top:0;
+  font-size:10px;
+}
+.appointment-slot input{
+  width:100%;
+  min-width:0;
+}
+@media(max-width:480px){
+  .appointment-slot{
+    grid-template-columns:32px minmax(0,1fr) minmax(0,.72fr);
+    gap:6px;
+    padding:9px 7px;
+  }
+  .appointment-slot-number{
+    width:28px;
+    height:40px;
+  }
+  .appointment-slot input{
+    padding-left:7px;
+    padding-right:7px;
+    font-size:12px;
+  }
+}
+</style>
+
 </head>
-<body data-build="payments-v7">
+<body data-build="appointments-v8">
 <section id="login" class="login">
   <div class="loginbox">
     <div class="login-logo-wrap">
@@ -3319,46 +3380,126 @@ async function deleteAppointment(aid){
   }
 }
 
-function appointmentForm(){show(`<h2>Nuovo appuntamento</h2><label>Cliente</label><select id="ac">${db.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select><div class="formgrid"><div><label>Data</label><input id="ad" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div><label>Ora</label><input id="at" type="time" value="18:00"></div></div><label>Note</label><input id="an" placeholder="Allenamento"><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveAppointment()">Salva</button></div>`)}
+
+function appointmentDefaultDate(index){
+  const d=new Date();
+  d.setDate(d.getDate()+(index*7));
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function collectAppointmentSlots(){
+  return [...document.querySelectorAll('.appointment-slot')].map(row=>({
+    date:row.querySelector('.appointment-date')?.value||'',
+    time:row.querySelector('.appointment-time')?.value||''
+  }));
+}
+
+function renderAppointmentSlots(){
+  const count=Math.max(1,Math.min(12,Number(document.getElementById('appointmentCount')?.value||4)));
+  const container=document.getElementById('appointmentSlots');
+  if(!container)return;
+
+  const previous=collectAppointmentSlots();
+  container.innerHTML=Array.from({length:count},(_,i)=>{
+    const prev=previous[i]||{};
+    const date=prev.date||appointmentDefaultDate(i);
+    const time=prev.time||'18:00';
+    return `<div class="appointment-slot">
+      <div class="appointment-slot-number">${i+1}</div>
+      <div>
+        <label>Data ${i+1}</label>
+        <input class="appointment-date" type="date" value="${date}">
+      </div>
+      <div>
+        <label>Ora ${i+1}</label>
+        <input class="appointment-time" type="time" value="${time}">
+      </div>
+    </div>`;
+  }).join('');
+
+  const saveBtn=document.getElementById('saveAppointmentsBtn');
+  if(saveBtn)saveBtn.textContent=count===1?'Salva appuntamento':`Salva ${count} appuntamenti`;
+}
+
+function appointmentForm(){
+  if(!db.clients.length)return alert('Crea prima un cliente.');
+  show(`<h2>Nuovi appuntamenti</h2>
+    <label>Cliente</label>
+    <select id="ac">${db.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>
+
+    <label>Numero appuntamenti</label>
+    <select id="appointmentCount" onchange="renderAppointmentSlots()">
+      ${Array.from({length:12},(_,i)=>i+1).map(n=>`<option value="${n}" ${n===4?'selected':''}>${n}</option>`).join('')}
+    </select>
+
+    <div class="appointment-batch-note">Scegli quante sedute vuoi inserire e imposta data e ora per ciascuna.</div>
+    <div id="appointmentSlots" class="appointment-slots"></div>
+
+    <label>Note</label>
+    <input id="an" placeholder="Allenamento">
+
+    <div class="actions">
+      <button class="btn" onclick="closeModal()">Annulla</button>
+      <button class="btn blue" id="saveAppointmentsBtn" onclick="saveAppointment()">Salva 4 appuntamenti</button>
+    </div>`);
+  renderAppointmentSlots();
+}
+
 async function saveAppointment(){
   if(!db.clients.length)return alert('Crea prima un cliente.');
   const clientId=document.getElementById('ac')?.value;
   const c=db.clients.find(x=>String(x.id)===String(clientId));
-  const date=document.getElementById('ad')?.value||'';
-  const time=document.getElementById('at')?.value||'';
   const note=(document.getElementById('an')?.value||'').trim();
+  const slots=collectAppointmentSlots();
 
   if(!c)return alert('Cliente non trovato.');
   if(!c.supabaseUserId)return alert('Questo cliente non è ancora collegato al suo account Supabase.');
-  if(!date||!time)return alert('Inserisci data e ora.');
+  if(!slots.length)return alert('Inserisci almeno un appuntamento.');
 
-  const appointmentId=id('ap');
+  const missing=slots.findIndex(x=>!x.date||!x.time);
+  if(missing>=0)return alert(`Inserisci data e ora per l'appuntamento ${missing+1}.`);
+
+  const seen=new Set();
+  for(let i=0;i<slots.length;i++){
+    const key=`${slots[i].date}|${slots[i].time}`;
+    if(seen.has(key))return alert(`Hai inserito due appuntamenti con la stessa data e ora.`);
+    seen.add(key);
+  }
+
+  const rows=slots.map(slot=>({
+    id:id('ap'),
+    client_id:String(c.id),
+    client_user_id:c.supabaseUserId,
+    appointment_date:slot.date,
+    appointment_time:slot.time,
+    note
+  }));
+
   try{
-    const {error}=await sb.from('appointments').insert({
-      id:appointmentId,
-      client_id:String(c.id),
-      client_user_id:c.supabaseUserId,
-      appointment_date:date,
-      appointment_time:time,
-      note
-    });
+    const {error}=await sb.from('appointments').insert(rows);
     if(error) throw error;
 
-    db.appointments.push({
-      id:appointmentId,
+    db.appointments.push(...rows.map(r=>({
+      id:String(r.id),
       clientId:String(c.id),
       supabaseUserId:c.supabaseUserId,
-      date,
-      time,
-      note
-    });
+      date:r.appointment_date,
+      time:r.appointment_time,
+      note:r.note
+    })));
+
     save();
     closeModal();
     try{await syncAppointmentsFromSupabase();}catch(e){console.warn(e);}
     setTrainerPage('appointments');
-    alert('Appuntamento salvato. Il cliente lo vedrà nella sua sezione Appuntamenti.');
+    alert(rows.length===1
+      ?'Appuntamento salvato. Il cliente lo vedrà nella sua sezione Appuntamenti.'
+      :`${rows.length} appuntamenti salvati. Il cliente li vedrà nella sua sezione Appuntamenti.`);
   }catch(err){
-    alert('Errore salvataggio appuntamento: '+(err.message||err));
+    alert('Errore salvataggio appuntamenti: '+(err.message||err));
   }
 }
 function paymentsPanel(){setTrainerPage('payments')}
