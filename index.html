@@ -2408,7 +2408,10 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 /* HOME CLIENTE */
 .sdc-client-home{padding:8px 2px 4px}
 .sdc-client-home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:0 2px 24px}
-.sdc-client-home-head h1{margin:0;font-size:31px;line-height:1.05;letter-spacing:-.035em;font-weight:850;color:white}.sdc-client-home-head p{margin:7px 0 0;color:#A7AAAD;font-size:14px}
+.sdc-client-home-head .sdc-greeting-kicker{display:block;margin:0 0 5px;color:var(--sdc-yellow);font-size:10px;font-weight:950;letter-spacing:.28em;line-height:1;text-transform:uppercase}
+.sdc-client-home-head h1{margin:0;font-size:34px;line-height:1;letter-spacing:-.045em;font-weight:900;color:#F7F7F4}
+.sdc-client-home-head .sdc-greeting-line{width:34px;height:3px;margin-top:10px;border-radius:999px;background:var(--sdc-yellow);box-shadow:0 0 12px rgba(var(--theme-accent-rgb),.22)}
+.sdc-client-home-head p{margin:9px 0 0;color:#A7AAAD;font-size:14px}
 .sdc-notify-btn{width:42px;height:42px;border:0;background:transparent;color:#E9E9E5;padding:8px}.sdc-notify-btn svg{width:100%;height:100%}
 .sdc-home-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;margin:0!important}
 .sdc-home-tile{position:relative!important;min-height:142px!important;padding:18px!important;border-radius:20px!important;border:1px solid rgba(255,255,255,.075)!important;background:linear-gradient(150deg,#1E2124,#171A1C)!important;color:white!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;text-align:left!important;box-shadow:0 14px 28px rgba(0,0,0,.16)!important}
@@ -2439,7 +2442,7 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 @media(max-width:480px){
   .wrap{padding-left:14px!important;padding-right:14px!important}.app.role-client .wrap{padding-top:18px!important}
   .sdc-wordmark{font-size:60px}.sdc-training-word{font-size:16px}.sdc-login-brand{margin-bottom:38px}
-  .sdc-client-home-head h1{font-size:29px}.sdc-home-tile{min-height:128px!important;padding:16px!important}.sdc-home-icon{width:48px;height:42px}.sdc-home-icon svg{width:33px;height:33px}
+  .sdc-client-home-head h1{font-size:32px}.sdc-home-tile{min-height:128px!important;padding:16px!important}.sdc-home-icon{width:48px;height:42px}.sdc-home-icon svg{width:33px;height:33px}
   .sdc-program-title h2{font-size:21px}.sdc-program-tabs span{font-size:11px;min-height:40px}.days-wrap{gap:5px!important}.day-tab{font-size:9px!important;min-height:36px!important}
   .sdc-client-ex-card{padding:13px 39px 12px 52px;min-height:78px}.sdc-client-ex-card::before{left:11px;top:14px;width:29px;height:29px}.sdc-client-ex-title{font-size:14px!important}.sdc-client-ex-meta{gap:6px;font-size:10.5px}.sdc-client-chevron{right:12px}
   .modal.sheet-page-mode .modalbox{padding:15px 13px 116px!important}.sdc-trainer-sheet-head h2{font-size:28px}.sdc-trainer-card{padding:12px 37px 11px 50px!important}.sdc-trainer-metrics{gap:4px!important}.sdc-edit-field input,.sdc-edit-field textarea{font-size:10px!important}.sdc-trainer-card .trainer-drag-handle{right:5px!important}
@@ -2487,6 +2490,13 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
     padding:4px 3px!important;
   }
 }
+</style>
+
+<style id="sdc-day-workout-title-v1">
+.sdc-day-title-editor{display:block!important;margin:12px 0 0!important;text-transform:none!important;letter-spacing:0!important}
+.sdc-day-title-editor>span{display:block;margin:0 0 6px;color:#8B9095;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.sdc-day-title-editor input{height:42px!important;padding:9px 12px!important;border-radius:12px!important;border:1px solid rgba(var(--theme-primary-rgb),.24)!important;background:#1C1F21!important;color:#F5F5F2!important;font-size:14px!important;font-weight:800!important;box-shadow:none!important}
+.sdc-day-title-editor input:focus{border-color:rgba(var(--theme-primary-rgb),.58)!important;box-shadow:0 0 0 2px rgba(var(--theme-primary-rgb),.08)!important}
 </style>
 </head>
 
@@ -4042,6 +4052,20 @@ async function openTrainerClientProfile(cid,skipSync=false){
   `);
 }
 
+function trainerSetDayWorkoutTitle(cid,day,value){
+  const clean=String(value||'').trim();
+  const rows=db.workouts.filter(w=>String(w.clientId)===String(cid)&&(w.day||'Giorno 1')===day);
+  if(!rows.length)return;
+  const circuitRow=rows.find(isCircuitWorkout);
+  if(circuitRow){
+    const meta=circuitMetaFromTitle(circuitRow.title)||{rounds:4,totalTime:'',label:'Circuito'};
+    setCircuitDayMeta(cid,day,{label:clean||'Circuito'});
+  }else{
+    rows.forEach(w=>w.title=clean||'Allenamento');
+    save();
+  }
+}
+
 async function openClient(cid,skipSync=false){
   const c=db.clients.find(x=>x.id===cid); if(!c)return;
   if(!skipSync){try{await syncWorkoutsFromSupabase(cid);}catch(e){console.warn('Sync scheda trainer:',e);}}
@@ -4049,6 +4073,7 @@ async function openClient(cid,skipSync=false){
   const trainerDay=(window.__trainerClientDay&&DAYS.includes(window.__trainerClientDay))?window.__trainerClientDay:'Giorno 1';
   const dayExercises=w.filter(x=>x.day===trainerDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
   const circuitMeta=circuitDayMeta(w,trainerDay);
+  const trainerDayTitle=circuitMeta?.label || dayExercises[0]?.title || 'Allenamento';
   const head='';
   const rows=dayExercises.length?dayExercises.map(ex=>circuitMeta?`<div class="exercise-row trainer-inline-row sdc-trainer-card circuit-row" data-workout-id="${ex.id}">
           <button class="trainer-drag-handle" type="button" aria-label="Sposta esercizio" title="Trascina per spostare" onpointerdown="trainerDragStart(event,'${cid}','${trainerDay}','${ex.id}')">≡</button>
@@ -4073,6 +4098,7 @@ async function openClient(cid,skipSync=false){
       <div class="page-kicker">${circuitMeta?'Circuito cliente':'Scheda cliente'}</div>
       <h2>${esc(c.name)}</h2><div class="page-sub">${esc(c.email)}</div>
       <div class="sdc-program-tabs trainer-tabs"><span class="${!circuitMeta?'active':''}">Scheda Classica</span><span class="${circuitMeta?'active':''}">Circuito / Hyrox</span></div>
+      <label class="sdc-day-title-editor"><span>Nome allenamento</span><input value="${esc(trainerDayTitle)}" placeholder="Es. Petto · Spalle" oninput="trainerSetDayWorkoutTitle('${cid}','${trainerDay}',this.value)"></label>
     </section>
     <section class="scheme-hero ${circuitMeta?'circuit-hero':''} sdc-trainer-sheet-body" style="margin-top:12px">
       <div class="days-wrap">${DAYS.map(day=>`<button class="day-tab ${day===trainerDay?'active':''}" onclick="window.__trainerClientDay='${day}';openClient('${cid}',true)">${day.replace('Giorno ','G')}</button>`).join('')}</div>
@@ -4546,13 +4572,12 @@ function client(){
   const latestWeight=weightList.length?weightList[weightList.length-1].weight:'—';
   const currentDay=session.clientDay&&DAYS.includes(session.clientDay)?session.clientDay:'Giorno 1';
   const dayExercises=workouts.filter(x=>x.day===currentDay).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));
-  const currentProgram=workouts[0]?.title||'Scheda attiva';
   const progressCount=weightList.length;
 
   const dashboard=`
     <section class="sdc-client-home">
       <div class="sdc-client-home-head">
-        <div><h1>Ciao ${esc(c.name.split(' ')[0])}</h1><p>Benvenuto nel tuo percorso</p></div>
+        <div><span class="sdc-greeting-kicker">CIAO,</span><h1>${esc(c.name.split(' ')[0])}</h1><div class="sdc-greeting-line"></div><p>Benvenuto nel tuo percorso</p></div>
         <button class="sdc-notify-btn" type="button" aria-label="Notifiche">${NAV_SVGS.bell}</button>
       </div>
       <div class="sdc-home-grid">
@@ -4576,6 +4601,7 @@ function client(){
     <section class="section session-history"><div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">Svolte: ${completedAppointments.length}</div></div><div class="list">${completedAppointments.length?completedAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)} <span class="badge ok">Svolta</span></strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta svolta ancora.</div>`}</div></section>`;
 
   const circuitMeta=circuitDayMeta(workouts,currentDay);
+  const currentProgram=circuitMeta?.label || dayExercises[0]?.title || 'Allenamento';
   const sheetHeader=`
     <section class="sdc-client-sheet-head">
       <div class="sdc-sheet-nav"><button type="button" onclick="setPage('dashboard')" aria-label="Indietro">‹</button><h1>Scheda</h1><span></span></div>
