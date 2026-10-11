@@ -2613,6 +2613,82 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
   .sdc-client-logout-btn{min-height:40px;padding:0 14px;font-size:12px}
 }
 </style>
+
+<style id="sdc-client-dashboard-honeycomb-v1">
+/* Dashboard cliente: texture nido d'ape dinamica + respiro sopra le card.
+   Nessun'altra pagina viene modificata. */
+#page-dashboard{
+  position:relative;
+  isolation:isolate;
+  min-height:calc(100svh - 150px);
+}
+#page-dashboard::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.82;
+  background:
+    radial-gradient(circle at 78% 18%,rgba(var(--theme-accent-rgb),.12) 0,rgba(var(--theme-accent-rgb),.055) 16%,transparent 34%),
+    radial-gradient(circle at 12% 74%,rgba(var(--theme-accent-rgb),.075) 0,transparent 27%),
+    linear-gradient(30deg,rgba(var(--theme-accent-rgb),.105) 12%,transparent 12.5%,transparent 87%,rgba(var(--theme-accent-rgb),.105) 87.5%,rgba(var(--theme-accent-rgb),.105)),
+    linear-gradient(150deg,rgba(var(--theme-accent-rgb),.105) 12%,transparent 12.5%,transparent 87%,rgba(var(--theme-accent-rgb),.105) 87.5%,rgba(var(--theme-accent-rgb),.105)),
+    linear-gradient(30deg,rgba(var(--theme-accent-rgb),.065) 12%,transparent 12.5%,transparent 87%,rgba(var(--theme-accent-rgb),.065) 87.5%,rgba(var(--theme-accent-rgb),.065)),
+    linear-gradient(150deg,rgba(var(--theme-accent-rgb),.065) 12%,transparent 12.5%,transparent 87%,rgba(var(--theme-accent-rgb),.065) 87.5%,rgba(var(--theme-accent-rgb),.065)),
+    linear-gradient(60deg,rgba(var(--theme-accent-rgb),.055) 25%,transparent 25.5%,transparent 75%,rgba(var(--theme-accent-rgb),.055) 75%,rgba(var(--theme-accent-rgb),.055)),
+    linear-gradient(60deg,rgba(var(--theme-accent-rgb),.055) 25%,transparent 25.5%,transparent 75%,rgba(var(--theme-accent-rgb),.055) 75%,rgba(var(--theme-accent-rgb),.055));
+  background-size:
+    100% 100%,
+    100% 100%,
+    72px 126px,
+    72px 126px,
+    72px 126px,
+    72px 126px,
+    72px 126px,
+    72px 126px;
+  background-position:
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    36px 63px,
+    36px 63px,
+    0 0,
+    36px 63px;
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.95) 0%,rgba(0,0,0,.82) 23%,rgba(0,0,0,.62) 58%,rgba(0,0,0,.78) 100%);
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.95) 0%,rgba(0,0,0,.82) 23%,rgba(0,0,0,.62) 58%,rgba(0,0,0,.78) 100%);
+}
+#page-dashboard::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 72% 20%,rgba(var(--theme-accent-rgb),.15),transparent 6%),
+    radial-gradient(circle at 5% 46%,rgba(var(--theme-accent-rgb),.10),transparent 5%),
+    radial-gradient(circle at 86% 82%,rgba(var(--theme-accent-rgb),.10),transparent 7%),
+    linear-gradient(180deg,rgba(8,10,11,.08),rgba(8,10,11,.24));
+  filter:blur(.2px);
+}
+#page-dashboard > *{
+  position:relative;
+  z-index:1;
+}
+#page-dashboard .sdc-home-grid{
+  margin-top:44px!important;
+}
+#page-dashboard .sdc-home-tile{
+  background:linear-gradient(150deg,rgba(30,33,36,.97),rgba(23,26,28,.97))!important;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+@media(max-width:480px){
+  #page-dashboard .sdc-home-grid{margin-top:42px!important}
+}
+</style>
+
 </head>
 
 <body data-build="sessions-v1">
