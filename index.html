@@ -462,6 +462,17 @@ input:focus,select:focus,textarea:focus{border-color:#29a6ff;box-shadow:0 0 0 3p
   margin:0;
 }
 
+.sdc-trainer-stat-card{position:relative;overflow:hidden}
+.sdc-trainer-stat-ico{position:absolute;top:14px;right:14px;width:28px;height:28px;color:rgba(var(--theme-primary-rgb),.88);opacity:.95;display:grid;place-items:center;pointer-events:none}
+.sdc-trainer-stat-ico svg{width:100%;height:100%;display:block}
+.sdc-trainer-stat-card.icon-only b{font-size:20px;line-height:1.05;margin-top:6px}
+.sdc-trainer-stat-card.icon-only span{max-width:80%}
+@media(max-width:480px){
+  .sdc-trainer-stat-ico{top:12px;right:12px;width:26px;height:26px}
+  .sdc-trainer-stat-card.icon-only b{font-size:18px}
+}
+
+
 /* Scheda: compattata solo su mobile */
 @media (max-width:480px){
   .scheme-hero{
@@ -2446,6 +2457,37 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 .session-summary-card span{font-size:11px;color:var(--muted)}
 @media(max-width:480px){.session-summary-grid{gap:8px}.session-summary-card{padding:12px}.session-summary-card b{font-size:22px}}
 </style>
+<style id="sdc-fix-dashboard-icons-reps-v1">
+/* Fix mirati: icone Dashboard trainer + allineamento valori RIP */
+.sdc-trainer-card .reps-cell{display:flex!important;flex-direction:column!important;justify-content:flex-start!important}
+.sdc-trainer-card .reps-cell .trainer-reps-input,
+.trainer-inline-row .trainer-reps-input{
+  display:block!important;
+  width:100%!important;
+  height:32px!important;
+  min-height:32px!important;
+  line-height:1.1!important;
+  padding:4px!important;
+  border-radius:9px!important;
+  border:1px solid rgba(255,255,255,.075)!important;
+  background:#24272A!important;
+  box-shadow:none!important;
+  text-align:center!important;
+  font-size:10.5px!important;
+  font-weight:800!important;
+  color:#F2F2EF!important;
+  margin:0!important;
+}
+@media(max-width:480px){
+  .sdc-trainer-card .reps-cell .trainer-reps-input,
+  .trainer-inline-row .trainer-reps-input{
+    height:32px!important;
+    min-height:32px!important;
+    font-size:10px!important;
+    padding:4px 3px!important;
+  }
+}
+</style>
 </head>
 
 <body data-build="sessions-v1">
@@ -3175,6 +3217,14 @@ const HOME_SVGS={
   altro:`<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="currentColor"><circle cx="7" cy="16" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="25" cy="16" r="3"/></g></svg>`
 };
 
+
+const TRAINER_DASH_ICONS={
+  clients:`<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="11" r="5" fill="currentColor"/><path d="M7 27c1-5.4 4-8.6 9-8.6S24 21.6 25 27" fill="currentColor"/></svg>`,
+  photo:HOME_SVGS.photo,
+  appointments:HOME_SVGS.appuntamenti,
+  payments:`<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="8" width="24" height="16" rx="4" fill="currentColor"/><rect x="7" y="12" width="18" height="2.8" rx="1.4" fill="#171717" opacity=".92"/><circle cx="22.5" cy="20" r="2.4" fill="#171717" opacity=".92"/></svg>`
+};
+
 function setNav(items,activeKey){
   const bottomNavEl=document.getElementById("bottomNav");
   if(!bottomNavEl) return;
@@ -3279,10 +3329,10 @@ function trainer(){
       </section>
 
       <div class="grid">
-        <div class="card stat action-card" onclick="setTrainerPage('clients')"><b>${db.clients.length}</b><span>Clienti</span></div>
-        <div class="card stat photo-quick action-card icon-card" onclick="jumpToTrainerSection('checkfoto')"><b>▣</b><span>Check Foto</span></div>
-        <div class="card stat action-card" onclick="setTrainerPage('appointments')"><b>${appointmentsUpcoming.length}</b><span>Sedute residue</span></div>
-        <div class="card stat action-card" onclick="setTrainerPage('payments')"><b>${db.payments.length}</b><span>Pagamenti</span></div>
+        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('clients')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.clients}</span><b>${db.clients.length}</b><span>Clienti</span></div>
+        <div class="card stat action-card icon-card sdc-trainer-stat-card icon-only" onclick="jumpToTrainerSection('checkfoto')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.photo}</span><b>Check Foto</b><span>Apri archivio</span></div>
+        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('appointments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.appointments}</span><b>${appointmentsUpcoming.length}</b><span>Sedute residue</span></div>
+        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('payments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.payments}</span><b>${db.payments.length}</b><span>Pagamenti</span></div>
       </div>
 
       <div class="actions trainer-actions-compact">
