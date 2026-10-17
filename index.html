@@ -2794,7 +2794,8 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 }
 </style>
 
-</head>
+<style>.sdc-tools{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.sdc-tools input{flex:2;min-width:150px}.sdc-tools select{flex:1;min-width:130px}.sdc-tools label{display:grid;gap:5px;flex:1}.sdc-week-scroll{overflow:auto;max-height:650px;border:1px solid var(--theme-accent,#ffe329);border-radius:18px;margin:16px 0}.sdc-week{display:grid;grid-template-columns:48px repeat(7,minmax(130px,1fr));min-width:980px;position:relative}.sdc-day{border-left:1px solid #ffffff18}.sdc-day-head{height:64px;padding:8px;text-align:center;background:var(--card,#191d20);position:sticky;top:0;z-index:2}.sdc-day-track{position:relative;height:1440px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 59px,#ffffff16 59px,#ffffff16 60px)}.sdc-hours{padding-top:64px}.sdc-hours span{display:block;height:60px;font-size:11px}.sdc-event{position:absolute;left:3px;right:3px;overflow:hidden;text-align:left;padding:5px;border:1px solid var(--theme-accent,#ffe329);border-radius:8px;background:#24251a;color:inherit;font-size:12px;cursor:pointer}.sdc-event strong,.sdc-event small{display:block}.sdc-menu{position:relative}.sdc-menu summary{cursor:pointer;list-style:none;padding:8px 12px;border-radius:10px;background:#ffffff10}.sdc-menu[open]{z-index:5}.sdc-menu-body{position:absolute;right:0;min-width:170px;background:#202428;padding:8px;border:1px solid #ffffff30;border-radius:12px;box-shadow:0 8px 24px #0009;display:grid;gap:8px}.sdc-alerts{display:grid;gap:10px;margin:16px 0}.sdc-alerts button{text-align:left;white-space:normal}.sdc-undo{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);width:min(94vw,520px);padding:15px;background:#202428;border:1px solid var(--theme-accent,#ffe329);border-radius:14px;z-index:99999;display:flex;gap:12px;align-items:center;box-shadow:0 8px 30px #0009}.sdc-undo span{flex:1}.sdc-profile-list{display:grid;gap:8px}.sdc-profile-list .row{padding:12px}.sdc-badge{color:var(--theme-accent,#ffe329)}@media(max-width:600px){.sdc-tools{flex-direction:column}.sdc-menu-body{min-width:145px}}
+</style></head>
 
 <body data-build="sessions-v1">
 <section id="login" class="login">
@@ -3252,7 +3253,7 @@ async function saveWorkoutsToSupabase(clientId){
 async function syncPaymentsFromSupabase(){
   const {data,error}=await sb
     .from('payments')
-    .select('id,client_id,client_user_id,amount,payment_date,status,method,created_at')
+    .select('id,client_id,client_user_id,amount,payment_date,status,method,purpose,due_date,created_at')
     .order('payment_date',{ascending:false});
   if(error) throw error;
 
@@ -3263,7 +3264,7 @@ async function syncPaymentsFromSupabase(){
     amount:p.amount==null?'':String(p.amount),
     date:p.payment_date||'',
     status:p.status||'da pagare',
-    method:p.method||''
+    method:p.method||'',purpose:p.purpose||'',dueDate:p.due_date||''
   }));
 
   if(session?.role==='client'){
@@ -3357,7 +3358,7 @@ async function deletePayment(pid){
 async function syncAppointmentsFromSupabase(){
   const {data,error}=await sb
     .from('appointments')
-    .select('id,client_id,client_user_id,appointment_date,appointment_time,note,created_at')
+    .select('id,client_id,client_user_id,appointment_date,appointment_time,note,duration_minutes,created_at')
     .order('appointment_date',{ascending:true})
     .order('appointment_time',{ascending:true});
   if(error) throw error;
@@ -3368,7 +3369,7 @@ async function syncAppointmentsFromSupabase(){
     supabaseUserId:a.client_user_id||'',
     date:a.appointment_date||'',
     time:(a.appointment_time||'').slice(0,5),
-    note:a.note||''
+    note:a.note||'',duration:Number(a.duration_minutes)||60
   }));
 
   if(session?.role==='client'){
@@ -3641,7 +3642,7 @@ function trainer(){
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('payments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.payments}</span><b>${db.payments.length}</b><span>Pagamenti</span></div>
       </div>
 
-      <div class="actions trainer-actions-compact">
+      ${dashboardTasks()}<div class="actions trainer-actions-compact">
         <button class="btn blue" onclick="clientForm()">＋ Nuovo cliente</button>
         <button class="btn" onclick="setTrainerPage('appointments')">Appuntamenti</button>
       </div>
@@ -3669,7 +3670,7 @@ function trainer(){
       </div>
 
       <section class="section">
-        <div class="list">${db.clients.length?db.clients.map(c=>{
+        ${clientFilters()}<div class="list">${filteredClients().length?filteredClients().map(c=>{
           const cw=db.weights.filter(w=>String(w.clientId)===String(c.id)).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
           const lastWeight=cw.length?cw[cw.length-1].weight:null;
           const sessionStats=clientSessionStats(c.id);
@@ -3678,7 +3679,7 @@ function trainer(){
             <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Sedute residue: ${sessionStats.remaining} · Svolte: ${sessionStats.completed}</small></div>
             <div class="actions" style="margin:0">
               <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>
-              <button class="mini-btn red" onclick="delClient('${c.id}')">Elimina</button>
+              ${recordMenu("client",c.id)}
             </div>
           </div>`;
         }).join(""):`<div class="card empty">Nessun cliente. Crea il primo account.</div>`}
@@ -3718,7 +3719,7 @@ function trainer(){
         </button>
       </div>`}
 
-      <section class="section">
+      ${weeklyAgenda()}<section class="section">
         <div class="list">${appointmentsVisible.length?appointmentsVisible.map(a=>`
           <div class="row">
             <div>
@@ -3726,7 +3727,7 @@ function trainer(){
               <small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")}</small>
             </div>
             <div class="actions" style="margin:0">
-              <button class="mini-btn red" onclick="deleteAppointment('${a.id}')">Elimina</button>
+              ${recordMenu("appointment",a.id)}
             </div>
           </div>`).join(""):`<div class="card empty">${appointmentsTodayOnly?'Nessun appuntamento per oggi.':'Nessuna seduta futura.'}</div>`}
         </div>
@@ -3768,13 +3769,13 @@ function trainer(){
 
       <section class="section">
         <div class="sectionhead"><h2>Pagamenti</h2><div class="subtle-note">Tocca lo stato per modificarlo</div></div>
-        <div class="list">${paymentsSorted.length?paymentsSorted.map(p=>{
+        ${paymentFilters()}<div class="list">${filteredPayments(paymentsSorted).length?filteredPayments(paymentsSorted).map(p=>{
           const paid=String(p.status||'').trim().toLowerCase()==='pagato';
           return `
           <div class="row">
             <div>
               <strong>${esc(cname(p.clientId))}</strong>
-              <small>${fmtDate(p.date)} · ${esc(p.method||'Metodo non indicato')}</small>
+              <small>${fmtDate(p.date)} · ${esc(p.purpose||'Causale non indicata')} · ${esc(p.method||'Metodo non indicato')}${p.dueDate?' · Scadenza: '+fmtDate(p.dueDate):''}</small>
             </div>
             <div class="payment-row-actions">
               <div class="payment-amount-block">
@@ -3783,7 +3784,7 @@ function trainer(){
                   <button class="mini-btn payment-status-toggle ${paid?'is-paid':'is-due'}" onclick="togglePaymentStatus('${p.id}')">${paid?'PAGATO':'DA PAGARE'}</button>
                 </div>
               </div>
-              <button class="mini-btn red" onclick="deletePayment('${p.id}')">Elimina</button>
+              ${recordMenu("payment",p.id)}
             </div>
           </div>`;
         }).join(""):`<div class="card empty">Nessun pagamento registrato.</div>`}
@@ -4333,7 +4334,7 @@ async function openTrainerClientProfile(cid,skipSync=false){
       <div class="info-row"><span>Note</span><strong>${esc(c.note||'—')}</strong></div>
     </div>
 
-    <section class="section">
+    ${clientOverview(c.id)}<section class="section">
       <div class="sectionhead"><h2>Peso</h2><span class="badge">${latest?esc(latest.weight)+' kg':'Nessun dato'}</span></div>
       ${weightChartSvg(weights)}
       <div class="weight-history-list">${rows}</div>
@@ -5291,6 +5292,37 @@ window.addEventListener("error",function(e){
     err.textContent="Errore app: "+(e.message||"errore sconosciuto");
   }
 });
+// Management upgrade; additive database columns are documented in migration.sql.
+const managementUI={query:'',filter:'all',sort:'name',paymentState:'all',paymentMonth:'',paymentMethod:'',week:0};
+const paidPayment=p=>String(p.status||'').trim().toLowerCase()==='pagato';
+function filteredClients(){return db.clients.filter(c=>c.name.toLocaleLowerCase('it').includes(managementUI.query.toLocaleLowerCase('it'))).filter(c=>managementUI.filter==='empty'?clientSessionStats(c.id).remaining===0:managementUI.filter==='low'?clientSessionStats(c.id).remaining<=2:managementUI.filter==='due'?db.payments.some(p=>p.clientId===c.id&&!paidPayment(p)):true).sort((a,b)=>managementUI.sort==='remaining'?clientSessionStats(a.id).remaining-clientSessionStats(b.id).remaining:a.name.localeCompare(b.name,'it'));}
+function uiSet(key,value){managementUI[key]=value;trainer();}
+function clientFilters(){return `<div class="sdc-tools"><input aria-label="Cerca cliente" placeholder="Cerca per nome" value="${esc(managementUI.query)}" oninput="const pos=this.selectionStart;uiSet('query',this.value);const el=document.querySelector('[aria-label=&quot;Cerca cliente&quot;]');el.focus();el.setSelectionRange(pos,pos)"><select aria-label="Filtra clienti" onchange="uiSet('filter',this.value)">${[['all','Tutti i clienti'],['empty','Sedute esaurite'],['low','Al massimo 2 sedute'],['due','Pagamenti in sospeso']].map(([v,t])=>`<option value="${v}" ${managementUI.filter===v?'selected':''}>${t}</option>`).join('')}</select><select aria-label="Ordina clienti" onchange="uiSet('sort',this.value)"><option value="name">Nome A–Z</option><option value="remaining" ${managementUI.sort==='remaining'?'selected':''}>Sedute crescenti</option></select></div>`;}
+function filteredPayments(rows){return rows.filter(p=>(managementUI.paymentState==='all'||(managementUI.paymentState==='paid'?paidPayment(p):!paidPayment(p)))&&(!managementUI.paymentMonth||p.date?.startsWith(managementUI.paymentMonth))&&(!managementUI.paymentMethod||p.method===managementUI.paymentMethod));}
+function paymentFilters(){return `<div class="sdc-tools"><select aria-label="Stato pagamenti" onchange="uiSet('paymentState',this.value)">${[['all','Tutti gli stati'],['paid','Pagati'],['due','Da pagare']].map(([v,t])=>`<option value="${v}" ${managementUI.paymentState===v?'selected':''}>${t}</option>`).join('')}</select><label>Mese<input aria-label="Mese pagamenti" type="month" value="${esc(managementUI.paymentMonth)}" onchange="uiSet('paymentMonth',this.value)"></label><select aria-label="Metodo pagamento" onchange="uiSet('paymentMethod',this.value)"><option value="">Tutti i metodi</option>${[...new Set(db.payments.map(p=>p.method).filter(Boolean))].sort().map(v=>`<option ${managementUI.paymentMethod===v?'selected':''}>${esc(v)}</option>`).join('')}</select></div>`;}
+function dashboardTasks(){const today=db.appointments.filter(a=>a.date===localTodayISO());const low=db.clients.filter(c=>clientSessionStats(c.id).remaining<=2);return `<section class="section"><h2>Da tenere d’occhio</h2><div class="sdc-alerts"><button class="btn" onclick="openTodayAppointments()">Oggi: ${today.length} appuntamenti</button><button class="btn" onclick="uiSet('filter','low');setTrainerPage('clients')">${low.length} clienti con al massimo 2 sedute in agenda</button><button class="btn" onclick="uiSet('paymentState','due');setTrainerPage('payments')">Da incassare: ${euro(outstandingTotal())}</button></div><small>Le sedute residue indicano gli appuntamenti futuri già registrati, non il credito acquistato.</small></section>`;}
+function recordMenu(kind,rid){return `<details class="sdc-menu"><summary aria-label="Azioni ${kind}">•••</summary><div class="sdc-menu-body">${kind!=='client'?`<button class="mini-btn" onclick="${kind==='payment'?'paymentForm':'appointmentForm'}('${rid}',true)">Modifica${kind==='appointment'?' / Sposta':''}</button>`:''}<button class="mini-btn red" onclick="${kind==='payment'?'deletePayment':kind==='appointment'?'deleteAppointment':'delClient'}('${rid}')">Elimina</button></div></details>`;}
+function weekStart(){const d=new Date(localTodayISO()+'T12:00:00');d.setDate(d.getDate()-(d.getDay()+6)%7+managementUI.week*7);return d;}
+function shiftWeek(n){managementUI.week=n===0?0:managementUI.week+n;trainer();}
+function weeklyAgenda(){const start=weekStart();return `<section class="section"><div class="sectionhead"><h2>Settimana</h2></div><div class="actions"><button class="btn" onclick="shiftWeek(-1)" aria-label="Settimana precedente">←</button><button class="btn" onclick="shiftWeek(0)">Questa settimana</button><button class="btn" onclick="shiftWeek(1)" aria-label="Settimana successiva">→</button></div><small>Tocca una seduta per modificarla. Scorri lateralmente per vedere tutti i giorni.</small><div class="sdc-week-scroll"><div class="sdc-week"><div class="sdc-hours">${Array.from({length:24},(_,i)=>`<span>${String(i).padStart(2,'0')}:00</span>`).join('')}</div>${Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);const date=localISODate(d);return `<div class="sdc-day"><div class="sdc-day-head"><strong>${d.toLocaleDateString('it-IT',{weekday:'short'})}</strong><br>${fmtDate(date)}</div><div class="sdc-day-track">${db.appointments.filter(a=>a.date===date).map(a=>{const minutes=timeMinutes(a.time),dur=Number(a.duration)||60;const top=Math.max(0,Math.min(1410,minutes));return `<button class="sdc-event" style="top:${top}px;height:${Math.max(28,Math.min(dur,1440-top))}px" onclick="appointmentForm('${a.id}',true)" aria-label="${esc(a.time+' '+cname(a.clientId))}"><strong>${esc(a.time)} · ${esc(cname(a.clientId))}</strong><small>${dur} min · ${esc(a.note||'Allenamento')}</small></button>`;}).join('')}</div></div>`;}).join('')}</div></div></section>`;}
+function clientOverview(cid){const aps=db.appointments.filter(a=>a.clientId===cid).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));const pays=db.payments.filter(p=>p.clientId===cid).sort((a,b)=>b.date.localeCompare(a.date));return `<section class="section"><h2>Gestione cliente</h2><div class="actions"><button class="btn blue" onclick="appointmentForm('${cid}')">＋ Appuntamento</button><button class="btn blue" onclick="paymentForm('${cid}')">＋ Pagamento</button><button class="btn" onclick="openPhotoHistory('${cid}',true)">Progressi foto</button></div><h3>Appuntamenti e storico</h3><div class="sdc-profile-list">${aps.map(a=>`<div class="row"><div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${isCompletedAppointment(a)?'Svolta':'In agenda'} · ${esc(a.note||'Allenamento')}</small></div>${recordMenu('appointment',a.id)}</div>`).join('')||'<p>Nessun appuntamento.</p>'}</div><h3>Pagamenti</h3><div class="sdc-profile-list">${pays.map(p=>`<div class="row"><div><strong>${euro(p.amount)} · ${paidPayment(p)?'Pagato':'Da pagare'}</strong><small>${fmtDate(p.date)} · ${esc(p.purpose||p.method||'—')}</small></div>${recordMenu('payment',p.id)}</div>`).join('')||'<p>Nessun pagamento.</p>'}</div></section>`;}
+function timeMinutes(t){const [h,m]=t.split(':').map(Number);return h*60+m;}
+function overlapping(a,b){return a.date===b.date&&timeMinutes(a.time)<timeMinutes(b.time)+(Number(b.duration)||60)&&timeMinutes(b.time)<timeMinutes(a.time)+(Number(a.duration)||60);}
+let editingAppointment=null,editingPayment=null;
+appointmentForm=function(key='',edit=false){if(!db.clients.length)return alert('Crea prima un cliente.');const a=edit?db.appointments.find(a=>a.id===key):null;editingAppointment=a?.id||null;show(`<h2>${a?'Modifica / Sposta':'Nuovo'} appuntamento</h2><label>Cliente<select id="ac">${db.clients.map(c=>`<option value="${c.id}" ${c.id===(a?.clientId||key)?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><div class="formgrid"><label>Data<input id="ad" type="date" value="${a?.date||localTodayISO()}"></label><label>Ora<input id="at" type="time" value="${a?.time||'18:00'}"></label><label>Durata in minuti<input id="adu" type="number" min="15" max="240" step="15" value="${a?.duration||60}"></label>${a?'':`<label>Sedute settimanali<select id="ar">${Array.from({length:12},(_,i)=>`<option>${i+1}</option>`).join('')}</select></label>`}</div><label>Note<input id="an" value="${esc(a?.note||'')}" placeholder="Allenamento"></label><p id="formError" role="alert"></p><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button id="managementSave" class="btn blue" onclick="saveAppointment()">Salva</button></div>`);};
+function formError(e){document.getElementById('formError').textContent=e.message||String(e);}
+saveAppointment=async function(){const button=document.getElementById('managementSave');if(button.disabled)return;button.disabled=true;try{const c=db.clients.find(c=>c.id===document.getElementById('ac').value);const date=document.getElementById('ad').value,time=document.getElementById('at').value,duration=Number(document.getElementById('adu').value),note=document.getElementById('an').value.trim(),count=Number(document.getElementById('ar')?.value||1);if(!c?.supabaseUserId||!date||!time||duration<15||duration>240||duration%15)throw Error('Controlla cliente, data, ora e durata (15–240 minuti, multipli di 15).');await syncAppointmentsFromSupabase();const slots=Array.from({length:count},(_,i)=>{const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+7*i);return {date:localISODate(d),time,duration};});const conflicts=slots.flatMap(a=>db.appointments.filter(b=>b.id!==editingAppointment&&overlapping(a,b)));if(conflicts.length)throw Error('Sovrapposizione: '+conflicts.map(a=>`${fmtDate(a.date)} ${a.time} ${cname(a.clientId)}`).join('; ')+'. Scegli un altro orario.');const rows=slots.map(a=>({id:editingAppointment||id('ap'),client_id:c.id,client_user_id:c.supabaseUserId,appointment_date:a.date,appointment_time:a.time,duration_minutes:duration,note}));const result=editingAppointment?await sb.from('appointments').update(rows[0]).eq('id',editingAppointment):await sb.from('appointments').insert(rows);if(result.error)throw result.error;await syncAppointmentsFromSupabase();closeModal();await setTrainerPage('appointments');notifyManagement('Appuntamenti salvati.');}catch(e){formError(e);}finally{button.disabled=false;}};
+paymentForm=function(key='',edit=false){if(!db.clients.length)return alert('Crea prima un cliente.');const p=edit?db.payments.find(p=>p.id===key):null;editingPayment=p?.id||null;show(`<h2>${p?'Modifica':'Nuovo'} pagamento</h2><label>Cliente<select id="pc">${db.clients.map(c=>`<option value="${c.id}" ${c.id===(p?.clientId||key)?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><div class="formgrid"><label>Importo (€)<input id="pa" type="number" min="0.01" step="0.01" value="${esc(p?.amount||'')}"></label><label>Data registrazione / incasso<input id="pd" type="date" value="${p?.date||localTodayISO()}"></label><label>Stato<select id="ps"><option ${p&& !paidPayment(p)?'':'selected'}>pagato</option><option ${p&&!paidPayment(p)?'selected':''}>da pagare</option></select></label><label>Causale<input id="pp" value="${esc(p?.purpose||'')}" placeholder="Es. pacchetto 8 lezioni"></label><label>Metodo<input id="pm" list="paymentMethods" value="${esc(p?.method||'')}" placeholder="Contanti / Bonifico / Carta"><datalist id="paymentMethods"><option>Contanti</option><option>Bonifico</option><option>Carta</option></datalist></label><label>Scadenza<input id="pdu" type="date" value="${p?.dueDate||''}"></label></div><p>Le descrizioni dei vecchi pagamenti restano nel campo originale: puoi correggerle con Modifica.</p><p id="formError" role="alert"></p><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button id="managementSave" class="btn blue" onclick="savePayment()">Salva</button></div>`);};
+savePayment=async function(){const button=document.getElementById('managementSave');if(button.disabled)return;button.disabled=true;try{const c=db.clients.find(c=>c.id===document.getElementById('pc').value);const amount=Number(document.getElementById('pa').value),date=document.getElementById('pd').value;if(!c?.supabaseUserId||!Number.isFinite(amount)||amount<=0||!date)throw Error('Inserisci cliente collegato, importo positivo e data.');const row={id:editingPayment||id('pay'),client_id:c.id,client_user_id:c.supabaseUserId,amount,payment_date:date,status:document.getElementById('ps').value,method:document.getElementById('pm').value.trim(),purpose:document.getElementById('pp').value.trim(),due_date:document.getElementById('pdu').value||null};const {error}=editingPayment?await sb.from('payments').update(row).eq('id',editingPayment):await sb.from('payments').insert(row);if(error)throw error;await syncPaymentsFromSupabase();closeModal();await setTrainerPage('payments');notifyManagement('Pagamento salvato.');}catch(e){formError(e);}finally{button.disabled=false;}};
+function notifyManagement(message){const el=document.createElement('div');el.className='sdc-undo';el.setAttribute('role','status');el.textContent=message;document.body.append(el);setTimeout(()=>el.remove(),4500);}
+const pendingManagementDeletes=new Map();
+function delayedDelete(kind,rid){const table=kind==='payment'?'payments':'appointments';const key=table+rid;if(pendingManagementDeletes.has(key))return;const el=document.createElement('div');el.className='sdc-undo';el.setAttribute('role','status');el.innerHTML='<span>Eliminazione tra 10 secondi. Puoi annullare.</span><button class="btn blue">Annulla</button>';document.body.append(el);const timer=setTimeout(async()=>{el.remove();try{const {error}=await sb.from(table).delete().eq('id',rid);if(error)throw error;db[table]=db[table].filter(x=>x.id!==rid);save();closeModal();await setTrainerPage(table);notifyManagement('Eliminato.');}catch(e){alert('Eliminazione non riuscita: '+e.message);}finally{pendingManagementDeletes.delete(key);}},10000);pendingManagementDeletes.set(key,timer);el.querySelector('button').onclick=()=>{clearTimeout(timer);pendingManagementDeletes.delete(key);el.remove();notifyManagement('Eliminazione annullata.');};}
+deletePayment=rid=>delayedDelete('payment',rid);
+deleteAppointment=rid=>delayedDelete('appointment',rid);
+window.addEventListener('beforeunload',e=>{if(pendingManagementDeletes.size){e.preventDefault();e.returnValue='';}});
+
+const managementTrainerBase=trainer;trainer=function(){managementTrainerBase();const agenda=document.querySelector(".sdc-week-scroll");if(agenda)agenda.scrollTop=420;};
+
 loadAppTheme();
 render();
 </script>
