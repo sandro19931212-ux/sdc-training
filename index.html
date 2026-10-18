@@ -4134,7 +4134,7 @@ function clientForm(c=null){
     <div><label>Password${c?" (solo nuovi clienti)":""}</label><input id="fp" ${c?"disabled":""} value=""></div>
     <div><label>Telefono</label><input id="ft" value="${esc(c?.phone||"")}"></div>
     <div><label>Data di nascita</label><input id="fb" type="date" value="${esc(c?.birth||"")}"></div>
-    <div class="full"><label>Note</label><textarea id="fno">${esc(c?.note||"")}</textarea></div>
+    <div><label for="fh">Altezza (cm)</label><input id="fh" type="number" min="30" max="300" step="0.1" value="${esc(c?.heightCm??'')}"></div><div class="full"><label for="fno">Obiettivo e problematiche</label><textarea id="fno" placeholder="Obiettivo del percorso, eventuali problematiche e informazioni utili">${esc(c?.note||"")}</textarea></div>
   </div>
   <div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveClient('${c?.id||""}')">Salva</button></div>`);
 }
@@ -4146,10 +4146,10 @@ async function saveClient(cid){
     if(cid){
       const old=db.clients.find(x=>String(x.id)===String(cid));
       if(!old) return;
-      const c={...old,name:n,email:e,phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value};
+      const c={...old,name:n,email:e,phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,heightCm:profileHeight(),note:document.getElementById('fno').value};
       db.clients=db.clients.map(x=>String(x.id)===String(cid)?c:x);save();
       if(old.supabaseUserId){
-        const {error}=await sb.from('clients').update({name:n,email:e,phone:c.phone||'',birth:c.birth||null,note:c.note||''}).eq('id',cid);
+        const {error}=await sb.from('clients').update({name:n,email:e,phone:c.phone||'',birth:c.birth||null,note:c.note||'',height_cm:c.heightCm??null}).eq('id',cid);
         if(error) console.warn(error);
       }
       closeModal();render();
@@ -4165,8 +4165,8 @@ async function saveClient(cid){
     const out=await res.json().catch(()=>({}));
     if(!res.ok||!out.success) throw new Error(out.error||'Errore creazione cliente.');
     const sc=out.client;
-    const c={id:sc.id,name:n,email:e,password:'',phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value,supabaseUserId:sc.user_id,openingBalance:0};
-    const {error:profileError}=await sb.from('clients').update({phone:c.phone||'',birth:c.birth||null,note:c.note||'',lesson_opening_balance:0}).eq('id',String(sc.id));
+    const c={id:sc.id,name:n,email:e,password:'',phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,heightCm:profileHeight(),note:document.getElementById('fno').value,supabaseUserId:sc.user_id,openingBalance:0};
+    const {error:profileError}=await sb.from('clients').update({phone:c.phone||'',birth:c.birth||null,note:c.note||'',height_cm:c.heightCm??null}).eq('id',String(sc.id));
     if(profileError) throw profileError;
     db.clients.push(c);
 
@@ -4335,7 +4335,7 @@ async function openTrainerClientProfile(cid,skipSync=false){
       <div class="info-row"><span>Email</span><strong>${esc(c.email||'—')}</strong></div>
       <div class="info-row"><span>Telefono</span><strong>${esc(c.phone||'—')}</strong></div>
       <div class="info-row"><span>Data di nascita</span><strong>${c.birth?fmtDate(c.birth):'—'}</strong></div>
-      <div class="info-row"><span>Note</span><strong>${esc(c.note||'—')}</strong></div>
+      <div class="info-row"><span>Altezza</span><strong>${c.heightCm==null?'—':esc(c.heightCm)+' cm'}</strong></div><div class="info-row"><span>Obiettivo e problematiche</span><strong style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(c.note||'—')}</strong></div>
     </div>
 
     ${clientOverview(c.id)}<section class="section">
@@ -5433,7 +5433,7 @@ async function readRows(table,active=true){
 }
 function currentRead(epoch,actor){if(epoch!==authEpoch||actor!==activeActor||!session)throw Error('Sessione cambiata.');}
 function activeChildren(rows){const ids=new Set(db.clients.map(c=>c.id));return rows.filter(r=>ids.has(String(r.client_id)));}
-function mapClient(c){return {id:String(c.id),supabaseUserId:c.user_id,name:c.name,email:c.email,phone:c.phone||'',birth:c.birth||'',note:c.note||'',openingBalance:c.lesson_opening_balance==null?null:Number(c.lesson_opening_balance)};}
+function mapClient(c){return {id:String(c.id),supabaseUserId:c.user_id,name:c.name,email:c.email,phone:c.phone||'',birth:c.birth||'',note:c.note||'',heightCm:c.height_cm==null?null:Number(c.height_cm),openingBalance:c.lesson_opening_balance==null?null:Number(c.lesson_opening_balance)};}
 function mapPayment(p){return {id:String(p.id),clientId:String(p.client_id),supabaseUserId:p.client_user_id,amount:String(p.amount),date:p.payment_date,status:p.status,method:p.method||'',purpose:p.purpose||'',dueDate:p.due_date||'',lessonQuantity:Number(p.lesson_quantity)||0};}
 function mapAppointment(a){return {id:String(a.id),clientId:String(a.client_id),supabaseUserId:a.client_user_id,date:a.appointment_date,time:(a.appointment_time||'').slice(0,5),note:a.note||'',duration:Number(a.duration_minutes)||60,attendanceStatus:a.attendance_status||'booked',consumeCredit:a.consume_credit!==false};}
 syncClientsFromSupabase=async function(){
@@ -5555,7 +5555,7 @@ async function togglePaymentStatusSafe(pid){
  try{requireTrainer();const p=db.payments.find(p=>p.id===pid);if(!p)return;const paid=paidPayment(p);const {data,error}=await sb.from('payments').update({status:paid?'da pagare':'pagato',...(!paid?{payment_date:localTodayISO()}:{})}).eq('id',pid).is('deleted_at',null).select('*').single();if(error)throw error;db.payments=db.payments.map(p=>p.id===pid?mapPayment(data):p);save();render();}catch(e){alert('Aggiornamento non riuscito: '+e.message);}
 }
 togglePaymentStatus=togglePaymentStatusSafe;
-const BACKUP_FIELDS={clients:['id','user_id','name','email','phone','birth','note','created_at','deleted_at','lesson_opening_balance'],workouts:['id','client_id','client_user_id','title','day','exercise','sets','reps','rest','load','note','position','created_at','updated_at'],payments:['id','client_id','client_user_id','amount','payment_date','status','method','purpose','due_date','created_at','deleted_at','lesson_quantity'],appointments:['id','client_id','client_user_id','appointment_date','appointment_time','note','created_at','duration_minutes','deleted_at','consume_credit','attendance_status'],weights:['id','client_id','client_user_id','weight','weight_date','created_at'],workout_archives:['id','client_id','client_user_id','title','archived_at','snapshot'],check_photos:['id','client_id','user_id','photo_path','photo_date','note','created_at']};
+const BACKUP_FIELDS={clients:['id','user_id','name','email','phone','birth','note','height_cm','created_at','deleted_at','lesson_opening_balance'],workouts:['id','client_id','client_user_id','title','day','exercise','sets','reps','rest','load','note','position','created_at','updated_at'],payments:['id','client_id','client_user_id','amount','payment_date','status','method','purpose','due_date','created_at','deleted_at','lesson_quantity'],appointments:['id','client_id','client_user_id','appointment_date','appointment_time','note','created_at','duration_minutes','deleted_at','consume_credit','attendance_status'],weights:['id','client_id','client_user_id','weight','weight_date','created_at'],workout_archives:['id','client_id','client_user_id','title','archived_at','snapshot'],check_photos:['id','client_id','user_id','photo_path','photo_date','note','created_at']};
 function backupPanel(){requireTrainer();showSheetPage(`<h2>Backup e recupero</h2><p>Copie automatiche dei dati applicativi ogni giorno, conservate per 30 giorni nello stesso progetto. Per una copia indipendente scarica il backup completo di dati e foto e custodiscilo in un luogo sicuro.</p><p>Il file non contiene password o sessioni. Il ripristino nell’app funziona sullo stesso progetto e richiede che gli account originali esistano ancora.</p><button class="btn blue" onclick="downloadBackup(this)">Scarica backup con foto</button><p id="backupStatus" role="status"></p><h3>Ripristina da file</h3><input aria-label="File backup SDC" type="file" accept=".json,application/json" onchange="inspectBackupFile(this.files[0])"><div id="backupPreview"></div><div class="actions"><button class="btn" onclick="openTrash()">Apri cestino</button><button class="btn" onclick="closeModal()">Chiudi</button></div>`);}
 function bytesBase64(bytes){let value='';for(let i=0;i<bytes.length;i+=16384)value+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(value);}
 async function downloadBackup(button){
@@ -5588,9 +5588,10 @@ trainer=function(){stabilityTrainerBase();if(session?.role==='trainer'&&session.
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&session?.role==='client'&&document.getElementById('modal')?.classList.contains('hidden'))refreshAllData().then(()=>{if(session?.role==='client')render();}).catch(console.warn);});
 if(sb.auth.onAuthStateChange)sb.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'&&!signingOut){discardPrivateState();render();}});
 const stabilitySaveClient=saveClient;
+function profileHeight(){const value=field('fh').trim();if(!value)return null;const height=Number(value.replace(',','.'));if(!Number.isFinite(height)||height<30||height>300)throw Error('Inserisci un’altezza valida in centimetri (da 30 a 300).');return height;}
 saveClient=async function(cid){
- if(!cid)return stabilitySaveClient(cid);
- try{requireTrainer();const name=field('fn').trim(),email=field('fe').trim();if(!name||!email)throw Error('Inserisci nome ed email.');if(db.clients.some(c=>c.id!==String(cid)&&c.email?.toLowerCase()===email.toLowerCase()))throw Error('Email già utilizzata.');const {data,error}=await sb.from('clients').update({name,email,phone:field('ft'),birth:field('fb')||null,note:field('fno')}).eq('id',cid).is('deleted_at',null).select('*').single();if(error)throw error;db.clients=db.clients.map(c=>c.id===String(cid)?mapClient(data):c);save();closeModal();render();}catch(e){alert('Modifica non salvata: '+e.message);}
+ if(!cid){try{profileHeight();}catch(e){alert(e.message);return;}return stabilitySaveClient(cid);}
+ try{requireTrainer();const name=field('fn').trim(),email=field('fe').trim();if(!name||!email)throw Error('Inserisci nome ed email.');if(db.clients.some(c=>c.id!==String(cid)&&c.email?.toLowerCase()===email.toLowerCase()))throw Error('Email già utilizzata.');const {data,error}=await sb.from('clients').update({name,email,phone:field('ft'),birth:field('fb')||null,note:field('fno'),height_cm:profileHeight()}).eq('id',cid).is('deleted_at',null).select('*').single();if(error)throw error;db.clients=db.clients.map(c=>c.id===String(cid)?mapClient(data):c);save();closeModal();render();}catch(e){alert('Modifica non salvata: '+e.message);}
 };
 
 const ACCESS_BLOCKED_MESSAGE='Accesso temporaneamente sospeso. Contatta il trainer.';
