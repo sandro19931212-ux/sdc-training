@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-profile-height-v20';
+const CACHE_NAME = 'sdc-training-agenda-hours-v21';
 
 const APP_SHELL = [
   './',
@@ -83,6 +83,7 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(event.request))
   );
 });
+
 
 
 
