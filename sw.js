@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-food-v17';
+const CACHE_NAME = 'sdc-training-food-grid-v18';
 
 const APP_SHELL = [
   './',
@@ -83,5 +83,6 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(event.request))
   );
 });
+
 
 
