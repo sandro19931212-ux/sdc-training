@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-directory-v9';
+const CACHE_NAME = 'sdc-training-reliability-v10';
 
 const APP_SHELL = [
   './',

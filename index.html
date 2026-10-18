@@ -2848,12 +2848,12 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const KEY="sdc_training_v6";
 const SESSION_KEY="sdc_session_v6";
 const DAYS=["Giorno 1","Giorno 2","Giorno 3","Giorno 4","Giorno 5"];
-let db=JSON.parse(localStorage.getItem(KEY)||"null")||JSON.parse(localStorage.getItem("sdc_training_v5")||"null")||{clients:[],workouts:[],payments:[],appointments:[],weights:[],workoutArchives:[]};
-let session=JSON.parse(localStorage.getItem(SESSION_KEY)||"null")||JSON.parse(localStorage.getItem("sdc_session_v5")||"null");
+let db={clients:[],workouts:[],payments:[],appointments:[],weights:[],workoutArchives:[]};
+let session=null;
 const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 const id=p=>p+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
-const saveSession=()=>localStorage.setItem(SESSION_KEY,JSON.stringify(session));
+let save=()=>{};
+let saveSession=()=>{};
 const cname=x=>db.clients.find(c=>c.id===x)?.name||"Cliente";
 const fmtDate=iso=>{if(!iso)return "—";const [y,m,d]=iso.split('-');return d&&m&&y?`${d}/${m}/${y}`:iso};
 const fmtRest=v=>{const s=String(v??'').trim(); if(!s) return '—'; return /[a-zA-Z]/.test(s)?s:`${s}s`};
@@ -3587,7 +3587,7 @@ function isCompletedAppointment(a){
 function clientSessionStats(clientId){
   const all=db.appointments.filter(a=>String(a.clientId)===String(clientId));
   return {
-    remaining:all.filter(a=>!isCompletedAppointment(a)).length,
+    remaining:all.filter(isPendingAppointment).length,
     completed:all.filter(isCompletedAppointment).length
   };
 }
@@ -3617,7 +3617,7 @@ function trainer(){
   const trainerPage=session.page||"dashboard";
   const appointmentsSorted=db.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   const todayISO=localTodayISO();
-  const appointmentsUpcoming=appointmentsSorted.filter(a=>!isCompletedAppointment(a));
+  const appointmentsUpcoming=appointmentsSorted.filter(isPendingAppointment);
   const appointmentsCompleted=appointmentsSorted.filter(isCompletedAppointment).slice().reverse();
   const appointmentsToday=appointmentsUpcoming.filter(a=>String(a.date||'')===todayISO);
   const appointmentsTodayOnly=!!session.appointmentsTodayOnly;
@@ -3639,7 +3639,7 @@ function trainer(){
       <div class="grid">
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('clients')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.clients}</span><b>${db.clients.length}</b><span>Clienti</span></div>
         <div class="card stat action-card icon-card sdc-trainer-stat-card icon-only" onclick="jumpToTrainerSection('checkfoto')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.photo}</span><b>Check Foto</b><span>Apri archivio</span></div>
-        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('appointments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.appointments}</span><b>${appointmentsUpcoming.length}</b><span>Sedute residue</span></div>
+        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('appointments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.appointments}</span><b>${appointmentsUpcoming.length}</b><span>Sedute prenotate</span></div>
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('payments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.payments}</span><b>${db.payments.length}</b><span>Pagamenti</span></div>
       </div>
 
@@ -3652,7 +3652,7 @@ function trainer(){
         <div class="sectionhead"><h2>Prossimi appuntamenti</h2></div>
         <div class="list">${appointmentsUpcoming.length?appointmentsUpcoming.slice(0,3).map(a=>`
           <div class="row">
-            <div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")}</small></div>
+            <div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")} · ${attendanceLabel(a)}</small></div>
           </div>`).join(""):`<div class="card empty">Nessun appuntamento.</div>`}
         </div>
       </section>
@@ -3677,7 +3677,7 @@ function trainer(){
           const sessionStats=clientSessionStats(c.id);
           return `
           <div class="row">
-            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Sedute residue: ${sessionStats.remaining} · Svolte: ${sessionStats.completed}</small></div>
+            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Lezioni residue: ${sessionStats.remaining} · Svolte confermate: ${sessionStats.completed}</small></div>
             <div class="actions" style="margin:0">
               <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>
               ${recordMenu("client",c.id)}
@@ -3704,7 +3704,7 @@ function trainer(){
       ${!appointmentsTodayOnly?`
       <div class="session-summary-grid">
         <div class="session-summary-card"><b>${appointmentsUpcoming.length}</b><span>Sedute ancora da svolgere</span></div>
-        <div class="session-summary-card"><b>${appointmentsCompleted.length}</b><span>Sedute svolte</span></div>
+        <div class="session-summary-card"><b>${appointmentsCompleted.length}</b><span>Storico e svolte</span></div>
       </div>`:''}
 
       ${appointmentsTodayOnly?`
@@ -3725,7 +3725,7 @@ function trainer(){
           <div class="row">
             <div>
               <strong>${fmtDate(a.date)} · ${esc(a.time)}</strong>
-              <small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")}</small>
+              <small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")} · ${attendanceLabel(a)}</small>
             </div>
             <div class="actions" style="margin:0">
               ${recordMenu("appointment",a.id)}
@@ -3735,10 +3735,10 @@ function trainer(){
       </section>
 
       ${!appointmentsTodayOnly?`<section class="section session-history">
-        <div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">Svolte: ${appointmentsCompleted.length}</div></div>
+        <div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">In storico: ${appointmentsCompleted.length}</div></div>
         <div class="list">${appointmentsCompleted.length?appointmentsCompleted.map(a=>`
           <div class="row">
-            <div><strong>${fmtDate(a.date)} · ${esc(a.time)} <span class="badge ok">Svolta</span></strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")}</small></div>
+            <div><strong>${fmtDate(a.date)} · ${esc(a.time)} <span class="badge ok">${attendanceLabel(a)}</span></strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")} · ${attendanceLabel(a)}</small></div>
           </div>`).join(''):`<div class="card empty">Nessuna seduta svolta ancora.</div>`}</div>
       </section>`:''}
     </div>`;
@@ -4162,8 +4162,8 @@ async function saveClient(cid){
     const out=await res.json().catch(()=>({}));
     if(!res.ok||!out.success) throw new Error(out.error||'Errore creazione cliente.');
     const sc=out.client;
-    const c={id:sc.id,name:n,email:e,password:'',phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value,supabaseUserId:sc.user_id};
-    const {error:profileError}=await sb.from('clients').update({phone:c.phone||'',birth:c.birth||null,note:c.note||''}).eq('id',String(sc.id));
+    const c={id:sc.id,name:n,email:e,password:'',phone:document.getElementById('ft').value,birth:document.getElementById('fb').value,note:document.getElementById('fno').value,supabaseUserId:sc.user_id,openingBalance:0};
+    const {error:profileError}=await sb.from('clients').update({phone:c.phone||'',birth:c.birth||null,note:c.note||'',lesson_opening_balance:0}).eq('id',String(sc.id));
     if(profileError) throw profileError;
     db.clients.push(c);
 
@@ -4455,7 +4455,7 @@ async function openClient(cid,skipSync=false){
 
 function exitTrainerClientSheet(cid){
   try{
-    const saved=JSON.parse(localStorage.getItem(KEY)||"null");
+    const saved=JSON.parse(localStorage.getItem("sdc_data_v10:"+activeActor)||"null");
     if(saved&&Array.isArray(saved.workouts)){
       db.workouts=[
         ...db.workouts.filter(x=>String(x.clientId)!==String(cid)),
@@ -4904,7 +4904,7 @@ function client(){
   if(appEl) appEl.classList.toggle("scheda-focus", session.page==='scheda');
   const workouts=db.workouts.filter(x=>x.clientId===c.id).map(x=>({...x,day:x.day||'Giorno 1',load:x.load??''}));
   const appointments=db.appointments.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-  const upcomingAppointments=appointments.filter(a=>!isCompletedAppointment(a));
+  const upcomingAppointments=appointments.filter(isPendingAppointment);
   const completedAppointments=appointments.filter(isCompletedAppointment).slice().reverse();
   const weightList=db.weights.filter(x=>x.clientId===c.id).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const latestWeight=weightList.length?weightList[weightList.length-1].weight:'—';
@@ -4933,13 +4933,13 @@ function client(){
     ${upcomingAppointments[0]?`<section class="sdc-next-session"><span>PROSSIMA SEDUTA</span><div><strong>${fmtDate(upcomingAppointments[0].date)} · ${esc(upcomingAppointments[0].time)}</strong><small>${esc(upcomingAppointments[0].note||'Allenamento')}</small></div><button onclick="setPage('appuntamenti')">›</button></section>`:''}`;
 
   const appuntamentiPage=`
-    <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Le sedute passate vengono archiviate automaticamente e quelle future restano come sedute residue.</div></section>
+    <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Le presenze sono confermate dal trainer. Gli appuntamenti precedenti restano nello storico.</div></section>
     <div class="session-summary-grid">
-      <div class="session-summary-card"><b>${upcomingAppointments.length}</b><span>Sedute residue</span></div>
-      <div class="session-summary-card"><b>${completedAppointments.length}</b><span>Sedute svolte</span></div>
+      <div class="session-summary-card"><b>${upcomingAppointments.length}</b><span>Sedute prenotate</span></div>
+      <div class="session-summary-card"><b>${completedAppointments.length}</b><span>Storico e svolte</span></div>
     </div>
-    <section class="section"><div class="sectionhead"><h2>Prossime sedute</h2><div class="subtle-note">Residue: ${upcomingAppointments.length}</div></div><div class="list">${upcomingAppointments.length?upcomingAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)}</strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta futura.</div>`}</div></section>
-    <section class="section session-history"><div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">Svolte: ${completedAppointments.length}</div></div><div class="list">${completedAppointments.length?completedAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)} <span class="badge ok">Svolta</span></strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta svolta ancora.</div>`}</div></section>`;
+    <section class="section"><div class="sectionhead"><h2>Prossime sedute</h2><div class="subtle-note">Prenotate: ${upcomingAppointments.length}</div></div><div class="list">${upcomingAppointments.length?upcomingAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)}</strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta futura.</div>`}</div></section>
+    <section class="section session-history"><div class="sectionhead"><h2>Storico sedute</h2><div class="subtle-note">In storico: ${completedAppointments.length}</div></div><div class="list">${completedAppointments.length?completedAppointments.map(x=>`<div class="row"><div><strong>${fmtDate(x.date)} · ${esc(x.time)} <span class="badge ok">${attendanceLabel(x)}</span></strong><small>${esc(x.note||'Allenamento')}</small></div></div>`).join(''):`<div class="card empty">Nessuna seduta svolta ancora.</div>`}</div></section>`;
 
   const circuitMeta=circuitDayMeta(workouts,currentDay);
   const currentProgram=circuitMeta?.label || dayExercises[0]?.title || 'Allenamento';
@@ -5298,15 +5298,15 @@ const managementUI={query:'',filter:'all',sort:'name',paymentState:'all',payment
 const paidPayment=p=>String(p.status||'').trim().toLowerCase()==='pagato';
 function filteredClients(){return db.clients.filter(c=>c.name.toLocaleLowerCase('it').includes(managementUI.query.toLocaleLowerCase('it'))).filter(c=>managementUI.filter==='empty'?clientSessionStats(c.id).remaining===0:managementUI.filter==='low'?clientSessionStats(c.id).remaining<=2:managementUI.filter==='due'?db.payments.some(p=>p.clientId===c.id&&!paidPayment(p)):true).sort((a,b)=>managementUI.sort==='remaining'?clientSessionStats(a.id).remaining-clientSessionStats(b.id).remaining:a.name.localeCompare(b.name,'it'));}
 function uiSet(key,value){managementUI[key]=value;trainer();}
-function clientFilters(){return `${directoryNotice()}<button class="btn" onclick="refreshTrainerDirectory(true)">Aggiorna elenco</button><div class="sdc-tools"><input aria-label="Cerca cliente" placeholder="Cerca per nome" value="${esc(managementUI.query)}" oninput="const pos=this.selectionStart;uiSet('query',this.value);const el=document.querySelector('[aria-label=&quot;Cerca cliente&quot;]');el.focus();el.setSelectionRange(pos,pos)"><select aria-label="Filtra clienti" onchange="uiSet('filter',this.value)">${[['all','Tutti i clienti'],['empty','Sedute esaurite'],['low','Al massimo 2 sedute'],['due','Pagamenti in sospeso']].map(([v,t])=>`<option value="${v}" ${managementUI.filter===v?'selected':''}>${t}</option>`).join('')}</select><select aria-label="Ordina clienti" onchange="uiSet('sort',this.value)"><option value="name">Nome A–Z</option><option value="remaining" ${managementUI.sort==='remaining'?'selected':''}>Sedute crescenti</option></select></div>`;}
+function clientFilters(){return `${directoryNotice()}<button class="btn" onclick="refreshTrainerDirectory(true)">Aggiorna elenco</button><div class="sdc-tools"><input aria-label="Cerca cliente" placeholder="Cerca per nome" value="${esc(managementUI.query)}" oninput="const pos=this.selectionStart;uiSet('query',this.value);const el=document.querySelector('[aria-label=&quot;Cerca cliente&quot;]');el.focus();el.setSelectionRange(pos,pos)"><select aria-label="Filtra clienti" onchange="uiSet('filter',this.value)">${[['all','Tutti i clienti'],['empty','Lezioni esaurite'],['low','Al massimo 2 lezioni'],['due','Pagamenti in sospeso']].map(([v,t])=>`<option value="${v}" ${managementUI.filter===v?'selected':''}>${t}</option>`).join('')}</select><select aria-label="Ordina clienti" onchange="uiSet('sort',this.value)"><option value="name">Nome A–Z</option><option value="remaining" ${managementUI.sort==='remaining'?'selected':''}>Lezioni crescenti</option></select></div>`;}
 function filteredPayments(rows){return rows.filter(p=>(managementUI.paymentState==='all'||(managementUI.paymentState==='paid'?paidPayment(p):!paidPayment(p)))&&(!managementUI.paymentMonth||p.date?.startsWith(managementUI.paymentMonth)));}
 function paymentFilters(){return `${directoryNotice()}<div class="sdc-tools"><select aria-label="Stato pagamenti" onchange="uiSet('paymentState',this.value)">${[['all','Tutti gli stati'],['paid','Pagati'],['due','Da pagare']].map(([v,t])=>`<option value="${v}" ${managementUI.paymentState===v?'selected':''}>${t}</option>`).join('')}</select><label>Mese<input aria-label="Mese pagamenti" type="month" value="${esc(managementUI.paymentMonth)}" onchange="uiSet('paymentMonth',this.value)"></label></div>`;}
 function dashboardTasks(){const today=db.appointments.filter(a=>a.date===localTodayISO());const low=db.clients.filter(c=>clientSessionStats(c.id).remaining<=2);return `<section class="section"><h2>Da tenere d’occhio</h2>${directoryNotice()}<div class="sdc-alerts"><button class="btn" onclick="openTodayAppointments()">Oggi: ${today.length} appuntamenti</button><button class="btn" onclick="uiSet('filter','low');setTrainerPage('clients')">${low.length} clienti con al massimo 2 sedute in agenda</button><button class="btn" onclick="uiSet('paymentState','due');setTrainerPage('payments')">Da incassare: ${euro(outstandingTotal())}</button></div><small>Le sedute residue indicano gli appuntamenti futuri già registrati, non il credito acquistato.</small></section>`;}
 function recordMenu(kind,rid){return `<details class="sdc-menu"><summary aria-label="Azioni ${kind}">•••</summary><div class="sdc-menu-body">${kind!=='client'?`<button class="mini-btn" onclick="${kind==='payment'?'paymentForm':'appointmentForm'}('${rid}',true)">Modifica${kind==='appointment'?' / Sposta':''}</button>`:''}<button class="mini-btn red" onclick="${kind==='payment'?'deletePayment':kind==='appointment'?'deleteAppointment':'delClient'}('${rid}')">Elimina</button></div></details>`;}
 function weekStart(){const d=new Date(localTodayISO()+'T12:00:00');d.setDate(d.getDate()-(d.getDay()+6)%7+managementUI.week*7);return d;}
 function shiftWeek(n){managementUI.week=n===0?0:managementUI.week+n;trainer();}
-function weeklyAgenda(){const start=weekStart();return `<section class="section"><div class="sectionhead"><h2>Settimana</h2></div><div class="actions"><button class="btn" onclick="shiftWeek(-1)" aria-label="Settimana precedente">←</button><button class="btn" onclick="shiftWeek(0)">Questa settimana</button><button class="btn" onclick="shiftWeek(1)" aria-label="Settimana successiva">→</button></div><small>Tocca una seduta per modificarla. Scorri lateralmente per vedere tutti i giorni.</small><div class="sdc-week-scroll"><div class="sdc-week"><div class="sdc-hours">${Array.from({length:24},(_,i)=>`<span>${String(i).padStart(2,'0')}:00</span>`).join('')}</div>${Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);const date=localISODate(d);return `<div class="sdc-day"><div class="sdc-day-head"><strong>${d.toLocaleDateString('it-IT',{weekday:'short'})}</strong><br>${fmtDate(date)}</div><div class="sdc-day-track">${db.appointments.filter(a=>a.date===date).map(a=>{const minutes=timeMinutes(a.time),dur=Number(a.duration)||60;const top=Math.max(0,Math.min(1410,minutes));return `<button class="sdc-event" style="top:${top}px;height:${Math.max(28,Math.min(dur,1440-top))}px" onclick="appointmentForm('${a.id}',true)" aria-label="${esc(a.time+' '+cname(a.clientId))}"><strong>${esc(a.time)} · ${esc(cname(a.clientId))}</strong><small>${dur} min · ${esc(a.note||'Allenamento')}</small></button>`;}).join('')}</div></div>`;}).join('')}</div></div></section>`;}
-function clientOverview(cid){const aps=db.appointments.filter(a=>a.clientId===cid).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));const pays=db.payments.filter(p=>p.clientId===cid).sort((a,b)=>b.date.localeCompare(a.date));return `<section class="section"><h2>Gestione cliente</h2><div class="actions"><button class="btn blue" onclick="appointmentForm('${cid}')">＋ Appuntamento</button><button class="btn blue" onclick="paymentForm('${cid}')">＋ Pagamento</button><button class="btn" onclick="openPhotoHistory('${cid}',true)">Progressi foto</button></div><h3>Appuntamenti e storico</h3><div class="sdc-profile-list">${aps.map(a=>`<div class="row"><div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${isCompletedAppointment(a)?'Svolta':'In agenda'} · ${esc(a.note||'Allenamento')}</small></div>${recordMenu('appointment',a.id)}</div>`).join('')||'<p>Nessun appuntamento.</p>'}</div><h3>Pagamenti</h3><div class="sdc-profile-list">${pays.map(p=>`<div class="row"><div><strong>${euro(p.amount)} · ${paidPayment(p)?'Pagato':'Da pagare'}</strong><small>${fmtDate(p.date)} · ${esc(p.purpose||p.method||'—')}</small></div>${recordMenu('payment',p.id)}</div>`).join('')||'<p>Nessun pagamento.</p>'}</div></section>`;}
+function weeklyAgenda(){const start=weekStart();return `<section class="section"><div class="sectionhead"><h2>Settimana</h2></div><div class="actions"><button class="btn" onclick="shiftWeek(-1)" aria-label="Settimana precedente">←</button><button class="btn" onclick="shiftWeek(0)">Questa settimana</button><button class="btn" onclick="shiftWeek(1)" aria-label="Settimana successiva">→</button></div><small>Tocca una seduta per modificarla. Scorri lateralmente per vedere tutti i giorni.</small><div class="sdc-week-scroll"><div class="sdc-week"><div class="sdc-hours">${Array.from({length:24},(_,i)=>`<span>${String(i).padStart(2,'0')}:00</span>`).join('')}</div>${Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);const date=localISODate(d);return `<div class="sdc-day"><div class="sdc-day-head"><strong>${d.toLocaleDateString('it-IT',{weekday:'short'})}</strong><br>${fmtDate(date)}</div><div class="sdc-day-track">${db.appointments.filter(a=>a.date===date).map(a=>{const minutes=timeMinutes(a.time),dur=Number(a.duration)||60;const top=Math.max(0,Math.min(1410,minutes));return `<button class="sdc-event" style="top:${top}px;height:${Math.max(28,Math.min(dur,1440-top))}px" onclick="appointmentForm('${a.id}',true)" aria-label="${esc(a.time+' '+cname(a.clientId))}"><strong>${esc(a.time)} · ${esc(cname(a.clientId))}</strong><small>${dur} min · ${attendanceLabel(a)} · ${esc(a.note||'Allenamento')}</small></button>`;}).join('')}</div></div>`;}).join('')}</div></div></section>`;}
+function clientOverview(cid){const aps=db.appointments.filter(a=>a.clientId===cid).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));const pays=db.payments.filter(p=>p.clientId===cid).sort((a,b)=>b.date.localeCompare(a.date));return `<section class="section"><h2>Gestione cliente</h2><div class="actions"><button class="btn blue" onclick="appointmentForm('${cid}')">＋ Appuntamento</button><button class="btn blue" onclick="paymentForm('${cid}')">＋ Pagamento</button><button class="btn" onclick="openPhotoHistory('${cid}',true)">Progressi foto</button></div><h3>Appuntamenti e storico</h3><div class="sdc-profile-list">${aps.map(a=>`<div class="row"><div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${attendanceLabel(a)} · ${esc(a.note||'Allenamento')}</small></div>${recordMenu('appointment',a.id)}</div>`).join('')||'<p>Nessun appuntamento.</p>'}</div><h3>Pagamenti</h3><div class="sdc-profile-list">${pays.map(p=>`<div class="row"><div><strong>${euro(p.amount)} · ${paidPayment(p)?'Pagato':'Da pagare'}</strong><small>${fmtDate(p.date)} · ${esc(p.purpose||p.method||'—')}</small></div>${recordMenu('payment',p.id)}</div>`).join('')||'<p>Nessun pagamento.</p>'}</div></section>`;}
 function timeMinutes(t){const [h,m]=t.split(':').map(Number);return h*60+m;}
 function overlapping(a,b){return a.date===b.date&&timeMinutes(a.time)<timeMinutes(b.time)+(Number(b.duration)||60)&&timeMinutes(b.time)<timeMinutes(a.time)+(Number(a.duration)||60);}
 let editingAppointment=null,editingPayment=null;
@@ -5351,9 +5351,236 @@ window.addEventListener('focus',()=>{
 
 const managementTrainerBase=trainer;trainer=function(){managementTrainerBase();const agenda=document.querySelector(".sdc-week-scroll");if(agenda)agenda.scrollTop=420;};
 
+// Reliability, authenticated cache boundaries, recovery and lesson accounting.
+const SDC_REF='snjxpiwxaekpkcdyuyxb';
+const DATA_TABLES=['clients','workouts','payments','appointments','weights','workout_archives','check_photos'];
+let activeActor='',authEpoch=0,bootPending=null,refreshPending=null,signingOut=false;
+let paymentOperation=null,appointmentOperation=null,restorableBackup=null;
+let modalRevision=0;
+const stabilityShow=show,stabilityCloseModal=closeModal;
+show=function(html){modalRevision++;return stabilityShow(html);};
+closeModal=function(){modalRevision++;return stabilityCloseModal();};
+save=()=>{if(activeActor&&session?.supabaseUserId===activeActor)localStorage.setItem('sdc_data_v10:'+activeActor,JSON.stringify(db));};
+saveSession=()=>{if(activeActor&&session?.supabaseUserId===activeActor)localStorage.setItem('sdc_ui_v10:'+activeActor,JSON.stringify({page:session.page,clientDay:session.clientDay}));};
+const emptyDatabase=()=>({clients:[],workouts:[],payments:[],appointments:[],weights:[],workoutArchives:[]});
+function storageKeys(storage){return Array.from({length:storage.length},(_,i)=>storage.key(i)).filter(Boolean);}
+function clearPrivateCache(includeAuth=true){
+ for(const storage of [localStorage,sessionStorage])for(const key of storageKeys(storage)){
+  if(/^sdc_(training|session|data|ui|pending|workout|circuit)/.test(key)||(includeAuth&&/^sb-snjxpiwxaekpkcdyuyxb-auth-token/.test(key)))storage.removeItem(key);
+ }
+ localStorage.removeItem(KEY);localStorage.removeItem(SESSION_KEY);localStorage.removeItem('sdc_training_v5');localStorage.removeItem('sdc_session_v5');
+}
+function discardPrivateState(includeAuth=true){
+ authEpoch++;activeActor='';session=null;db=emptyDatabase();paymentOperation=null;appointmentOperation=null;restorableBackup=null;
+ trainerDirectoryPending=null;refreshPending=null;trainerDirectoryError='';closeModal();clearPrivateCache(includeAuth);
+ pendingManagementDeletes.forEach(timer=>clearTimeout(timer));pendingManagementDeletes.clear();
+ Object.assign(managementUI,{query:'',filter:'all',sort:'name',paymentState:'all',paymentMonth:'',week:0});
+}
+logout=async function(){
+ signingOut=true;discardPrivateState(false);render();
+ try{const {error}=await sb.auth.signOut({scope:'local'});if(error)console.warn('Disconnessione:',error);}catch(error){console.warn(error);}finally{clearPrivateCache();signingOut=false;}
+};
+function loginMessage(text){const node=document.getElementById('loginError');if(node)node.textContent=text;}
+async function bootstrapAuthenticatedApp(){
+ if(bootPending)return bootPending;
+ bootPending=(async()=>{
+  const startingEpoch=authEpoch;
+  const {data:auth,error}=await sb.auth.getUser();
+  if(startingEpoch!==authEpoch||signingOut)return;
+  if(error||!auth?.user){discardPrivateState();render();if(error)loginMessage('Accedi per aprire i tuoi dati. Se sei offline, riprova quando torna la connessione.');return;}
+  const user=auth.user;authEpoch++;activeActor=user.id;db=emptyDatabase();
+  for(const key of ['sdc_training_v5','sdc_training_v6','sdc_session_v5','sdc_session_v6'])localStorage.removeItem(key);
+  let ui={};try{ui=JSON.parse(localStorage.getItem('sdc_ui_v10:'+activeActor)||'{}');}catch{}
+  const role=user.app_metadata?.role==='trainer'?'trainer':'client';
+  session={role,userId:null,supabaseUserId:user.id,page:role==='trainer'?'dashboard':'scheda',clientDay:'Giorno 1'};
+  const allowed=role==='trainer'?['dashboard','clients','scheda','appointments','payments','more']:['dashboard','scheda','appuntamenti','peso','altro'];
+  if(allowed.includes(ui.page))session.page=ui.page;
+  if(DAYS.includes(ui.clientDay))session.clientDay=ui.clientDay;
+  await syncClientsFromSupabase();
+  if(role==='client'){
+   const own=db.clients.find(c=>c.supabaseUserId===user.id);if(!own){await logout();loginMessage('Profilo non disponibile. Contatta il trainer.');return;}
+   session.userId=own.id;
+  }
+  await refreshAllData();saveSession();render();
+ })().catch(error=>{discardPrivateState();render();loginMessage('Non riesco a verificare l’accesso. Controlla la connessione e riprova.');console.warn(error);}).finally(()=>{bootPending=null;});
+ return bootPending;
+}
+login=async function(){
+ const expected=roleEl().value,username=(document.getElementById('username')?.value||'').trim(),password=document.getElementById('password')?.value||'';
+ loginMessage('');
+ try{
+  if(expected==='trainer'&&username!==TRAINER.username)throw Error('Credenziali non valide.');
+  const {data,error}=await sb.auth.signInWithPassword({email:expected==='trainer'?TRAINER.email:username.toLowerCase(),password});
+  if(error||!data?.user)throw Error('Credenziali non valide.');
+  if(expected==='trainer'&&data.user.app_metadata?.role!=='trainer'){await logout();throw Error('Account trainer non autorizzato.');}
+  await bootstrapAuthenticatedApp();
+ }catch(error){loginMessage(error.message||'Accesso non riuscito.');}
+};
+async function readRows(table,active=true){
+ const result=[];
+ for(let offset=0;;offset+=500){
+  let query=sb.from(table).select('*').order('id',{ascending:true}).range(offset,offset+499);
+  if(active&&['clients','payments','appointments'].includes(table))query=query.is('deleted_at',null);
+  const {data,error}=await query;if(error)throw error;result.push(...(data||[]));if((data||[]).length<500)break;
+ }
+ return result;
+}
+function currentRead(epoch,actor){if(epoch!==authEpoch||actor!==activeActor||!session)throw Error('Sessione cambiata.');}
+function activeChildren(rows){const ids=new Set(db.clients.map(c=>c.id));return rows.filter(r=>ids.has(String(r.client_id)));}
+function mapClient(c){return {id:String(c.id),supabaseUserId:c.user_id,name:c.name,email:c.email,phone:c.phone||'',birth:c.birth||'',note:c.note||'',openingBalance:c.lesson_opening_balance==null?null:Number(c.lesson_opening_balance)};}
+function mapPayment(p){return {id:String(p.id),clientId:String(p.client_id),supabaseUserId:p.client_user_id,amount:String(p.amount),date:p.payment_date,status:p.status,method:p.method||'',purpose:p.purpose||'',dueDate:p.due_date||'',lessonQuantity:Number(p.lesson_quantity)||0};}
+function mapAppointment(a){return {id:String(a.id),clientId:String(a.client_id),supabaseUserId:a.client_user_id,date:a.appointment_date,time:(a.appointment_time||'').slice(0,5),note:a.note||'',duration:Number(a.duration_minutes)||60,attendanceStatus:a.attendance_status||'booked',consumeCredit:a.consume_credit!==false};}
+syncClientsFromSupabase=async function(){
+ const epoch=authEpoch,actor=activeActor,rows=await readRows('clients');currentRead(epoch,actor);db.clients=rows.map(mapClient);
+ const ids=new Set(db.clients.map(c=>c.id));for(const key of ['workouts','payments','appointments','weights','workoutArchives'])db[key]=(db[key]||[]).filter(r=>ids.has(String(r.clientId)));save();return db.clients;
+};
+syncPaymentsFromSupabase=async function(){const e=authEpoch,a=activeActor,rows=await readRows('payments');currentRead(e,a);db.payments=activeChildren(rows).map(mapPayment);save();return db.payments;};
+syncAppointmentsFromSupabase=async function(){const e=authEpoch,a=activeActor,rows=await readRows('appointments');currentRead(e,a);db.appointments=activeChildren(rows).map(mapAppointment);save();return db.appointments;};
+syncWeightsFromSupabase=async function(){const e=authEpoch,a=activeActor,rows=await readRows('weights');currentRead(e,a);db.weights=activeChildren(rows).map(w=>({id:String(w.id),clientId:String(w.client_id),supabaseUserId:w.client_user_id,date:w.weight_date,weight:String(w.weight)}));save();return db.weights;};
+syncWorkoutsFromSupabase=async function(){const e=authEpoch,a=activeActor,revision=modalRevision,rows=await readRows('workouts');currentRead(e,a);if(revision!==modalRevision)return db.workouts;db.workouts=activeChildren(rows).map(w=>({id:String(w.id),clientId:String(w.client_id),supabaseUserId:w.client_user_id,title:w.title||'',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:String(w.sets??''),reps:String(w.reps??''),rest:String(w.rest??''),load:String(w.load??''),note:session.role==='client'?(w.note||''):'',position:Number(w.position)||9999}));save();return db.workouts;};
+syncWorkoutArchivesFromSupabase=async function(){const e=authEpoch,a=activeActor,rows=await readRows('workout_archives');currentRead(e,a);db.workoutArchives=activeChildren(rows).map(r=>({id:String(r.id),clientId:String(r.client_id),clientUserId:r.client_user_id,title:r.title,archivedAt:r.archived_at,workouts:r.snapshot||[]}));save();return db.workoutArchives;};
+async function refreshAllData(){
+ if(!session||!activeActor)return;
+ if(refreshPending)return refreshPending;
+ const epoch=authEpoch;
+ const task=(async()=>{await syncClientsFromSupabase();await Promise.all([syncPaymentsFromSupabase(),syncAppointmentsFromSupabase(),syncWeightsFromSupabase(),syncWorkoutsFromSupabase(),syncWorkoutArchivesFromSupabase()]);})();
+ refreshPending=task;try{await task;}finally{if(epoch===authEpoch)refreshPending=null;}
+}
+refreshTrainerDirectory=async function(redraw=false){
+ if(session?.role!=='trainer')return;
+ if(redraw&&!document.getElementById('modal')?.classList.contains('hidden'))return;
+ try{await refreshAllData();trainerDirectoryError='';}catch(error){trainerDirectoryError='Non riesco ad aggiornare i dati. Controlla la connessione e riprova.';console.warn(error);}
+ if(redraw&&session?.role==='trainer')render();
+};
+setTrainerPage=async function(page){if(session?.role!=='trainer')return;session.page=page;if(page!=='appointments')session.appointmentsTodayOnly=false;saveSession();await refreshTrainerDirectory();if(session?.role==='trainer')render();};
+setPage=async function(page){if(!session)return;if(session.role==='client'&&page==='pagamenti')page='dashboard';session.page=page;saveSession();try{await refreshAllData();}catch(error){console.warn(error);notifyManagement('Aggiornamento non riuscito. Riprova quando torna la connessione.');}if(session)render();};
+isCompletedAppointment=a=>['completed','legacy'].includes(a?.attendanceStatus);
+function isPendingAppointment(a){return (a?.attendanceStatus||'booked')==='booked';}
+function attendanceLabel(a){return ({booked:a.date<localTodayISO()?'Da confermare':'Prenotata',completed:'Svolta',legacy:'Storico precedente',cancelled:'Annullata',no_show:'Assente'})[a.attendanceStatus||'booked'];}
+function lessonBalance(cid){const c=db.clients.find(c=>c.id===cid);if(!c||c.openingBalance==null)return null;return Number(c.openingBalance)+db.payments.filter(p=>p.clientId===cid&&paidPayment(p)).reduce((n,p)=>n+(Number(p.lessonQuantity)||0),0)-db.appointments.filter(a=>a.clientId===cid&&a.attendanceStatus==='completed'&&a.consumeCredit!==false).length;}
+clientSessionStats=function(cid){return {remaining:lessonBalance(cid)??'Da impostare',scheduled:db.appointments.filter(a=>a.clientId===cid&&isPendingAppointment(a)).length,completed:db.appointments.filter(a=>a.clientId===cid&&a.attendanceStatus==='completed').length};};
+filteredClients=function(){return db.clients.filter(c=>c.name.toLocaleLowerCase('it').includes(managementUI.query.toLocaleLowerCase('it'))).filter(c=>{const balance=lessonBalance(c.id);return managementUI.filter==='empty'?balance!==null&&balance<=0:managementUI.filter==='low'?balance!==null&&balance<=2:managementUI.filter==='due'?db.payments.some(p=>p.clientId===c.id&&!paidPayment(p)):true;}).sort((a,b)=>managementUI.sort==='remaining'?(lessonBalance(a.id)??Infinity)-(lessonBalance(b.id)??Infinity):a.name.localeCompare(b.name,'it'));};
+function requireTrainer(){if(session?.role!=='trainer'||!activeActor)throw Error('Accedi come trainer.');}
+function field(id){return document.getElementById(id)?.value||'';}
+function pendingKey(table){return 'sdc_pending_v10:'+activeActor+':'+table;}
+function loadPending(table){try{const value=JSON.parse(sessionStorage.getItem(pendingKey(table))||'null');return value?.actor===activeActor?value:null;}catch{return null;}}
+function savePending(table,operation){sessionStorage.setItem(pendingKey(table),JSON.stringify(operation));}
+function freezeForm(){document.querySelectorAll('#modalBody input,#modalBody select').forEach(e=>e.disabled=true);}
+function newOperation(prefix){return {actor:activeActor,id:id(prefix),rows:null,edit:false};}
+const stabilityPaymentForm=paymentForm,stabilityAppointmentForm=appointmentForm;
+paymentForm=function(key='',edit=false){
+ requireTrainer();stabilityPaymentForm(key,edit);paymentOperation=edit?{...newOperation('pay'),id:key,edit:true}:loadPending('payments')||newOperation('pay');
+ const p=edit?db.payments.find(p=>p.id===key):null;
+ document.querySelector('#modalBody .formgrid').insertAdjacentHTML('beforeend',`<label>Lezioni acquistate (0 per servizi senza lezioni)<input id="plq" type="number" min="0" max="10000" step="1" value="${p?.lessonQuantity||0}"></label>`);
+ if(paymentOperation.rows){const r=paymentOperation.rows[0];for(const [k,v]of Object.entries({pc:r.client_id,pa:r.amount,pd:r.payment_date,ps:r.status,pm:r.method,pp:r.purpose,pdu:r.due_date||'',plq:r.lesson_quantity}))document.getElementById(k).value=v;freezeForm();document.getElementById('managementSave').textContent='Verifica / Riprova salvataggio';}
+};
+appointmentForm=function(key='',edit=false){
+ requireTrainer();stabilityAppointmentForm(key,edit);appointmentOperation=edit?{...newOperation('ap'),id:key,edit:true}:loadPending('appointments')||newOperation('ap');
+ if(appointmentOperation.rows){const r=appointmentOperation.rows[0];for(const [k,v]of Object.entries({ac:r.client_id,ad:r.appointment_date,at:r.appointment_time,adu:r.duration_minutes,an:r.note,ar:appointmentOperation.rows.length})){const el=document.getElementById(k);if(el)el.value=v;}freezeForm();document.getElementById('managementSave').textContent='Verifica / Riprova salvataggio';}
+};
+async function writeOperation(table,op){
+ if(op.edit){const {data,error}=await sb.from(table).update(op.rows[0]).eq('id',op.id).is('deleted_at',null).select('*').single();if(error)throw error;return [data];}
+ const {error}=await sb.from(table).upsert(op.rows,{onConflict:'id',ignoreDuplicates:true});if(error)throw error;
+ const {data,error:readError}=await sb.from(table).select('*').in('id',op.rows.map(r=>r.id));if(readError)throw readError;
+ if(data.length!==op.rows.length)throw Error('Conferma del salvataggio non disponibile. Riprova la stessa operazione.');return data;
+}
+async function finishOperation(table,rows,op){
+ if(op.actor!==activeActor||!session)return;
+ sessionStorage.removeItem(pendingKey(table));const mapper=table==='payments'?mapPayment:mapAppointment,ids=new Set(rows.map(r=>String(r.id)));
+ db[table]=[...db[table].filter(r=>!ids.has(r.id)),...rows.map(mapper)];save();
+ if(table==='payments')paymentOperation=null;else appointmentOperation=null;
+ closeModal();session.page=table;saveSession();render();notifyManagement('Salvataggio confermato.');
+ refreshAllData().then(()=>{if(session&&document.getElementById('modal')?.classList.contains('hidden'))render();}).catch(error=>{console.warn(error);notifyManagement('Salvato. Aggiorna la schermata quando torna la connessione.');});
+}
+savePayment=async function(){
+ const button=document.getElementById('managementSave');if(!button||button.disabled)return;button.disabled=true;
+ try{requireTrainer();const op=paymentOperation||newOperation('pay');paymentOperation=op;
+  if(!op.rows){const c=db.clients.find(c=>c.id===field('pc')),amount=Number(field('pa')),qty=Number(field('plq')||0);if(!c?.supabaseUserId||amount<=0||!Number.isFinite(amount)||!field('pd')||!Number.isInteger(qty)||qty<0||qty>10000)throw Error('Controlla cliente, importo, data e numero di lezioni.');
+   op.rows=[{id:op.id,client_id:c.id,client_user_id:c.supabaseUserId,amount,payment_date:field('pd'),status:field('ps'),method:field('pm').trim(),purpose:field('pp').trim(),due_date:field('pdu')||null,lesson_quantity:qty}];savePending('payments',op);freezeForm();
+  }
+  const rows=await writeOperation('payments',op);await finishOperation('payments',rows,op);
+ }catch(error){if(document.getElementById('formError'))formError(error);button.textContent=paymentOperation?.rows?'Verifica / Riprova salvataggio':'Salva';}finally{button.disabled=false;}
+};
+saveAppointment=async function(){
+ const button=document.getElementById('managementSave');if(!button||button.disabled)return;button.disabled=true;
+ try{requireTrainer();const op=appointmentOperation||newOperation('ap');appointmentOperation=op;
+  if(!op.rows){const c=db.clients.find(c=>c.id===field('ac')),date=field('ad'),time=field('at'),duration=Number(field('adu')),count=Number(field('ar')||1);if(!c?.supabaseUserId||!date||!time||duration<15||duration>240||duration%15||!Number.isInteger(count)||count<1||count>12||timeMinutes(time)+duration>1440)throw Error('Controlla cliente, data, ora e durata. La seduta deve terminare entro mezzanotte.');
+   await syncAppointmentsFromSupabase();const slots=Array.from({length:count},(_,i)=>{const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+7*i);return {date:localISODate(d),time,duration};});
+   const conflicts=slots.flatMap(slot=>db.appointments.filter(a=>a.id!==op.id&&!['cancelled','no_show'].includes(a.attendanceStatus)&&overlapping(slot,a)));if(conflicts.length)throw Error('Orario occupato: '+conflicts.map(a=>`${fmtDate(a.date)} ${a.time} ${cname(a.clientId)}`).join('; '));
+   op.rows=slots.map((slot,i)=>({id:op.edit?op.id:op.id+'_'+i,client_id:c.id,client_user_id:c.supabaseUserId,appointment_date:slot.date,appointment_time:slot.time,duration_minutes:duration,note:field('an').trim(),...(op.edit?{}:{attendance_status:'booked',consume_credit:true})}));savePending('appointments',op);freezeForm();
+  }
+  const rows=await writeOperation('appointments',op);await finishOperation('appointments',rows,op);
+ }catch(error){if(document.getElementById('formError'))formError(error);button.textContent=appointmentOperation?.rows?'Verifica / Riprova salvataggio':'Salva';}finally{button.disabled=false;}
+};
+async function archiveRecord(table,rid){
+ requireTrainer();const {data,error}=await sb.from(table).update({deleted_at:new Date().toISOString()}).eq('id',rid).select('id').single();if(error)throw error;if(!data)throw Error('Elemento non trovato.');await refreshAllData();closeModal();render();notifyManagement('Spostato nel cestino. Puoi ripristinarlo da Altro → Cestino.');
+}
+deletePayment=async rid=>{try{await archiveRecord('payments',rid);}catch(e){alert(e.message);}};
+deleteAppointment=async rid=>{try{await archiveRecord('appointments',rid);}catch(e){alert(e.message);}};
+delClient=async cid=>{try{requireTrainer();if(!confirm('Spostare il cliente nel cestino? I dati e le foto restano recuperabili.'))return;await archiveRecord('clients',cid);}catch(e){alert(e.message);}};
+async function openTrash(){
+ requireTrainer();show('<h2>Cestino</h2><p>Caricamento…</p>');
+ try{const clients=await readRows('clients',false),payments=await readRows('payments',false),appointments=await readRows('appointments',false);const name=cid=>clients.find(c=>String(c.id)===String(cid))?.name||'Cliente';
+  showSheetPage(`<h2>Cestino</h2><p>Gli elementi restano recuperabili. Ripristina prima il cliente se anche lui è nel cestino.</p>${[['clients','Clienti',clients],['payments','Pagamenti',payments],['appointments','Appuntamenti',appointments]].map(([table,title,rows])=>`<h3>${title}</h3>${rows.filter(r=>r.deleted_at).map(r=>`<div class="row"><div><strong>${esc(table==='clients'?r.name:name(r.client_id))}</strong><small>${table==='payments'?euro(r.amount):table==='appointments'?fmtDate(r.appointment_date)+' '+r.appointment_time:''}</small></div><button class="mini-btn blue" onclick="restoreRecord('${table}','${r.id}')">Ripristina</button></div>`).join('')||'<p>Nessun elemento.</p>'}`).join('')}<button class="btn" onclick="closeModal()">Chiudi</button>`);
+ }catch(e){show(`<h2>Cestino</h2><p>${esc(e.message)}</p><button class="btn" onclick="closeModal()">Chiudi</button>`);}
+}
+async function restoreRecord(table,rid){
+ try{requireTrainer();if(!['clients','payments','appointments'].includes(table))throw Error('Elemento non valido.');const {error}=await sb.from(table).update({deleted_at:null}).eq('id',rid).select('id').single();if(error)throw error;await refreshAllData();await openTrash();render();}catch(e){alert('Ripristino non riuscito: '+e.message);}
+}
+recordMenu=function(kind,rid){return `<details class="sdc-menu"><summary aria-label="Azioni ${kind}">•••</summary><div class="sdc-menu-body">${kind!=='client'?`<button class="mini-btn" onclick="${kind==='payment'?'paymentForm':'appointmentForm'}('${rid}',true)">Modifica${kind==='appointment'?' / Sposta':''}</button>`:''}${kind==='appointment'?`<button class="mini-btn" onclick="attendanceForm('${rid}')">Presenza / Stato</button>`:''}<button class="mini-btn red" onclick="${kind==='payment'?'deletePayment':kind==='appointment'?'deleteAppointment':'delClient'}('${rid}')">Sposta nel cestino</button></div></details>`;};
+function attendanceForm(aid){const a=db.appointments.find(a=>a.id===aid);if(!a)return;show(`<h2>Presenza / Stato</h2><p>${esc(cname(a.clientId))} · ${fmtDate(a.date)} ${esc(a.time)}</p><label>Stato<select id="attendance">${[['booked','Prenotata / Da confermare'],['completed','Svolta'],['cancelled','Annullata'],['no_show','Assente'],...(a.attendanceStatus==='legacy'?[['legacy','Storico precedente']]:[])].map(([v,t])=>`<option value="${v}" ${v===a.attendanceStatus?'selected':''}>${t}</option>`).join('')}</select></label><label>Scalare una lezione se svolta?<select id="consume"><option value="yes" ${a.consumeCredit?'selected':''}>Sì</option><option value="no" ${!a.consumeCredit?'selected':''}>No — prova o servizio incluso</option></select></label><p>Le sedute passate non diventano più svolte automaticamente.</p><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveAttendance('${aid}',this)">Salva stato</button></div>`);}
+async function saveAttendance(aid,button){button.disabled=true;try{requireTrainer();const status=field('attendance'),row=db.appointments.find(a=>a.id===aid);if(!row)throw Error('Seduta non trovata.');if(status==='completed'&&row.date>localTodayISO())throw Error('Non puoi confermare una seduta futura come svolta.');const {error}=await sb.from('appointments').update({attendance_status:status,consume_credit:field('consume')==='yes'}).eq('id',aid).is('deleted_at',null).select('id').single();if(error)throw error;await syncAppointmentsFromSupabase();closeModal();render();}catch(e){alert(e.message);}finally{button.disabled=false;}}
+function lessonForm(cid){const balance=lessonBalance(cid);show(`<h2>Saldo lezioni</h2><p>${esc(cname(cid))}</p><p>Imposta quante lezioni restano adesso. Lo storico precedente non viene scalato automaticamente. Le nuove sedute confermate come svolte e gli acquisti con quantità esplicita aggiorneranno il saldo.</p><label>Lezioni residue attuali<input id="lessonTarget" type="number" min="0" step="1" value="${balance??0}"></label><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveLessonBalance('${cid}',this)">Salva saldo</button></div>`);}
+async function saveLessonBalance(cid,button){button.disabled=true;try{requireTrainer();await refreshAllData();const target=Number(field('lessonTarget'));if(!Number.isInteger(target)||target<0)throw Error('Inserisci un numero intero non negativo.');const c=db.clients.find(c=>c.id===cid);if(!c)throw Error('Cliente non trovato.');const bought=db.payments.filter(p=>p.clientId===cid&&paidPayment(p)).reduce((n,p)=>n+(Number(p.lessonQuantity)||0),0),used=db.appointments.filter(a=>a.clientId===cid&&a.attendanceStatus==='completed'&&a.consumeCredit!==false).length,opening=target-bought+used;const {error}=await sb.from('clients').update({lesson_opening_balance:opening}).eq('id',cid).is('deleted_at',null).select('id').single();if(error)throw error;await syncClientsFromSupabase();closeModal();render();notifyManagement('Saldo lezioni aggiornato.');}catch(e){alert(e.message);}finally{button.disabled=false;}}
+const stabilityClientOverview=clientOverview;
+clientOverview=function(cid){const balance=lessonBalance(cid);return `<section class="section"><h2>Lezioni residue: ${balance??'Da impostare'}</h2><button class="btn" onclick="lessonForm('${cid}')">${balance===null?'Imposta':'Correggi'} saldo lezioni</button></section>`+stabilityClientOverview(cid);};
+const stabilityDashboardTasks=dashboardTasks;
+dashboardTasks=function(){return stabilityDashboardTasks().replace('clienti con al massimo 2 sedute in agenda','clienti con al massimo 2 lezioni residue').replace('Le sedute residue indicano gli appuntamenti futuri già registrati, non il credito acquistato.','I saldi iniziali vanno impostati nei profili. Le lezioni si scalano solo dopo la conferma della presenza.');};
+async function togglePaymentStatusSafe(pid){
+ try{requireTrainer();const p=db.payments.find(p=>p.id===pid);if(!p)return;const paid=paidPayment(p);const {data,error}=await sb.from('payments').update({status:paid?'da pagare':'pagato',...(!paid?{payment_date:localTodayISO()}:{})}).eq('id',pid).is('deleted_at',null).select('*').single();if(error)throw error;db.payments=db.payments.map(p=>p.id===pid?mapPayment(data):p);save();render();}catch(e){alert('Aggiornamento non riuscito: '+e.message);}
+}
+togglePaymentStatus=togglePaymentStatusSafe;
+const BACKUP_FIELDS={clients:['id','user_id','name','email','phone','birth','note','created_at','deleted_at','lesson_opening_balance'],workouts:['id','client_id','client_user_id','title','day','exercise','sets','reps','rest','load','note','position','created_at','updated_at'],payments:['id','client_id','client_user_id','amount','payment_date','status','method','purpose','due_date','created_at','deleted_at','lesson_quantity'],appointments:['id','client_id','client_user_id','appointment_date','appointment_time','note','created_at','duration_minutes','deleted_at','consume_credit','attendance_status'],weights:['id','client_id','client_user_id','weight','weight_date','created_at'],workout_archives:['id','client_id','client_user_id','title','archived_at','snapshot'],check_photos:['id','client_id','user_id','photo_path','photo_date','note','created_at']};
+function backupPanel(){requireTrainer();showSheetPage(`<h2>Backup e recupero</h2><p>Copie automatiche dei dati applicativi ogni giorno, conservate per 30 giorni nello stesso progetto. Per una copia indipendente scarica il backup completo di dati e foto e custodiscilo in un luogo sicuro.</p><p>Il file non contiene password o sessioni. Il ripristino nell’app funziona sullo stesso progetto e richiede che gli account originali esistano ancora.</p><button class="btn blue" onclick="downloadBackup(this)">Scarica backup con foto</button><p id="backupStatus" role="status"></p><h3>Ripristina da file</h3><input aria-label="File backup SDC" type="file" accept=".json,application/json" onchange="inspectBackupFile(this.files[0])"><div id="backupPreview"></div><div class="actions"><button class="btn" onclick="openTrash()">Apri cestino</button><button class="btn" onclick="closeModal()">Chiudi</button></div>`);}
+function bytesBase64(bytes){let value='';for(let i=0;i<bytes.length;i+=16384)value+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(value);}
+async function downloadBackup(button){
+ button.disabled=true;const status=document.getElementById('backupStatus');const actor=activeActor,epoch=authEpoch;
+ try{requireTrainer();const tables={};for(const table of DATA_TABLES){if(status)status.textContent='Raccolta dati…';tables[table]=(await readRows(table,false)).map(row=>Object.fromEntries(Object.entries(row).filter(([key])=>BACKUP_FIELDS[table].includes(key))));currentRead(epoch,actor);}
+  const photos=[];let size=0;for(const p of tables.check_photos){if(status)status.textContent=`Copia foto ${photos.length+1}…`;const {data,error}=await sb.storage.from('check-foto').download(p.photo_path);if(error)throw error;size+=data.size;if(size>100*1024*1024)throw Error('Le foto superano 100 MB. Richiedi un’esportazione separata dei file.');photos.push({path:p.photo_path,type:data.type||'image/jpeg',base64:bytesBase64(new Uint8Array(await data.arrayBuffer()))});currentRead(epoch,actor);}
+  const backup={format:'sdc-training-backup',version:1,project:SDC_REF,createdAt:new Date().toISOString(),tables,photos};
+  const blob=new Blob([JSON.stringify(backup)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='sdc-training-backup-'+localTodayISO()+'.json';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);if(status)status.textContent='Backup pronto. Conserva il file scaricato: contiene dati personali.';
+ }catch(e){if(status)status.textContent='Backup non completato: '+e.message;}finally{button.disabled=false;}
+}
+function validateBackup(value){
+ if(!value||value.format!=='sdc-training-backup'||value.version!==1||value.project!==SDC_REF)throw Error('Questo file non è un backup valido di questa app.');
+ for(const table of DATA_TABLES)if(Array.isArray(value.tables?.[table]))value.tables[table]=value.tables[table].map(row=>({...row,id:row.id==null?'':String(row.id),...(row.client_id!=null?{client_id:String(row.client_id)}:{})}));
+ for(const table of DATA_TABLES){if(!Array.isArray(value.tables?.[table])||value.tables[table].length>100000)throw Error('Dati non validi: '+table);const ids=new Set();for(const row of value.tables[table]){if(!row||typeof row!=='object'||Array.isArray(row)||typeof row.id!=='string'||!row.id||ids.has(row.id)||Object.keys(row).some(k=>!BACKUP_FIELDS[table].includes(k)))throw Error('Record non valido: '+table);ids.add(row.id);}}
+ const clients=new Map(value.tables.clients.map(c=>[String(c.id),c.user_id]));
+ for(const table of DATA_TABLES.filter(t=>t!=='clients'))for(const row of value.tables[table]){const owner=clients.get(String(row.client_id));if(!owner||owner!==(table==='check_photos'?row.user_id:row.client_user_id))throw Error('Collegamento cliente non valido nel backup.');}
+ if(!Array.isArray(value.photos)||value.photos.some(p=>!p||typeof p.path!=='string'||p.path.includes('..')||typeof p.base64!=='string'||!value.tables.check_photos.some(r=>r.photo_path===p.path)))throw Error('Foto non valide.');
+ if(value.tables.check_photos.some(r=>!value.photos.some(p=>p.path===r.photo_path)))throw Error('Il backup non contiene tutte le foto.');
+ return value;
+}
+async function inspectBackupFile(file){restorableBackup=null;const view=document.getElementById('backupPreview');try{requireTrainer();if(!file||file.size>180*1024*1024)throw Error('File assente o troppo grande.');const value=validateBackup(JSON.parse(await file.text()));restorableBackup=value;view.innerHTML=`<p>Backup del ${esc(value.createdAt)}: ${value.tables.clients.length} clienti, ${value.tables.payments.length} pagamenti, ${value.tables.appointments.length} appuntamenti, ${value.photos.length} foto.</p><p>Ripristina solo elementi mancanti o nel cestino. I record attivi non vengono sovrascritti.</p><button class="btn blue" onclick="restoreBackup(this)">Ripristina elementi mancanti o archiviati</button>`;}catch(e){view.textContent=e.message;}}
+async function restoreBackup(button){
+ button.disabled=true;try{requireTrainer();const backup=validateBackup(restorableBackup);let restored=0;for(const table of DATA_TABLES){const current=new Map((await readRows(table,false)).map(r=>[String(r.id),r]));for(const row of backup.tables[table]){const existing=current.get(String(row.id));if(existing&&!existing.deleted_at)continue;const payload={...row,...(['clients','payments','appointments'].includes(table)?{deleted_at:null}:{})};let result=existing?await sb.from(table).update(payload).eq('id',row.id).not('deleted_at','is',null).select('id'):await sb.from(table).upsert(payload,{onConflict:'id',ignoreDuplicates:true}).select('id');if(result.error)throw result.error;restored+=(result.data||[]).length;}}
+  for(const photo of backup.photos){const bytes=Uint8Array.from(atob(photo.base64),c=>c.charCodeAt(0));const {error}=await sb.storage.from('check-foto').upload(photo.path,new Blob([bytes],{type:photo.type}),{upsert:false});if(error&&!['409','Duplicate'].includes(String(error.statusCode||error.error)))throw error;}
+  await refreshAllData();render();document.getElementById('backupPreview').textContent=`Ripristino completato: ${restored} elementi recuperati. I record attivi sono rimasti invariati.`;restorableBackup=null;
+ }catch(e){document.getElementById('backupPreview').textContent='Ripristino interrotto: '+e.message+'. Gli elementi già recuperati restano disponibili. Puoi riprovare senza duplicarli.';}finally{button.disabled=false;}
+}
+const stabilityTrainerBase=trainer;
+trainer=function(){stabilityTrainerBase();if(session?.role==='trainer'&&session.page==='more')document.getElementById('trainerView')?.insertAdjacentHTML('beforeend','<section class="section"><div class="actions"><button class="btn" onclick="openTrash()">Cestino</button><button class="btn blue" onclick="backupPanel()">Backup e recupero</button></div></section>');};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&session?.role==='client'&&document.getElementById('modal')?.classList.contains('hidden'))refreshAllData().then(()=>{if(session?.role==='client')render();}).catch(console.warn);});
+if(sb.auth.onAuthStateChange)sb.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'&&!signingOut){discardPrivateState();render();}});
+const stabilitySaveClient=saveClient;
+saveClient=async function(cid){
+ if(!cid)return stabilitySaveClient(cid);
+ try{requireTrainer();const name=field('fn').trim(),email=field('fe').trim();if(!name||!email)throw Error('Inserisci nome ed email.');if(db.clients.some(c=>c.id!==String(cid)&&c.email?.toLowerCase()===email.toLowerCase()))throw Error('Email già utilizzata.');const {data,error}=await sb.from('clients').update({name,email,phone:field('ft'),birth:field('fb')||null,note:field('fno')}).eq('id',cid).is('deleted_at',null).select('*').single();if(error)throw error;db.clients=db.clients.map(c=>c.id===String(cid)?mapClient(data):c);save();closeModal();render();}catch(e){alert('Modifica non salvata: '+e.message);}
+};
+
 loadAppTheme();
 render();
-if(session?.role==='trainer')refreshTrainerDirectory(true);
+bootstrapAuthenticatedApp();
 </script>
 
 <script id="sdc-visual-viewport-bottom-v3">
