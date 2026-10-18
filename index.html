@@ -5620,6 +5620,44 @@ async function setClientAccess(cid,blocked,button){
 }
 setInterval(()=>{if(session?.role==='client')checkClientAccess().catch(error=>{if(error.code!=='ACCESS_BLOCKED')console.warn('Verifica accesso:',error);});},30000);
 
+// Local PDF export. Client data and rendered pages never leave this device.
+function workoutPdfLines(ctx,text,width){
+ const lines=[];for(const paragraph of String(text??'').split(/\r?\n/)){let line='';for(const word of paragraph.split(/\s+/).filter(Boolean)){if(ctx.measureText(word).width>width){if(line){lines.push(line);line='';}let part='';for(const char of word){if(part&&ctx.measureText(part+char).width>width){lines.push(part);part='';}part+=char;}line=part;}else if(line&&ctx.measureText(line+' '+word).width>width){lines.push(line);line=word;}else line+=(line?' ':'')+word;}lines.push(line);}return lines;
+}
+function workoutPdfBlob(pages){
+ const encode=s=>new TextEncoder().encode(s),chunks=[],offsets=[0];let size=0;const append=x=>{const b=typeof x==='string'?encode(x):x;chunks.push(b);size+=b.length;};
+ const object=(n,body)=>{offsets[n]=size;append(n+' 0 obj\n');append(body);append('\nendobj\n');};
+ append('%PDF-1.4\n%SDC\n');object(1,'<< /Type /Catalog /Pages 2 0 R >>');object(2,`<< /Type /Pages /Count ${pages.length} /Kids [${pages.map((_,i)=>(3+i*3)+' 0 R').join(' ')}] >>`);
+ pages.forEach((page,i)=>{const n=3+i*3;object(n,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 ${n+2} 0 R >> >> /Contents ${n+1} 0 R >>`);const drawing='q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ';object(n+1,`<< /Length ${encode(drawing).length} >>\nstream\n${drawing}\nendstream`);offsets[n+2]=size;append(`${n+2} 0 obj\n<< /Type /XObject /Subtype /Image /Width 1190 /Height 1684 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${page.length} >>\nstream\n`);append(page);append('\nendstream\nendobj\n');});
+ const start=size,total=3+pages.length*3;append(`xref\n0 ${total}\n0000000000 65535 f \n`);for(let n=1;n<total;n++)append(String(offsets[n]).padStart(10,'0')+' 00000 n \n');append(`trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${start}\n%%EOF`);return new Blob(chunks,{type:'application/pdf'});
+}
+async function createWorkoutPdf(customer,workouts,issued=new Date()){
+ const rows=workouts.filter(w=>String(w.exercise||'').trim());if(!rows.length)throw Error('La scheda non contiene ancora esercizi.');
+ if(JSON.stringify(rows).length>1000000)throw Error('Scheda troppo grande per questa esportazione.');
+ const days=getWorkoutActiveDays(rows),pages=[];let canvas,ctx,y,pageDay='',pageTitle='',pageRound='';
+ const font=(size,bold=false)=>{ctx.font=`${bold?'700':'400'} ${size}px Arial, sans-serif`;};
+ const text=(value,x,top,size=23,color='#f7f7f7',bold=false)=>{font(size,bold);ctx.fillStyle=color;ctx.fillText(value,x,top);};
+ async function finish(){if(!canvas)return;text('SDC TRAINING  •  Scheda personale',64,1612,18,'#aaaaaa');text('Pagina '+(pages.length+1),1000,1612,18,'#aaaaaa');const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Esportazione immagine non riuscita.')),'image/jpeg',0.94));pages.push(new Uint8Array(await blob.arrayBuffer()));canvas.width=0;canvas=null;if(pages.length>100)throw Error('La scheda supera il limite di 100 pagine.');}
+ async function start(continuation=false){await finish();canvas=document.createElement('canvas');canvas.width=1190;canvas.height=1684;ctx=canvas.getContext('2d');if(!ctx)throw Error('Il dispositivo non supporta l’esportazione PDF.');ctx.textBaseline='top';ctx.fillStyle='#111315';ctx.fillRect(0,0,1190,1684);text('SDC',64,48,48,'#ffd400',true);text('TRAINING',178,66,24,'#f7f7f7',true);text('SCHEDA DI ALLENAMENTO',64,122,19,'#aaaaaa',true);font(29,true);const names=workoutPdfLines(ctx,customer.name,1062);let top=160;for(const line of names){text(line,64,top,29,'#f7f7f7',true);top+=35;}text('Scaricata il '+issued.toLocaleDateString('it-IT'),64,top+7,19,'#aaaaaa');y=top+52;ctx.fillStyle='#ffd400';ctx.fillRect(64,y,1062,3);y+=25;font(29,true);for(const line of workoutPdfLines(ctx,pageDay+(continuation?' - continua':''),1062)){text(line,64,y,29,'#ffd400',true);y+=36;}font(23);for(const line of workoutPdfLines(ctx,pageTitle+(pageRound?' • '+pageRound:''),1062)){text(line,64,y,23,'#eeeeee');y+=29;}y+=18;}
+ for(const day of days){const exercises=rows.filter(w=>(w.day||'Giorno 1')===day).sort((a,b)=>(Number(a.position)||9999)-(Number(b.position)||9999));const circuit=circuitDayMeta(rows,day);pageDay=day;pageTitle=circuit?.label||exercises[0]?.title||'Allenamento';pageRound=circuit?`${circuit.rounds} round${circuit.totalTime?' • Tempo: '+circuit.totalTime:''}`:'';await start();
+  for(const ex of exercises){const content=[];font(28,true);workoutPdfLines(ctx,ex.exercise,1006).forEach(t=>content.push({t,size:28,bold:true,step:35}));const meta=circuit?`REP / MT: ${ex.reps||'—'}   |   Carico: ${ex.load?ex.load+' kg':'—'}`:`Serie: ${ex.sets||'—'}   |   Ripetizioni: ${ex.reps||'—'}   |   Recupero: ${fmtRest(ex.rest)}   |   Carico: ${ex.load?ex.load+' kg':'—'}`;font(22);workoutPdfLines(ctx,meta,1006).forEach(t=>content.push({t,size:22,step:29,color:'#e0e0e0'}));if(ex.note){font(22);workoutPdfLines(ctx,'Note: '+ex.note,1006).forEach(t=>content.push({t,size:22,step:29,color:'#c1c7cc'}));}
+   let index=0;while(index<content.length){if(y+120>1540)await start(true);let end=index,height=42;while(end<content.length&&height+content[end].step<=1540-y){height+=content[end].step;end++;}if(end===index)throw Error('Intestazione troppo lunga per la pagina.');ctx.fillStyle='#202427';ctx.beginPath();ctx.roundRect(64,y,1062,height,18);ctx.fill();let lineY=y+21;for(const line of content.slice(index,end)){text(line.t,92,lineY,line.size,line.color||'#f7f7f7',line.bold);lineY+=line.step;}y+=height+18;index=end;if(index<content.length)await start(true);}
+  }
+ }
+ await finish();return workoutPdfBlob(pages);
+}
+async function downloadWorkoutPdf(cid,button){
+ if(button.disabled)return;const label=button.textContent;button.disabled=true;button.textContent='Preparazione PDF…';
+ try{if(!session||!activeActor)throw Error('Accedi per scaricare la scheda.');if(session.role!=='trainer'&&String(session.userId)!==String(cid))throw Error('Puoi scaricare solo la tua scheda.');const epoch=authEpoch,actor=activeActor;await syncClientsFromSupabase();currentRead(epoch,actor);const c=db.clients.find(c=>c.id===String(cid));if(!c)throw Error('Profilo non disponibile.');let rows;
+  if(session.role==='trainer'){rows=(await readRows('workouts')).filter(w=>String(w.client_id)===String(cid)).map(w=>({...w,clientId:String(w.client_id)}));}else rows=db.workouts.filter(w=>w.clientId===String(cid)).map(w=>({...w}));
+  const blob=await createWorkoutPdf(c,rows);currentRead(epoch,actor);const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;link.download='SDC-Training-'+c.name.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')+'.pdf';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);notifyManagement('PDF pronto. Conserva il file scaricato.');
+ }catch(e){if(e.code!=='ACCESS_BLOCKED')alert('PDF non scaricato: '+e.message);}finally{button.disabled=false;button.textContent=label;}
+}
+const pdfClientBase=client;
+client=function(){pdfClientBase();if(session?.role==='client'&&session.page==='scheda'){const head=document.querySelector('#clientView .sdc-client-sheet-head');if(head)head.insertAdjacentHTML('beforeend',`<div class="actions" style="padding:0 16px 16px"><button class="btn blue" onclick="downloadWorkoutPdf('${session.userId}',this)">Scarica scheda PDF</button></div>`);}};
+const pdfClientOverviewBase=clientOverview;
+clientOverview=function(cid){return pdfClientOverviewBase(cid)+(session?.role==='trainer'?`<section class="section"><button class="btn blue" onclick="downloadWorkoutPdf('${cid}',this)">Scarica scheda PDF</button><p>Tutti i giorni della scheda attuale, con carichi e note.</p></section>`:'');};
+
 loadAppTheme();
 render();
 bootstrapAuthenticatedApp();

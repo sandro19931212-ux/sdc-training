@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-navigation-v13';
+const CACHE_NAME = 'sdc-training-pdf-v14';
 
 const APP_SHELL = [
   './',
