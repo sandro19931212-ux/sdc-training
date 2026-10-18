@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-pdf-v15';
+const CACHE_NAME = 'sdc-training-pdf-print-v16';
 
 const APP_SHELL = [
   './',
