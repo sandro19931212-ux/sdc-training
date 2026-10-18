@@ -5355,6 +5355,7 @@ const managementTrainerBase=trainer;trainer=function(){managementTrainerBase();c
 const SDC_REF='snjxpiwxaekpkcdyuyxb';
 const DATA_TABLES=['clients','workouts','payments','appointments','weights','workout_archives','check_photos'];
 let activeActor='',authEpoch=0,bootPending=null,refreshPending=null,signingOut=false;
+let lastDataRefreshAt=0,lastDataRefreshActor='',navigationRefreshPending=null;
 let paymentOperation=null,appointmentOperation=null,restorableBackup=null;
 let modalRevision=0;
 const stabilityShow=show,stabilityCloseModal=closeModal;
@@ -5445,7 +5446,8 @@ async function refreshAllData(){
  if(!session||!activeActor)return;
  if(refreshPending)return refreshPending;
  const epoch=authEpoch;
- const task=(async()=>{await syncClientsFromSupabase();await Promise.all([syncPaymentsFromSupabase(),syncAppointmentsFromSupabase(),syncWeightsFromSupabase(),syncWorkoutsFromSupabase(),syncWorkoutArchivesFromSupabase()]);})();
+ const actor=activeActor,revision=modalRevision;
+ const task=(async()=>{await syncClientsFromSupabase();await Promise.all([syncPaymentsFromSupabase(),syncAppointmentsFromSupabase(),syncWeightsFromSupabase(),revision===modalRevision?syncWorkoutsFromSupabase():Promise.resolve(),syncWorkoutArchivesFromSupabase()]);currentRead(epoch,actor);lastDataRefreshAt=Date.now();lastDataRefreshActor=actor;})();
  refreshPending=task;try{await task;}finally{if(epoch===authEpoch)refreshPending=null;}
 }
 refreshTrainerDirectory=async function(redraw=false){
@@ -5454,8 +5456,16 @@ refreshTrainerDirectory=async function(redraw=false){
  try{await refreshAllData();trainerDirectoryError='';}catch(error){trainerDirectoryError='Non riesco ad aggiornare i dati. Controlla la connessione e riprova.';console.warn(error);}
  if(redraw&&session?.role==='trainer')render();
 };
-setTrainerPage=async function(page){if(session?.role!=='trainer')return;session.page=page;if(page!=='appointments')session.appointmentsTodayOnly=false;saveSession();await refreshTrainerDirectory();if(session?.role==='trainer')render();};
-setPage=async function(page){if(!session)return;if(session.role==='client'&&page==='pagamenti')page='dashboard';session.page=page;saveSession();try{await refreshAllData();}catch(error){console.warn(error);notifyManagement('Aggiornamento non riuscito. Riprova quando torna la connessione.');}if(session)render();};
+function refreshAfterNavigation(){
+ if(!session||!activeActor)return;
+ if(lastDataRefreshActor===activeActor&&Date.now()-lastDataRefreshAt<30000)return;
+ if(navigationRefreshPending?.epoch===authEpoch)return navigationRefreshPending.task;
+ const epoch=authEpoch,actor=activeActor;
+ const task=refreshAllData().then(()=>{if(epoch===authEpoch&&actor===activeActor&&session){trainerDirectoryError='';if(document.getElementById('modal')?.classList.contains('hidden'))render();}}).catch(error=>{if(epoch!==authEpoch||actor!==activeActor||!session)return;console.warn(error);trainerDirectoryError='Aggiornamento non riuscito. Riprova quando torna la connessione.';if(document.getElementById('modal')?.classList.contains('hidden')){render();notifyManagement(trainerDirectoryError);}}).finally(()=>{if(navigationRefreshPending?.epoch===epoch)navigationRefreshPending=null;});
+ navigationRefreshPending={epoch,task};return task;
+}
+setTrainerPage=function(page){if(session?.role!=='trainer')return;session.page=page;if(page!=='appointments')session.appointmentsTodayOnly=false;saveSession();render();refreshAfterNavigation();};
+setPage=function(page){if(!session)return;if(session.role==='client'&&page==='pagamenti')page='dashboard';session.page=page;saveSession();render();refreshAfterNavigation();};
 isCompletedAppointment=a=>['completed','legacy'].includes(a?.attendanceStatus);
 function isPendingAppointment(a){return (a?.attendanceStatus||'booked')==='booked';}
 function attendanceLabel(a){return ({booked:a.date<localTodayISO()?'Da confermare':'Prenotata',completed:'Svolta',legacy:'Storico precedente',cancelled:'Annullata',no_show:'Assente'})[a.attendanceStatus||'booked'];}
