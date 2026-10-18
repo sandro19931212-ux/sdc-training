@@ -5404,7 +5404,7 @@ async function bootstrapAuthenticatedApp(){
    session.userId=own.id;
   }
   await refreshAllData();saveSession();render();
- })().catch(error=>{discardPrivateState();render();loginMessage('Non riesco a verificare l’accesso. Controlla la connessione e riprova.');console.warn(error);}).finally(()=>{bootPending=null;});
+ })().catch(error=>{discardPrivateState();render();loginMessage(error.code==='ACCESS_BLOCKED'?'Accesso temporaneamente sospeso. Contatta il trainer.':'Non riesco a verificare l’accesso. Controlla la connessione e riprova.');console.warn(error);}).finally(()=>{bootPending=null;});
  return bootPending;
 }
 login=async function(){
@@ -5579,6 +5579,36 @@ saveClient=async function(cid){
  if(!cid)return stabilitySaveClient(cid);
  try{requireTrainer();const name=field('fn').trim(),email=field('fe').trim();if(!name||!email)throw Error('Inserisci nome ed email.');if(db.clients.some(c=>c.id!==String(cid)&&c.email?.toLowerCase()===email.toLowerCase()))throw Error('Email già utilizzata.');const {data,error}=await sb.from('clients').update({name,email,phone:field('ft'),birth:field('fb')||null,note:field('fno')}).eq('id',cid).is('deleted_at',null).select('*').single();if(error)throw error;db.clients=db.clients.map(c=>c.id===String(cid)?mapClient(data):c);save();closeModal();render();}catch(e){alert('Modifica non salvata: '+e.message);}
 };
+
+const ACCESS_BLOCKED_MESSAGE='Accesso temporaneamente sospeso. Contatta il trainer.';
+const accessMapClient=mapClient;
+mapClient=function(row){return {...accessMapClient(row),accessBlocked:row.access_blocked===true};};
+BACKUP_FIELDS.clients.push('access_blocked');
+async function checkClientAccess(){
+ if(session?.role!=='client')return;
+ const epoch=authEpoch,actor=activeActor;
+ const {data,error}=await sb.rpc('client_access_blocked');if(error)throw error;
+ currentRead(epoch,actor);
+ if(data===true){await logout();loginMessage(ACCESS_BLOCKED_MESSAGE);const denied=Error(ACCESS_BLOCKED_MESSAGE);denied.code='ACCESS_BLOCKED';throw denied;}
+}
+const accessSyncClients=syncClientsFromSupabase;
+syncClientsFromSupabase=async function(){const epoch=authEpoch,actor=activeActor;await checkClientAccess();currentRead(epoch,actor);return accessSyncClients();};
+const accessOverview=clientOverview;
+clientOverview=function(cid){
+ const c=db.clients.find(c=>c.id===cid);if(!c)return '';
+ return (session?.role==='trainer'?`<section class="section"><h2>Accesso all’app: ${c.accessBlocked?'bloccato':'attivo'}</h2><p>La sospensione è manuale e non dipende automaticamente dai pagamenti. I dati restano conservati.</p><button class="btn ${c.accessBlocked?'blue':'red'}" onclick="setClientAccess('${c.id}',${!c.accessBlocked},this)">${c.accessBlocked?'Sblocca accesso':'Blocca accesso'}</button></section>`:'')+accessOverview(cid);
+};
+async function setClientAccess(cid,blocked,button){
+ if(button.disabled)return;
+ try{requireTrainer();const c=db.clients.find(c=>c.id===cid);if(!c)throw Error('Cliente non trovato.');
+  if(!confirm(`${blocked?'Bloccare':'Sbloccare'} l’accesso di ${c.name}?${blocked?' Potrà rientrare quando lo sblocchi. I dati restano conservati.':''}`))return;
+  button.disabled=true;const epoch=authEpoch,actor=activeActor;
+  const {data,error}=await sb.from('clients').update({access_blocked:blocked}).eq('id',cid).is('deleted_at',null).select('*').single();if(error)throw error;currentRead(epoch,actor);
+  db.clients=db.clients.map(c=>c.id===cid?mapClient(data):c);save();
+  await openTrainerClientProfile(cid,true);notifyManagement(blocked?'Accesso cliente bloccato.':'Accesso cliente riattivato.');
+ }catch(e){alert('Modifica accesso non riuscita: '+e.message);}finally{button.disabled=false;}
+}
+setInterval(()=>{if(session?.role==='client')checkClientAccess().catch(error=>{if(error.code!=='ACCESS_BLOCKED')console.warn('Verifica accesso:',error);});},30000);
 
 loadAppTheme();
 render();
