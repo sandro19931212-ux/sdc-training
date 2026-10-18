@@ -5373,6 +5373,8 @@ function clearPrivateCache(includeAuth=true){
 function discardPrivateState(includeAuth=true){
  authEpoch++;activeActor='';session=null;db=emptyDatabase();paymentOperation=null;appointmentOperation=null;restorableBackup=null;
  trainerDirectoryPending=null;refreshPending=null;trainerDirectoryError='';closeModal();clearPrivateCache(includeAuth);
+ for(const id of ['trainerView','clientView','modalBody']){const node=document.getElementById(id);if(node)node.innerHTML='';}
+ const password=document.getElementById('password');if(password)password.value='';
  pendingManagementDeletes.forEach(timer=>clearTimeout(timer));pendingManagementDeletes.clear();
  Object.assign(managementUI,{query:'',filter:'all',sort:'name',paymentState:'all',paymentMonth:'',week:0});
 }
@@ -5463,8 +5465,8 @@ filteredClients=function(){return db.clients.filter(c=>c.name.toLocaleLowerCase(
 function requireTrainer(){if(session?.role!=='trainer'||!activeActor)throw Error('Accedi come trainer.');}
 function field(id){return document.getElementById(id)?.value||'';}
 function pendingKey(table){return 'sdc_pending_v10:'+activeActor+':'+table;}
-function loadPending(table){try{const value=JSON.parse(sessionStorage.getItem(pendingKey(table))||'null');return value?.actor===activeActor?value:null;}catch{return null;}}
-function savePending(table,operation){sessionStorage.setItem(pendingKey(table),JSON.stringify(operation));}
+function loadPending(table){try{const value=JSON.parse(localStorage.getItem(pendingKey(table))||'null');return value?.actor===activeActor?value:null;}catch{return null;}}
+function savePending(table,operation){localStorage.setItem(pendingKey(table),JSON.stringify(operation));}
 function freezeForm(){document.querySelectorAll('#modalBody input,#modalBody select').forEach(e=>e.disabled=true);}
 function newOperation(prefix){return {actor:activeActor,id:id(prefix),rows:null,edit:false};}
 const stabilityPaymentForm=paymentForm,stabilityAppointmentForm=appointmentForm;
@@ -5486,7 +5488,7 @@ async function writeOperation(table,op){
 }
 async function finishOperation(table,rows,op){
  if(op.actor!==activeActor||!session)return;
- sessionStorage.removeItem(pendingKey(table));const mapper=table==='payments'?mapPayment:mapAppointment,ids=new Set(rows.map(r=>String(r.id)));
+ localStorage.removeItem(pendingKey(table));sessionStorage.removeItem(pendingKey(table));const mapper=table==='payments'?mapPayment:mapAppointment,ids=new Set(rows.map(r=>String(r.id)));
  db[table]=[...db[table].filter(r=>!ids.has(r.id)),...rows.map(mapper)];save();
  if(table==='payments')paymentOperation=null;else appointmentOperation=null;
  closeModal();session.page=table;saveSession();render();notifyManagement('Salvataggio confermato.');
