@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-exercise-library-v25';
+const CACHE_NAME = 'sdc-training-drawn-library-v26';
 
 const APP_SHELL = [
   './',
@@ -95,6 +95,7 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(event.request))
   );
 });
+
 
 
 
