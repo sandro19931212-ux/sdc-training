@@ -1,7 +1,203 @@
 {
-  "source": "wger e illustrazione originale SDC Training",
-  "changes": "Solo illustrazioni, ridimensionamento e compressione WebP.",
+  "source": "wger e illustrazioni originali SDC Training",
+  "changes": "Solo disegni; nomi italiani e sinonimi, ridimensionamento e compressione WebP.",
   "images": [
+    {
+      "id": "348",
+      "name": "Alzate laterali con manubri",
+      "names": [
+        "Alzate laterali con manubri",
+        "Alzate laterali",
+        "Alzate laterali manubri",
+        "Lateral raise",
+        "Lateral raises dumbbells",
+        "Alzate Laterali",
+        "Lateral Raises",
+        "Shoulder fly",
+        "Side raises"
+      ],
+      "group": "Shoulders",
+      "equipment": [
+        "Dumbbell"
+      ],
+      "credit": "Everkinetic",
+      "license": "CC-BY-SA 3",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+      "source": "https://wger.de/media/exercise-images/148/lateral-dumbbell-raises-large-2.png",
+      "atlas": "exercise-atlas-102.webp",
+      "tile": 10
+    },
+    {
+      "id": "1725",
+      "name": "Low row",
+      "names": [
+        "Low row",
+        "Low row alla macchina",
+        "Rematore alla macchina",
+        "Seated row machine",
+        "Seated Row (Machine)"
+      ],
+      "group": "Back",
+      "equipment": [],
+      "credit": "barry",
+      "license": "CC-BY-SA 4",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      "source": "https://wger.de/media/exercise-images/1725/f0ebd44e-b8e1-400c-b598-ca371f3a07af.png",
+      "atlas": "exercise-atlas-110.webp",
+      "tile": 14
+    },
+    {
+      "id": "371",
+      "name": "Pressa orizzontale",
+      "names": [
+        "Pressa orizzontale",
+        "Leg press orizzontale",
+        "Pressa gambe orizzontale",
+        "Horizontal leg press",
+        "Leg Press"
+      ],
+      "group": "Legs",
+      "equipment": [],
+      "credit": "BFad07",
+      "license": "CC-BY-SA 4",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      "source": "https://wger.de/media/exercise-images/371/d2136f96-3a43-4d4c-9944-1919c4ca1ce1.webp",
+      "atlas": "exercise-atlas-103.webp",
+      "tile": 1
+    },
+    {
+      "id": "1801",
+      "name": "Squat con bilanciere",
+      "names": [
+        "Squat con bilanciere",
+        "Squat",
+        "Back squat",
+        "Squat bilanciere dietro",
+        "Barbell Full Squat"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Barbell"
+      ],
+      "credit": "Workout Guru",
+      "license": "CC-BY-SA 4",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      "source": "https://wger.de/media/exercise-images/1801/60043328-1cfb-4289-9865-aaf64d5aaa28.jpg",
+      "atlas": "exercise-atlas-111.webp",
+      "tile": 6
+    },
+    {
+      "id": "900002",
+      "name": "RDL con bilanciere",
+      "names": [
+        "RDL con bilanciere",
+        "RDL",
+        "Romanian deadlift",
+        "Stacco rumeno con bilanciere",
+        "Stacchi rumeni",
+        "Stacco rumeno"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Bilanciere"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 0
+    },
+    {
+      "id": "900003",
+      "name": "Stacchi a gambe tese con bilanciere",
+      "names": [
+        "Stacchi a gambe tese con bilanciere",
+        "Stacchi a gambe tese",
+        "Stacco a gambe tese",
+        "Stacchi gambe tese",
+        "SLDL",
+        "Stiff leg deadlift",
+        "Stiff-legged deadlift"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Bilanciere"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 1
+    },
+    {
+      "id": "900004",
+      "name": "Stacco da terra con bilanciere",
+      "names": [
+        "Stacco da terra con bilanciere",
+        "Stacco da terra",
+        "Stacchi da terra",
+        "Stacco classico",
+        "Conventional deadlift",
+        "Deadlift"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Bilanciere"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 2
+    },
+    {
+      "id": "900005",
+      "name": "Hip thrust con bilanciere",
+      "names": [
+        "Hip thrust con bilanciere",
+        "Hip thrust",
+        "Barbell hip thrust",
+        "Spinte anca con bilanciere"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Bilanciere"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 3
+    },
+    {
+      "id": "900006",
+      "name": "Goblet squat con manubrio",
+      "names": [
+        "Goblet squat con manubrio",
+        "Goblet squat",
+        "Squat goblet",
+        "Squat con manubrio al petto"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Manubrio"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 4
+    },
     {
       "id": "900001",
       "name": "Lat machine",
@@ -28,9 +224,118 @@
       "tile": 0
     },
     {
-      "id": "12",
-      "name": "Seated Hip Adduction",
+      "id": "900008",
+      "name": "Face pull al cavo con corda",
       "names": [
+        "Face pull al cavo con corda",
+        "Face pull",
+        "Facepull",
+        "Face pull con corda"
+      ],
+      "group": "Shoulders",
+      "equipment": [
+        "Cavo"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 5
+    },
+    {
+      "id": "900009",
+      "name": "Kickback tricipiti con manubrio",
+      "names": [
+        "Kickback tricipiti con manubrio",
+        "Kick back tricipiti",
+        "Kickback con manubrio",
+        "Triceps kickback"
+      ],
+      "group": "Arms",
+      "equipment": [
+        "Manubrio"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 6
+    },
+    {
+      "id": "900010",
+      "name": "Calf da seduto alla macchina",
+      "names": [
+        "Calf da seduto alla macchina",
+        "Calf seduto",
+        "Seated calf raise",
+        "Calf machine seduto",
+        "Polpacci seduto macchina"
+      ],
+      "group": "Calves",
+      "equipment": [
+        "Macchina"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 7
+    },
+    {
+      "id": "900011",
+      "name": "Pull through al cavo basso",
+      "names": [
+        "Pull through al cavo basso",
+        "Pull through",
+        "Cable pull through",
+        "Pullthrough"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Cavo"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 8
+    },
+    {
+      "id": "900012",
+      "name": "Abduzioni anca al cavo in piedi",
+      "names": [
+        "Abduzioni anca al cavo in piedi",
+        "Abduzioni al cavo",
+        "Abduzione anca cavo",
+        "Standing cable hip abduction"
+      ],
+      "group": "Legs",
+      "equipment": [
+        "Cavo"
+      ],
+      "credit": "Illustrazione SDC Training, generata con AI",
+      "license": "Illustrazione originale",
+      "licenseUrl": "",
+      "source": "",
+      "generated": true,
+      "atlas": "exercise-atlas-200.webp",
+      "tile": 9
+    },
+    {
+      "id": "12",
+      "name": "Adductor machine",
+      "names": [
+        "Adductor machine",
+        "Adduzioni delle anche alla macchina",
+        "Macchina adduttori",
         "Seated Hip Adduction"
       ],
       "group": "Legs",
@@ -44,8 +349,10 @@
     },
     {
       "id": "31",
-      "name": "Axe Hold",
+      "name": "Tenuta isometrica con manubri",
       "names": [
+        "Tenuta isometrica con manubri",
+        "Axe hold",
         "Axe Hold"
       ],
       "group": "Arms",
@@ -61,8 +368,10 @@
     },
     {
       "id": "41",
-      "name": "Barbell Ab Rollout",
+      "name": "Ab rollout con bilanciere",
       "names": [
+        "Ab rollout con bilanciere",
+        "Ruota addominali con bilanciere",
         "Barbell Ab Rollout"
       ],
       "group": "Abs",
@@ -78,8 +387,10 @@
     },
     {
       "id": "51",
-      "name": "Barbell Wrist Curl",
+      "name": "Wrist curl con bilanciere",
       "names": [
+        "Wrist curl con bilanciere",
+        "Flessioni dei polsi con bilanciere",
         "Barbell Wrist Curl",
         "Forearm Curls"
       ],
@@ -97,8 +408,11 @@
     },
     {
       "id": "73",
-      "name": "Distensione Panca Piana con Bilanciere",
+      "name": "Panca piana con bilanciere",
       "names": [
+        "Panca piana con bilanciere",
+        "Bench press",
+        "Distensioni panca piana bilanciere",
         "Distensione Panca Piana con Bilanciere",
         "Bench Press"
       ],
@@ -116,8 +430,11 @@
     },
     {
       "id": "75",
-      "name": "Panca Piana con Manubri",
+      "name": "Panca piana con manubri",
       "names": [
+        "Panca piana con manubri",
+        "Distensioni panca piana manubri",
+        "Dumbbell bench press",
         "Panca Piana con Manubri",
         "Benchpress Dumbbells"
       ],
@@ -135,8 +452,11 @@
     },
     {
       "id": "76",
-      "name": "Panca piana con presa srtetta",
+      "name": "Panca piana presa stretta",
       "names": [
+        "Panca piana presa stretta",
+        "Panca stretta",
+        "Close grip bench press",
         "Panca piana con presa srtetta",
         "Bench Press Narrow Grip",
         "Close-Grip Bench Press"
@@ -155,8 +475,10 @@
     },
     {
       "id": "79",
-      "name": "Bent High Pulls",
+      "name": "Tirate alte con manubri a busto flesso",
       "names": [
+        "Tirate alte con manubri a busto flesso",
+        "Bent high pulls",
         "Bent High Pulls"
       ],
       "group": "Shoulders",
@@ -172,8 +494,11 @@
     },
     {
       "id": "81",
-      "name": "Bent Over Dumbbell Rows (Single Arm)",
+      "name": "Rematore con manubrio",
       "names": [
+        "Rematore con manubrio",
+        "Rematore manubrio a un braccio",
+        "Rematore singolo con manubrio",
         "Bent Over Dumbbell Rows (Single Arm)",
         "One Arm DB Rows"
       ],
@@ -209,8 +534,10 @@
     },
     {
       "id": "84",
-      "name": "Bent Over Rowing Reverse",
+      "name": "Rematore con bilanciere presa supina",
       "names": [
+        "Rematore con bilanciere presa supina",
+        "Rematore bilanciere presa inversa",
         "Bent Over Rowing Reverse"
       ],
       "group": "Back",
@@ -229,6 +556,7 @@
       "name": "Curl con bilanciere",
       "names": [
         "Curl con bilanciere",
+        "Curl bilanciere dritto",
         "Biceps Curls With Barbell"
       ],
       "group": "Arms",
@@ -244,8 +572,11 @@
     },
     {
       "id": "92",
-      "name": "Curl per Bicipiti con Manubrio",
+      "name": "Curl con manubri",
       "names": [
+        "Curl con manubri",
+        "Curl manubrio",
+        "Curl bicipiti manubri",
         "Curl per Bicipiti con Manubrio",
         "Biceps Curls With Dumbbell"
       ],
@@ -262,8 +593,11 @@
     },
     {
       "id": "94",
-      "name": "Biceps Curls With SZ-bar",
+      "name": "Curl con bilanciere EZ",
       "names": [
+        "Curl con bilanciere EZ",
+        "Curl EZ",
+        "Curl bilanciere sagomato",
         "Biceps Curls With SZ-bar"
       ],
       "group": "Arms",
@@ -279,8 +613,10 @@
     },
     {
       "id": "95",
-      "name": "Biceps Curl With Cable",
+      "name": "Curl al cavo basso",
       "names": [
+        "Curl al cavo basso",
+        "Curl bicipiti al cavo",
         "Biceps Curl With Cable"
       ],
       "group": "Arms",
@@ -296,8 +632,11 @@
     },
     {
       "id": "129",
-      "name": "Chest Press",
+      "name": "Chest press",
       "names": [
+        "Chest press",
+        "Distensioni alla chest press",
+        "Macchina pettorali chest press",
         "Chest Press",
         "Machine Chest Press"
       ],
@@ -312,9 +651,12 @@
     },
     {
       "id": "135",
-      "name": "Butterfly",
+      "name": "Pectoral machine",
       "names": [
-        "Butterfly"
+        "Pectoral machine",
+        "Pec deck",
+        "Butterfly",
+        "Croci alla macchina"
       ],
       "group": "Chest",
       "equipment": [],
@@ -327,8 +669,11 @@
     },
     {
       "id": "146",
-      "name": "Pressa per polpacci alla Leg Press",
+      "name": "Calf alla pressa",
       "names": [
+        "Calf alla pressa",
+        "Polpacci alla pressa",
+        "Calf press",
         "Pressa per polpacci alla Leg Press",
         "Calf Press Using Leg Press Machine"
       ],
@@ -346,6 +691,8 @@
       "name": "Trazioni alla sbarra",
       "names": [
         "Trazioni alla sbarra",
+        "Pull up",
+        "Trazioni",
         "Chin Up"
       ],
       "group": "Back",
@@ -377,8 +724,11 @@
     },
     {
       "id": "161",
-      "name": "Croci su panca piana",
+      "name": "Croci con manubri su panca piana",
       "names": [
+        "Croci con manubri su panca piana",
+        "Croci panca piana",
+        "Dumbbell fly",
         "Croci su panca piana",
         "Cross-Bench Dumbbell Pullovers"
       ],
@@ -395,8 +745,11 @@
     },
     {
       "id": "167",
-      "name": "Addominali",
+      "name": "Crunch",
       "names": [
+        "Crunch",
+        "Crunch a terra",
+        "Addominali crunch",
         "Addominali",
         "Crunches"
       ],
@@ -413,8 +766,9 @@
     },
     {
       "id": "171",
-      "name": "Addominali su panca inclinata",
+      "name": "Crunch su panca declinata",
       "names": [
+        "Crunch su panca declinata",
         "Addominali su panca inclinata",
         "Incline Crunches"
       ],
@@ -434,6 +788,7 @@
       "name": "Panca declinata con bilanciere",
       "names": [
         "Panca declinata con bilanciere",
+        "Distensioni panca declinata",
         "Decline Bench Press Barbell"
       ],
       "group": "Chest",
@@ -450,9 +805,12 @@
     },
     {
       "id": "194",
-      "name": "Dips",
+      "name": "Dip alle parallele",
       "names": [
+        "Dip alle parallele",
         "Dips",
+        "Parallele",
+        "Dip",
         "Weighted Dips"
       ],
       "group": "Chest",
@@ -468,8 +826,11 @@
     },
     {
       "id": "197",
-      "name": "Dips Between Two Benches",
+      "name": "Dip tra due panche",
       "names": [
+        "Dip tra due panche",
+        "Bench dips",
+        "Tricipiti tra due panche",
         "Dips Between Two Benches"
       ],
       "group": "Arms",
@@ -485,8 +846,11 @@
     },
     {
       "id": "206",
-      "name": "Dumbbell Lunges Walking",
+      "name": "Affondi camminati con manubri",
       "names": [
+        "Affondi camminati con manubri",
+        "Affondi in camminata",
+        "Walking lunges",
         "Dumbbell Lunges Walking",
         "Walking Lunges"
       ],
@@ -503,9 +867,10 @@
     },
     {
       "id": "237",
-      "name": "Fly With Cable",
+      "name": "Distensioni su panca inclinata con bilanciere",
       "names": [
-        "Fly With Cable"
+        "Distensioni su panca inclinata con bilanciere",
+        "Panca inclinata bilanciere variante"
       ],
       "group": "Chest",
       "equipment": [
@@ -520,8 +885,10 @@
     },
     {
       "id": "238",
-      "name": "Croci su panca Inclinata",
+      "name": "Croci con manubri su panca inclinata",
       "names": [
+        "Croci con manubri su panca inclinata",
+        "Croci panca inclinata",
         "Croci su panca Inclinata",
         "Fly With Dumbbells"
       ],
@@ -538,8 +905,11 @@
     },
     {
       "id": "246",
-      "name": "Skullcrusher SZ-bar",
+      "name": "French press con bilanciere EZ",
       "names": [
+        "French press con bilanciere EZ",
+        "Skull crusher EZ",
+        "Estensioni tricipiti su panca con bilanciere EZ",
         "Skullcrusher SZ-bar",
         "French Press SZ-bar"
       ],
@@ -557,9 +927,11 @@
     },
     {
       "id": "256",
-      "name": "Distensione lento avanti Bilanciere",
+      "name": "Alzate frontali con manubri",
       "names": [
-        "Distensione lento avanti Bilanciere",
+        "Alzate frontali con manubri",
+        "Alzate frontali",
+        "Front raise",
         "Front Raises",
         "dumbbell front raises",
         "DB Front Raises"
@@ -578,8 +950,11 @@
     },
     {
       "id": "257",
-      "name": "Front Squats",
+      "name": "Front squat con bilanciere",
       "names": [
+        "Front squat con bilanciere",
+        "Front squat",
+        "Squat frontale",
         "Front Squats"
       ],
       "group": "Legs",
@@ -595,8 +970,11 @@
     },
     {
       "id": "272",
-      "name": "Hummer curl con manubri",
+      "name": "Hammer curl con manubri",
       "names": [
+        "Hammer curl con manubri",
+        "Curl a martello",
+        "Curl martello con manubri",
         "Hummer curl con manubri",
         "Hammer Curls"
       ],
@@ -613,8 +991,10 @@
     },
     {
       "id": "275",
-      "name": "Hammercurls on Cable",
+      "name": "Hammer curl al cavo",
       "names": [
+        "Hammer curl al cavo",
+        "Curl a martello al cavo con corda",
         "Hammercurls on Cable"
       ],
       "group": "Arms",
@@ -630,8 +1010,10 @@
     },
     {
       "id": "279",
-      "name": "Hand Grip",
+      "name": "Hand grip",
       "names": [
+        "Hand grip",
+        "Esercizio per la presa",
         "Hand Grip"
       ],
       "group": "Arms",
@@ -645,8 +1027,10 @@
     },
     {
       "id": "282",
-      "name": "Handstand Pushup",
+      "name": "Piegamenti in verticale",
       "names": [
+        "Piegamenti in verticale",
+        "Handstand push up",
         "Handstand Pushup"
       ],
       "group": "Shoulders",
@@ -662,8 +1046,10 @@
     },
     {
       "id": "285",
-      "name": "High Knee Jumps",
+      "name": "Salti con ginocchia alte",
       "names": [
+        "Salti con ginocchia alte",
+        "High knee jumps",
         "High Knee Jumps"
       ],
       "group": "Cardio",
@@ -695,8 +1081,11 @@
     },
     {
       "id": "301",
-      "name": "Iperestensioni",
+      "name": "Iperestensioni lombari",
       "names": [
+        "Iperestensioni lombari",
+        "Hyperextension",
+        "Estensioni del busto alla panca",
         "Iperestensioni",
         "Hyperextensions"
       ],
@@ -727,8 +1116,11 @@
     },
     {
       "id": "323",
-      "name": "Cable Cross-over",
+      "name": "Croci ai cavi alti",
       "names": [
+        "Croci ai cavi alti",
+        "Crossover ai cavi",
+        "Cable cross over",
         "Cable Cross-over"
       ],
       "group": "Chest",
@@ -743,29 +1135,12 @@
       "tile": 9
     },
     {
-      "id": "348",
-      "name": "Alzate Laterali",
-      "names": [
-        "Alzate Laterali",
-        "Lateral Raises",
-        "Shoulder fly",
-        "Side raises"
-      ],
-      "group": "Shoulders",
-      "equipment": [
-        "Dumbbell"
-      ],
-      "credit": "Everkinetic",
-      "license": "CC-BY-SA 3",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
-      "source": "https://wger.de/media/exercise-images/148/lateral-dumbbell-raises-large-2.png",
-      "atlas": "exercise-atlas-102.webp",
-      "tile": 10
-    },
-    {
       "id": "349",
-      "name": "Lateral Rows on Cable, One Armed",
+      "name": "Alzate laterali al cavo",
       "names": [
+        "Alzate laterali al cavo",
+        "Alzata laterale singola al cavo",
+        "Alzate laterali ai cavi",
         "Lateral Rows on Cable, One Armed",
         "Side raises on Cable"
       ],
@@ -782,8 +1157,10 @@
     },
     {
       "id": "364",
-      "name": "Leg Curl",
+      "name": "Leg curl sdraiato alla macchina",
       "names": [
+        "Leg curl sdraiato alla macchina",
+        "Leg curl prono macchina",
         "Leg Curl"
       ],
       "group": "Legs",
@@ -797,8 +1174,11 @@
     },
     {
       "id": "365",
-      "name": "Leg Curls (laying)",
+      "name": "Leg curl da sdraiato",
       "names": [
+        "Leg curl da sdraiato",
+        "Leg curl prono",
+        "Leg curl lying",
         "Leg Curls (laying)"
       ],
       "group": "Legs",
@@ -812,8 +1192,10 @@
     },
     {
       "id": "366",
-      "name": "Leg Curls (sitting)",
+      "name": "Leg curl seduto alla macchina",
       "names": [
+        "Leg curl seduto alla macchina",
+        "Leg curl sitting",
         "Leg Curls (sitting)"
       ],
       "group": "Legs",
@@ -827,8 +1209,10 @@
     },
     {
       "id": "367",
-      "name": "Leg Curls (standing)",
+      "name": "Leg curl in piedi",
       "names": [
+        "Leg curl in piedi",
+        "Leg curl standing",
         "Leg Curls (standing)"
       ],
       "group": "Legs",
@@ -842,8 +1226,11 @@
     },
     {
       "id": "369",
-      "name": "Leg Extension",
+      "name": "Leg extension",
       "names": [
+        "Leg extension",
+        "Estensioni delle gambe alla macchina",
+        "Quadricipiti leg extension",
         "Leg Extension"
       ],
       "group": "Legs",
@@ -856,24 +1243,12 @@
       "tile": 0
     },
     {
-      "id": "371",
-      "name": "Leg Press",
-      "names": [
-        "Leg Press"
-      ],
-      "group": "Legs",
-      "equipment": [],
-      "credit": "BFad07",
-      "license": "CC-BY-SA 4",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
-      "source": "https://wger.de/media/exercise-images/371/d2136f96-3a43-4d4c-9944-1919c4ca1ce1.webp",
-      "atlas": "exercise-atlas-103.webp",
-      "tile": 1
-    },
-    {
       "id": "373",
-      "name": "Leg Presses (narrow)",
+      "name": "Pressa inclinata piedi stretti",
       "names": [
+        "Pressa inclinata piedi stretti",
+        "Pressa 45 gradi piedi stretti",
+        "Leg press presa stretta",
         "Leg Presses (narrow)"
       ],
       "group": "Legs",
@@ -887,8 +1262,11 @@
     },
     {
       "id": "375",
-      "name": "Leg Press on Hackenschmidt Machine",
+      "name": "Hack squat alla macchina",
       "names": [
+        "Hack squat alla macchina",
+        "Hack squat",
+        "Hackenschmidt",
         "Leg Press on Hackenschmidt Machine"
       ],
       "group": "Legs",
@@ -902,8 +1280,11 @@
     },
     {
       "id": "377",
-      "name": "Leg Raises, Lying",
+      "name": "Sollevamento gambe da sdraiato",
       "names": [
+        "Sollevamento gambe da sdraiato",
+        "Leg raises a terra",
+        "Addominali gambe tese a terra",
         "Leg Raises, Lying"
       ],
       "group": "Abs",
@@ -922,6 +1303,9 @@
       "name": "Pulley basso",
       "names": [
         "Pulley basso",
+        "Rematore al cavo basso",
+        "Pulley",
+        "Seated cable row",
         "Long-Pulley (low Row)"
       ],
       "group": "Back",
@@ -937,8 +1321,10 @@
     },
     {
       "id": "427",
-      "name": "Negative Crunches",
+      "name": "Crunch inverso su panca",
       "names": [
+        "Crunch inverso su panca",
+        "Reverse crunch",
         "Negative Crunches"
       ],
       "group": "Abs",
@@ -952,8 +1338,11 @@
     },
     {
       "id": "454",
-      "name": "Flessioni del luccio",
+      "name": "Pike push up",
       "names": [
+        "Pike push up",
+        "Piegamenti a V",
+        "Flessioni a V",
         "Flessioni del luccio",
         "Pike Push Ups"
       ],
@@ -972,7 +1361,8 @@
       "id": "458",
       "name": "Plank",
       "names": [
-        "Plank"
+        "Plank",
+        "Plank sulle braccia"
       ],
       "group": "Abs",
       "equipment": [
@@ -987,8 +1377,10 @@
     },
     {
       "id": "465",
-      "name": "Curl su Panca a 45°",
+      "name": "Curl su panca inclinata con manubri",
       "names": [
+        "Curl su panca inclinata con manubri",
+        "Curl panca inclinata 45 gradi",
         "Curl su Panca a 45°",
         "Preacher Curls"
       ],
@@ -1005,8 +1397,11 @@
     },
     {
       "id": "475",
-      "name": "Pull ups",
+      "name": "Trazioni presa supina",
       "names": [
+        "Trazioni presa supina",
+        "Chin up",
+        "Chin ups",
         "Pull ups",
         "Pull-ups"
       ],
@@ -1023,8 +1418,11 @@
     },
     {
       "id": "484",
-      "name": "Rack Deadlift",
+      "name": "Rack pull",
       "names": [
+        "Rack pull",
+        "Stacco dai supporti",
+        "Rack deadlift",
         "Rack Deadlift"
       ],
       "group": "Back",
@@ -1038,8 +1436,11 @@
     },
     {
       "id": "487",
-      "name": "Rear Delt Raises",
+      "name": "Alzate posteriori con manubri",
       "names": [
+        "Alzate posteriori con manubri",
+        "Croci inverse con manubri",
+        "Reverse fly manubri",
         "Rear Delt Raises"
       ],
       "group": "Shoulders",
@@ -1055,8 +1456,10 @@
     },
     {
       "id": "512",
-      "name": "Rowing seated, narrow grip",
+      "name": "Rematore seduto presa stretta",
       "names": [
+        "Rematore seduto presa stretta",
+        "Row presa stretta",
         "Rowing seated, narrow grip"
       ],
       "group": "Back",
@@ -1070,8 +1473,11 @@
     },
     {
       "id": "513",
-      "name": "Rowing, T-bar",
+      "name": "Rematore T bar",
       "names": [
+        "Rematore T bar",
+        "T bar row",
+        "Rematore con bilanciere a T",
         "Rowing, T-bar"
       ],
       "group": "Back",
@@ -1088,6 +1494,7 @@
       "name": "Panca inclinata con manubri",
       "names": [
         "Panca inclinata con manubri",
+        "Distensioni manubri panca inclinata",
         "Incline Bench Press - Dumbbell",
         "Incline Dumbbell Press"
       ],
@@ -1105,8 +1512,10 @@
     },
     {
       "id": "538",
-      "name": "Distensione Panca Inclinata Bilanciere",
+      "name": "Panca inclinata con bilanciere",
       "names": [
+        "Panca inclinata con bilanciere",
+        "Incline bench press",
         "Distensione Panca Inclinata Bilanciere",
         "Incline Bench Press - Barbell"
       ],
@@ -1124,8 +1533,10 @@
     },
     {
       "id": "539",
-      "name": "Distensione su Panca Piana Imp Stretta",
+      "name": "Distensioni su panca presa stretta",
       "names": [
+        "Distensioni su panca presa stretta",
+        "Panca stretta bilanciere variante",
         "Distensione su Panca Piana Imp Stretta",
         "Incline Bench Press - MP"
       ],
@@ -1140,8 +1551,11 @@
     },
     {
       "id": "543",
-      "name": "Shoulder Press, on Machine",
+      "name": "Shoulder press alla macchina",
       "names": [
+        "Shoulder press alla macchina",
+        "Macchina spalle",
+        "Shoulder press machine",
         "Shoulder Press, on Machine"
       ],
       "group": "Shoulders",
@@ -1155,8 +1569,11 @@
     },
     {
       "id": "566",
-      "name": "Shoulder Press, Barbell",
+      "name": "Lento avanti con bilanciere",
       "names": [
+        "Lento avanti con bilanciere",
+        "Military press",
+        "Shoulder press bilanciere",
         "Shoulder Press, Barbell",
         "OHP Barbell",
         "Overhead press Barbell",
@@ -1175,8 +1592,11 @@
     },
     {
       "id": "567",
-      "name": "Shoulder Press, Dumbbells",
+      "name": "Lento avanti con manubri",
       "names": [
+        "Lento avanti con manubri",
+        "Shoulder press manubri",
+        "Distensioni sopra la testa con manubri",
         "Shoulder Press, Dumbbells",
         "OHP Dumbbells",
         "Overhead press Dumbbells",
@@ -1198,6 +1618,7 @@
       "name": "Scrollate con bilanciere",
       "names": [
         "Scrollate con bilanciere",
+        "Shrug bilanciere",
         "Shrugs, Barbells"
       ],
       "group": "Shoulders",
@@ -1213,8 +1634,10 @@
     },
     {
       "id": "572",
-      "name": "Shrugs, Dumbbells",
+      "name": "Scrollate con manubri",
       "names": [
+        "Scrollate con manubri",
+        "Shrug manubri",
         "Shrugs, Dumbbells"
       ],
       "group": "Shoulders",
@@ -1230,8 +1653,10 @@
     },
     {
       "id": "576",
-      "name": "Side Crunch",
+      "name": "Crunch laterale",
       "names": [
+        "Crunch laterale",
+        "Addominali obliqui a terra",
         "Side Crunch"
       ],
       "group": "Abs",
@@ -1247,8 +1672,11 @@
     },
     {
       "id": "622",
-      "name": "Sollevamento dei polpacci in piedi",
+      "name": "Calf in piedi",
       "names": [
+        "Calf in piedi",
+        "Calf raise in piedi",
+        "Polpacci in piedi",
         "Sollevamento dei polpacci in piedi",
         "Standing Calf Raises"
       ],
@@ -1263,8 +1691,11 @@
     },
     {
       "id": "630",
-      "name": "Sumo Deadlift",
+      "name": "Stacco sumo con bilanciere",
       "names": [
+        "Stacco sumo con bilanciere",
+        "Stacco sumo",
+        "Sumo deadlift",
         "Sumo Deadlift"
       ],
       "group": "Legs",
@@ -1278,8 +1709,10 @@
     },
     {
       "id": "659",
-      "name": "Triceps Extensions on Cable",
+      "name": "Estensioni tricipiti al cavo alto sopra la testa",
       "names": [
+        "Estensioni tricipiti al cavo alto sopra la testa",
+        "French press al cavo alto",
         "Triceps Extensions on Cable"
       ],
       "group": "Arms",
@@ -1295,8 +1728,10 @@
     },
     {
       "id": "691",
-      "name": "Upright Row, on Multi Press",
+      "name": "Tirate al mento al multipower",
       "names": [
+        "Tirate al mento al multipower",
+        "Upright row multipower",
         "Upright Row, on Multi Press"
       ],
       "group": "Shoulders",
@@ -1310,8 +1745,10 @@
     },
     {
       "id": "693",
-      "name": "Upright Row, SZ-bar",
+      "name": "Tirate al mento con bilanciere EZ",
       "names": [
+        "Tirate al mento con bilanciere EZ",
+        "Upright row EZ",
         "Upright Row, SZ-bar"
       ],
       "group": "Shoulders",
@@ -1327,8 +1764,10 @@
     },
     {
       "id": "694",
-      "name": "Upright Row w/ Dumbbells",
+      "name": "Tirate al mento con manubri",
       "names": [
+        "Tirate al mento con manubri",
+        "Upright row manubri",
         "Upright Row w/ Dumbbells"
       ],
       "group": "Shoulders",
@@ -1361,8 +1800,11 @@
     },
     {
       "id": "805",
-      "name": "Flessioni dei Tricipiti al Cavo",
+      "name": "Push down tricipiti con sbarra",
       "names": [
+        "Push down tricipiti con sbarra",
+        "Pushdown tricipiti al cavo",
+        "Triceps pushdown",
         "Flessioni dei Tricipiti al Cavo",
         "Tricep Pushdown on Cable"
       ],
@@ -1379,8 +1821,11 @@
     },
     {
       "id": "822",
-      "name": "Cable Rear Delt Fly",
+      "name": "Croci inverse ai cavi",
       "names": [
+        "Croci inverse ai cavi",
+        "Alzate posteriori ai cavi",
+        "Reverse fly ai cavi",
         "Cable Rear Delt Fly"
       ],
       "group": "Shoulders",
@@ -1396,8 +1841,10 @@
     },
     {
       "id": "828",
-      "name": "Alzate posteriori",
+      "name": "Alzate posteriori su panca",
       "names": [
+        "Alzate posteriori su panca",
+        "Croci inverse su panca inclinata",
         "Alzate posteriori",
         "Incline Bench Reverse Fly"
       ],
@@ -1415,8 +1862,10 @@
     },
     {
       "id": "909",
-      "name": "Reverse Nordic Curl",
+      "name": "Reverse nordic curl",
       "names": [
+        "Reverse nordic curl",
+        "Nordic inverso",
         "Reverse Nordic Curl"
       ],
       "group": "Legs",
@@ -1430,8 +1879,10 @@
     },
     {
       "id": "912",
-      "name": "Straight Bar Cable Curls",
+      "name": "Curl al cavo con sbarra dritta",
       "names": [
+        "Curl al cavo con sbarra dritta",
+        "Curl bicipiti cavo sbarra",
         "Straight Bar Cable Curls"
       ],
       "group": "Arms",
@@ -1462,8 +1913,10 @@
     },
     {
       "id": "916",
-      "name": "Smith Press",
+      "name": "Panca piana al multipower",
       "names": [
+        "Panca piana al multipower",
+        "Smith machine bench press",
         "Smith Press"
       ],
       "group": "Shoulders",
@@ -1479,8 +1932,10 @@
     },
     {
       "id": "925",
-      "name": "Smith Machine Slight Incline Press",
+      "name": "Panca inclinata al multipower",
       "names": [
+        "Panca inclinata al multipower",
+        "Smith machine incline press",
         "Smith Machine Slight Incline Press"
       ],
       "group": "Chest",
@@ -1494,8 +1949,10 @@
     },
     {
       "id": "926",
-      "name": "Pectoral Machine",
+      "name": "Croci alla pectoral machine",
       "names": [
+        "Croci alla pectoral machine",
+        "Pectoral machine variante",
         "Pectoral Machine",
         "Machine chest fly"
       ],
@@ -1510,8 +1967,10 @@
     },
     {
       "id": "957",
-      "name": "Quadriped Arm and Leg Raise",
+      "name": "Estensione alternata braccio gamba in quadrupedia",
       "names": [
+        "Estensione alternata braccio gamba in quadrupedia",
+        "Bird dog variante",
         "Quadriped Arm and Leg Raise"
       ],
       "group": "Back",
@@ -1527,8 +1986,10 @@
     },
     {
       "id": "958",
-      "name": "Bicipiti al trx",
+      "name": "Curl bicipiti al TRX",
       "names": [
+        "Curl bicipiti al TRX",
+        "TRX curl",
         "Bicipiti al trx",
         "Biceps with TRX"
       ],
@@ -1548,6 +2009,7 @@
       "name": "Kettlebell swing",
       "names": [
         "Kettlebell swing",
+        "Swing con kettlebell",
         "Kettlebell Swing"
       ],
       "group": "Legs",
@@ -1563,8 +2025,10 @@
     },
     {
       "id": "975",
-      "name": "Curl con kettlebell una sola mano",
+      "name": "Curl con kettlebell a un braccio",
       "names": [
+        "Curl con kettlebell a un braccio",
+        "Curl kettlebell",
         "Curl con kettlebell una sola mano",
         "one-handed kettlebell curls"
       ],
@@ -1581,8 +2045,9 @@
     },
     {
       "id": "976",
-      "name": "Crunch a libretto con palla medica",
+      "name": "V up con palla medica",
       "names": [
+        "V up con palla medica",
         "Crunch a libretto con palla medica",
         "Medicine ball booklet crunch"
       ],
@@ -1599,10 +2064,11 @@
     },
     {
       "id": "977",
-      "name": "Squat box",
+      "name": "Box squat",
       "names": [
-        "Squat box",
-        "Box squat"
+        "Box squat",
+        "Squat al box",
+        "Squat box"
       ],
       "group": "Legs",
       "equipment": [
@@ -1617,8 +2083,10 @@
     },
     {
       "id": "978",
-      "name": "Addominali alla sbarra",
+      "name": "Sollevamento ginocchia alla sbarra",
       "names": [
+        "Sollevamento ginocchia alla sbarra",
+        "Knee raises alla sbarra",
         "Addominali alla sbarra",
         "Knee Raises"
       ],
@@ -1635,8 +2103,10 @@
     },
     {
       "id": "979",
-      "name": "Addominali alla sbarra a gambe distese",
+      "name": "Sollevamento gambe tese alla sbarra",
       "names": [
+        "Sollevamento gambe tese alla sbarra",
+        "Leg raises alla sbarra",
         "Addominali alla sbarra a gambe distese",
         "Leg raises pull up bar"
       ],
@@ -1653,8 +2123,11 @@
     },
     {
       "id": "981",
-      "name": "Step",
+      "name": "Step up",
       "names": [
+        "Step up",
+        "Salita sullo step",
+        "Salita su panca",
         "Step",
         "Step-ups",
         "Chair steps"
@@ -1672,8 +2145,10 @@
     },
     {
       "id": "983",
-      "name": "Corsa sul posto con ginocchia alte",
+      "name": "Skip alto",
       "names": [
+        "Skip alto",
+        "Corsa sul posto a ginocchia alte",
         "Corsa sul posto con ginocchia alte",
         "High knees",
         "Running in place"
@@ -1691,8 +2166,10 @@
     },
     {
       "id": "984",
-      "name": "Affondi",
+      "name": "Affondi con bilanciere",
       "names": [
+        "Affondi con bilanciere",
+        "Affondi bilanciere",
         "Affondi",
         "Lunges"
       ],
@@ -1709,8 +2186,11 @@
     },
     {
       "id": "988",
-      "name": "Affondo bulgaro con manubri",
+      "name": "Squat bulgaro con manubri",
       "names": [
+        "Squat bulgaro con manubri",
+        "Affondi bulgari",
+        "Bulgarian split squat",
         "Affondo bulgaro con manubri",
         "Bulgarian split squats left"
       ],
@@ -1727,8 +2207,11 @@
     },
     {
       "id": "990",
-      "name": "Contraccolpi in ginocchio",
+      "name": "Calci indietro in quadrupedia",
       "names": [
+        "Calci indietro in quadrupedia",
+        "Donkey kick",
+        "Estensioni anca in quadrupedia",
         "Contraccolpi in ginocchio",
         "Kneeling kickbacks"
       ],
@@ -1763,8 +2246,10 @@
     },
     {
       "id": "1002",
-      "name": "Posa del bambino",
+      "name": "Posizione del bambino",
       "names": [
+        "Posizione del bambino",
+        "Child pose",
         "Posa del bambino",
         "Child's pose",
         "Prayer pose"
@@ -1782,8 +2267,10 @@
     },
     {
       "id": "1003",
-      "name": "Kettlebell Deadlifts",
+      "name": "Stacco con kettlebell",
       "names": [
+        "Stacco con kettlebell",
+        "Kettlebell deadlift",
         "Kettlebell Deadlifts",
         "Kettlebell deadlifts"
       ],
@@ -1800,8 +2287,10 @@
     },
     {
       "id": "1007",
-      "name": "La testa gira",
+      "name": "Rotazioni del collo",
       "names": [
+        "Rotazioni del collo",
+        "Rotazioni della testa",
         "La testa gira",
         "Head turns"
       ],
@@ -1818,8 +2307,10 @@
     },
     {
       "id": "1012",
-      "name": "Alternating bicep curls",
+      "name": "Curl alternato con manubri",
       "names": [
+        "Curl alternato con manubri",
+        "Curl manubri alternati",
         "Alternating bicep curls"
       ],
       "group": "Arms",
@@ -1835,8 +2326,10 @@
     },
     {
       "id": "1018",
-      "name": "Head tilts",
+      "name": "Inclinazioni del collo",
       "names": [
+        "Inclinazioni del collo",
+        "Inclinazioni della testa",
         "Head tilts"
       ],
       "group": "Back",
@@ -1855,6 +2348,7 @@
       "name": "Russian twist con palla medica",
       "names": [
         "Russian twist con palla medica",
+        "Twist con palla medica",
         "Medicine ball twist"
       ],
       "group": "Abs",
@@ -1870,8 +2364,10 @@
     },
     {
       "id": "1091",
-      "name": "Plank shoulder taps",
+      "name": "Plank con tocco delle spalle",
       "names": [
+        "Plank con tocco delle spalle",
+        "Shoulder taps",
         "Plank shoulder taps",
         "Plank Shoulder Taps"
       ],
@@ -1888,8 +2384,10 @@
     },
     {
       "id": "1098",
-      "name": "Seated rear delt rise",
+      "name": "Alzate posteriori da seduto",
       "names": [
+        "Alzate posteriori da seduto",
+        "Reverse fly seduto",
         "Seated rear delt rise"
       ],
       "group": "Back",
@@ -1905,8 +2403,10 @@
     },
     {
       "id": "1100",
-      "name": "Wall balls",
+      "name": "Wall ball",
       "names": [
+        "Wall ball",
+        "Lanci palla medica al muro",
         "Wall balls"
       ],
       "group": "Legs",
@@ -1922,8 +2422,10 @@
     },
     {
       "id": "1105",
-      "name": "Seated Knee Tuck",
+      "name": "Raccolta ginocchia da seduto",
       "names": [
+        "Raccolta ginocchia da seduto",
+        "Knee tuck da seduto",
         "Seated Knee Tuck"
       ],
       "group": "Abs",
@@ -1939,8 +2441,10 @@
     },
     {
       "id": "1109",
-      "name": "Cable Concentration Curl",
+      "name": "Curl di concentrazione al cavo",
       "names": [
+        "Curl di concentrazione al cavo",
+        "Concentration curl al cavo",
         "Cable Concentration Curl"
       ],
       "group": "Arms",
@@ -1956,8 +2460,10 @@
     },
     {
       "id": "1112",
-      "name": "Push-Ups | Decline",
+      "name": "Piegamenti con piedi rialzati",
       "names": [
+        "Piegamenti con piedi rialzati",
+        "Push up declinati",
         "Push-Ups | Decline"
       ],
       "group": "Chest",
@@ -1977,6 +2483,7 @@
       "name": "Rematore seduto al cavo",
       "names": [
         "Rematore seduto al cavo",
+        "Rematore cavo variante",
         "Seated Cable Row"
       ],
       "group": "Back",
@@ -1992,8 +2499,10 @@
     },
     {
       "id": "1119",
-      "name": "Remo maquina agarre estrecho",
+      "name": "Rematore alla macchina presa stretta",
       "names": [
+        "Rematore alla macchina presa stretta",
+        "Row machine presa stretta",
         "Remo maquina agarre estrecho"
       ],
       "group": "Back",
@@ -2025,8 +2534,11 @@
     },
     {
       "id": "1131",
-      "name": "Cable glute extension",
+      "name": "Estensioni anca al cavo",
       "names": [
+        "Estensioni anca al cavo",
+        "Glutei al cavo",
+        "Kickback glutei al cavo",
         "Cable glute extension"
       ],
       "group": "Legs",
@@ -2060,8 +2572,10 @@
     },
     {
       "id": "1137",
-      "name": "High-pulley pullover",
+      "name": "Pullover al cavo alto",
       "names": [
+        "Pullover al cavo alto",
+        "High pulley pullover",
         "High-pulley pullover"
       ],
       "group": "Back",
@@ -2094,8 +2608,10 @@
     },
     {
       "id": "1143",
-      "name": "Back extensión",
+      "name": "Estensioni lombari alla macchina",
       "names": [
+        "Estensioni lombari alla macchina",
+        "Back extension machine",
         "Back extensión"
       ],
       "group": "Back",
@@ -2109,8 +2625,10 @@
     },
     {
       "id": "1185",
-      "name": "Triceps Pushdown",
+      "name": "Push down tricipiti",
       "names": [
+        "Push down tricipiti",
+        "Pushdown al cavo alto",
         "Triceps Pushdown"
       ],
       "group": "Arms",
@@ -2126,8 +2644,10 @@
     },
     {
       "id": "1186",
-      "name": "One Arm Bent Row",
+      "name": "Rematore singolo appoggiato alla panca",
       "names": [
+        "Rematore singolo appoggiato alla panca",
+        "Rematore manubrio con appoggio",
         "One Arm Bent Row"
       ],
       "group": "Back",
@@ -2143,8 +2663,9 @@
     },
     {
       "id": "1188",
-      "name": "Side bend",
+      "name": "Flessioni laterali del busto",
       "names": [
+        "Flessioni laterali del busto",
         "Side bend"
       ],
       "group": "Abs",
@@ -2160,8 +2681,10 @@
     },
     {
       "id": "1192",
-      "name": "Curl Bicipiti Alternato con Manubrio",
+      "name": "Curl alternato manubri in piedi",
       "names": [
+        "Curl alternato manubri in piedi",
+        "Curl bicipiti alternato",
         "Curl Bicipiti Alternato con Manubrio",
         "Alternating Biceps Curls With Dumbbell"
       ],
@@ -2178,8 +2701,10 @@
     },
     {
       "id": "1193",
-      "name": "Russian Twist",
+      "name": "Russian twist",
       "names": [
+        "Russian twist",
+        "Twist addominali",
         "Russian Twist"
       ],
       "group": "Abs",
@@ -2197,8 +2722,11 @@
     },
     {
       "id": "1198",
-      "name": "Trazioni orizzontali",
+      "name": "Rematore inverso",
       "names": [
+        "Rematore inverso",
+        "Trazioni orizzontali alla sbarra",
+        "Inverted row",
         "Trazioni orizzontali",
         "Inverted Rows",
         "horizontal pull-ups"
@@ -2216,8 +2744,10 @@
     },
     {
       "id": "1217",
-      "name": "Finger Pushup",
+      "name": "Piegamenti sulle dita",
       "names": [
+        "Piegamenti sulle dita",
+        "Finger push up",
         "Finger Pushup",
         "Flexão de dedo"
       ],
@@ -2234,8 +2764,9 @@
     },
     {
       "id": "1223",
-      "name": "Claps over the head",
+      "name": "Battiti delle mani sopra la testa",
       "names": [
+        "Battiti delle mani sopra la testa",
         "Claps over the head"
       ],
       "group": "Arms",
@@ -2251,8 +2782,10 @@
     },
     {
       "id": "1232",
-      "name": "Standing biceps stretch left",
+      "name": "Stretching bicipite sinistro",
       "names": [
+        "Stretching bicipite sinistro",
+        "Allungamento bicipite sinistro",
         "Standing biceps stretch left"
       ],
       "group": "Arms",
@@ -2268,8 +2801,10 @@
     },
     {
       "id": "1233",
-      "name": "Standing biceps stretch right",
+      "name": "Stretching bicipite destro",
       "names": [
+        "Stretching bicipite destro",
+        "Allungamento bicipite destro",
         "Standing biceps stretch right"
       ],
       "group": "Arms",
@@ -2285,8 +2820,10 @@
     },
     {
       "id": "1275",
-      "name": "Plantarflexion Stretch with Band",
+      "name": "Stretching plantare con elastico",
       "names": [
+        "Stretching plantare con elastico",
+        "Allungamento caviglia con elastico",
         "Plantarflexion Stretch with Band"
       ],
       "group": "Legs",
@@ -2302,8 +2839,11 @@
     },
     {
       "id": "1283",
-      "name": "Incline Chest-Supported Dumbbell Row",
+      "name": "Rematore con manubri petto appoggiato",
       "names": [
+        "Rematore con manubri petto appoggiato",
+        "Rematore su panca inclinata",
+        "Chest supported row",
         "Incline Chest-Supported Dumbbell Row"
       ],
       "group": "Back",
@@ -2320,8 +2860,10 @@
     },
     {
       "id": "1285",
-      "name": "Talons fesses",
+      "name": "Calciata dietro",
       "names": [
+        "Calciata dietro",
+        "Calci ai glutei",
         "Talons fesses",
         "Bum kicks"
       ],
@@ -2338,8 +2880,10 @@
     },
     {
       "id": "1290",
-      "name": "Reverse Grip Barbell Curls",
+      "name": "Curl inverso con bilanciere",
       "names": [
+        "Curl inverso con bilanciere",
+        "Reverse curl bilanciere",
         "Reverse Grip Barbell Curls"
       ],
       "group": "Arms",
@@ -2355,8 +2899,10 @@
     },
     {
       "id": "1296",
-      "name": "Low-Cable Cross-Over - NB",
+      "name": "Croci ai cavi bassi",
       "names": [
+        "Croci ai cavi bassi",
+        "Crossover cavi bassi",
         "Low-Cable Cross-Over - NB"
       ],
       "group": "Chest",
@@ -2372,8 +2918,10 @@
     },
     {
       "id": "1298",
-      "name": "High-Cable Cross Tricep Extention - NB",
+      "name": "Estensioni tricipiti incrociate ai cavi alti",
       "names": [
+        "Estensioni tricipiti incrociate ai cavi alti",
+        "Cross cable triceps extension",
         "High-Cable Cross Tricep Extention - NB"
       ],
       "group": "Arms",
@@ -2389,8 +2937,10 @@
     },
     {
       "id": "1333",
-      "name": "Forearm Curls (underhand grip)",
+      "name": "Flessioni polsi con manubri",
       "names": [
+        "Flessioni polsi con manubri",
+        "Wrist curl manubri",
         "Forearm Curls (underhand grip)"
       ],
       "group": "Arms",
@@ -2406,8 +2956,10 @@
     },
     {
       "id": "1336",
-      "name": "Triceps Overhead (Dumbbell)",
+      "name": "French press con manubrio sopra la testa",
       "names": [
+        "French press con manubrio sopra la testa",
+        "Estensioni tricipiti sopra la testa con manubrio",
         "Triceps Overhead (Dumbbell)"
       ],
       "group": "Arms",
@@ -2423,8 +2975,10 @@
     },
     {
       "id": "1338",
-      "name": "Shoulder Raise (Dumbbell)",
+      "name": "Alzate per le spalle con manubri",
       "names": [
+        "Alzate per le spalle con manubri",
+        "Shoulder raise manubri",
         "Shoulder Raise (Dumbbell)"
       ],
       "group": "Shoulders",
@@ -2440,8 +2994,10 @@
     },
     {
       "id": "1348",
-      "name": "Lower Back Extensions",
+      "name": "Iperestensioni del busto",
       "names": [
+        "Iperestensioni del busto",
+        "Lower back extension",
         "Lower Back Extensions"
       ],
       "group": "Back",
@@ -2455,8 +3011,11 @@
     },
     {
       "id": "1353",
-      "name": "Dumbbell Hex Press",
+      "name": "Hex press con manubri",
       "names": [
+        "Hex press con manubri",
+        "Squeeze press",
+        "Distensioni manubri uniti",
         "Dumbbell Hex Press"
       ],
       "group": "Chest",
@@ -2472,8 +3031,10 @@
     },
     {
       "id": "1377",
-      "name": "Torso Twist",
+      "name": "Rotazioni del busto",
       "names": [
+        "Rotazioni del busto",
+        "Torso twist",
         "Torso Twist"
       ],
       "group": "Abs",
@@ -2489,8 +3050,10 @@
     },
     {
       "id": "1387",
-      "name": "Hamstring Kicks",
+      "name": "Slanci della gamba in avanti",
       "names": [
+        "Slanci della gamba in avanti",
+        "Hamstring kicks",
         "Hamstring Kicks"
       ],
       "group": "Legs",
@@ -2506,8 +3069,10 @@
     },
     {
       "id": "1392",
-      "name": "Good Morning",
+      "name": "Good morning con bilanciere",
       "names": [
+        "Good morning con bilanciere",
+        "Good morning",
         "Good Morning",
         "Hip Hinge"
       ],
@@ -2524,8 +3089,10 @@
     },
     {
       "id": "1448",
-      "name": "Seated W Curl",
+      "name": "Curl a W da seduto",
       "names": [
+        "Curl a W da seduto",
+        "Seated W curl",
         "Seated W Curl"
       ],
       "group": "Arms",
@@ -2542,8 +3109,10 @@
     },
     {
       "id": "1479",
-      "name": "Sit Up Elbow Thrust",
+      "name": "Sit up con torsione",
       "names": [
+        "Sit up con torsione",
+        "Sit up gomito al ginocchio",
         "Sit Up Elbow Thrust"
       ],
       "group": "Abs",
@@ -2559,8 +3128,10 @@
     },
     {
       "id": "1519",
-      "name": "Overhead Triceps Extension",
+      "name": "Estensioni tricipiti sopra la testa",
       "names": [
+        "Estensioni tricipiti sopra la testa",
+        "Overhead triceps extension",
         "Overhead Triceps Extension"
       ],
       "group": "Arms",
@@ -2576,8 +3147,11 @@
     },
     {
       "id": "1551",
-      "name": "Push-Up",
+      "name": "Piegamenti sulle braccia",
       "names": [
+        "Piegamenti sulle braccia",
+        "Push up",
+        "Flessioni",
         "Push-Up"
       ],
       "group": "Chest",
@@ -2593,8 +3167,10 @@
     },
     {
       "id": "1554",
-      "name": "Clap Push-UP",
+      "name": "Piegamenti con battito delle mani",
       "names": [
+        "Piegamenti con battito delle mani",
+        "Clap push up",
         "Clap Push-UP"
       ],
       "group": "Chest",
@@ -2610,8 +3186,10 @@
     },
     {
       "id": "1556",
-      "name": "Devil’s Press",
+      "name": "Devil press con manubri",
       "names": [
+        "Devil press con manubri",
+        "Devils press",
         "Devil’s Press"
       ],
       "group": "Shoulders",
@@ -2627,8 +3205,10 @@
     },
     {
       "id": "1567",
-      "name": "Alternating dumbbell hammer curl",
+      "name": "Curl a martello alternato",
       "names": [
+        "Curl a martello alternato",
+        "Hammer curl alternato",
         "Alternating dumbbell hammer curl"
       ],
       "group": "Arms",
@@ -2644,8 +3224,10 @@
     },
     {
       "id": "1572",
-      "name": "Bird Dog",
+      "name": "Bird dog",
       "names": [
+        "Bird dog",
+        "Estensioni alternate in quadrupedia",
         "Bird Dog"
       ],
       "group": "Abs",
@@ -2699,8 +3281,10 @@
     },
     {
       "id": "1593",
-      "name": "Smith Machine Split Squat",
+      "name": "Split squat al multipower",
       "names": [
+        "Split squat al multipower",
+        "Affondi al multipower",
         "Smith Machine Split Squat"
       ],
       "group": "Legs",
@@ -2716,8 +3300,10 @@
     },
     {
       "id": "1612",
-      "name": "kettlebell sumo deadlift",
+      "name": "Stacco sumo con kettlebell",
       "names": [
+        "Stacco sumo con kettlebell",
+        "Sumo kettlebell deadlift",
         "kettlebell sumo deadlift"
       ],
       "group": "Legs",
@@ -2733,8 +3319,11 @@
     },
     {
       "id": "1615",
-      "name": "Treadmill Cardio",
+      "name": "Camminata sul tapis roulant",
       "names": [
+        "Camminata sul tapis roulant",
+        "Tapis roulant",
+        "Treadmill",
         "Treadmill Cardio"
       ],
       "group": "Cardio",
@@ -2750,8 +3339,11 @@
     },
     {
       "id": "1618",
-      "name": "Stationary bike cardio",
+      "name": "Cyclette",
       "names": [
+        "Cyclette",
+        "Bici da camera",
+        "Bike",
         "Stationary bike cardio"
       ],
       "group": "Cardio",
@@ -2767,8 +3359,10 @@
     },
     {
       "id": "1620",
-      "name": "Seated Dumbbell Calf Raise",
+      "name": "Calf da seduto con manubri",
       "names": [
+        "Calf da seduto con manubri",
+        "Polpacci seduto con manubri",
         "Seated Dumbbell Calf Raise"
       ],
       "group": "Calves",
@@ -2784,8 +3378,10 @@
     },
     {
       "id": "1621",
-      "name": "Unilateral Cable row",
+      "name": "Rematore unilaterale al cavo",
       "names": [
+        "Rematore unilaterale al cavo",
+        "Rematore singolo al cavo",
         "Unilateral Cable row",
         "Single-arm cable row"
       ],
@@ -2803,8 +3399,10 @@
     },
     {
       "id": "1638",
-      "name": "Barbell Clean and press",
+      "name": "Girata e distensione con bilanciere",
       "names": [
+        "Girata e distensione con bilanciere",
+        "Barbell clean and press",
         "Barbell Clean and press"
       ],
       "group": "Shoulders",
@@ -2820,8 +3418,10 @@
     },
     {
       "id": "1639",
-      "name": "Dumbbell Bent Over Face Pull",
+      "name": "Alzate posteriori a busto flesso con manubri",
       "names": [
+        "Alzate posteriori a busto flesso con manubri",
+        "Dumbbell bent over face pull",
         "Dumbbell Bent Over Face Pull"
       ],
       "group": "Back",
@@ -2837,8 +3437,10 @@
     },
     {
       "id": "1640",
-      "name": "Dumbbell Front Squat",
+      "name": "Front squat con manubri",
       "names": [
+        "Front squat con manubri",
+        "Squat frontale con due manubri",
         "Dumbbell Front Squat"
       ],
       "group": "Legs",
@@ -2854,8 +3456,10 @@
     },
     {
       "id": "1641",
-      "name": "Kettlebell One Legged Deadlift",
+      "name": "Stacco a una gamba con kettlebell",
       "names": [
+        "Stacco a una gamba con kettlebell",
+        "Single leg kettlebell deadlift",
         "Kettlebell One Legged Deadlift"
       ],
       "group": "Legs",
@@ -2872,8 +3476,10 @@
     },
     {
       "id": "1642",
-      "name": "Dumbbell Hip Thrust",
+      "name": "Hip thrust con manubrio",
       "names": [
+        "Hip thrust con manubrio",
+        "Spinte anca con manubrio",
         "Dumbbell Hip Thrust"
       ],
       "group": "Legs",
@@ -2889,8 +3495,10 @@
     },
     {
       "id": "1648",
-      "name": "Weighted Crunch",
+      "name": "Crunch con sovraccarico",
       "names": [
+        "Crunch con sovraccarico",
+        "Crunch zavorrato",
         "Weighted Crunch"
       ],
       "group": "Abs",
@@ -2906,8 +3514,10 @@
     },
     {
       "id": "1650",
-      "name": "Dumbbell Side Bend",
+      "name": "Flessioni laterali con manubrio",
       "names": [
+        "Flessioni laterali con manubrio",
+        "Side bend con manubrio",
         "Dumbbell Side Bend"
       ],
       "group": "Abs",
@@ -2923,8 +3533,10 @@
     },
     {
       "id": "1651",
-      "name": "Dumbbell Rear Lunge",
+      "name": "Affondi indietro con manubri",
       "names": [
+        "Affondi indietro con manubri",
+        "Reverse lunge con manubri",
         "Dumbbell Rear Lunge"
       ],
       "group": "Legs",
@@ -2940,8 +3552,11 @@
     },
     {
       "id": "1652",
-      "name": "Dumbbell Romanian Deadlift",
+      "name": "RDL con manubri",
       "names": [
+        "RDL con manubri",
+        "Stacco rumeno con manubri",
+        "Romanian deadlift manubri",
         "Dumbbell Romanian Deadlift"
       ],
       "group": "Legs",
@@ -2957,8 +3572,10 @@
     },
     {
       "id": "1653",
-      "name": "Dumbbell Side Squat",
+      "name": "Affondi laterali con manubri",
       "names": [
+        "Affondi laterali con manubri",
+        "Squat laterale con manubri",
         "Dumbbell Side Squat"
       ],
       "group": "Legs",
@@ -2972,8 +3589,10 @@
     },
     {
       "id": "1654",
-      "name": "Machine Lateral Raise",
+      "name": "Alzate laterali alla macchina",
       "names": [
+        "Alzate laterali alla macchina",
+        "Lateral raise machine",
         "Machine Lateral Raise"
       ],
       "group": "Shoulders",
@@ -2989,8 +3608,10 @@
     },
     {
       "id": "1706",
-      "name": "Bulgarian Squat with Dumbbells",
+      "name": "Bulgarian squat con manubri",
       "names": [
+        "Bulgarian squat con manubri",
+        "Squat bulgaro variante",
         "Bulgarian Squat with Dumbbells"
       ],
       "group": "Legs",
@@ -3003,21 +3624,6 @@
       "source": "https://wger.de/media/exercise-images/1706/0c5243cc-2539-4005-aee0-d3a8c5d3a32c.jfif",
       "atlas": "exercise-atlas-110.webp",
       "tile": 13
-    },
-    {
-      "id": "1725",
-      "name": "Seated Row (Machine)",
-      "names": [
-        "Seated Row (Machine)"
-      ],
-      "group": "Back",
-      "equipment": [],
-      "credit": "barry",
-      "license": "CC-BY-SA 4",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
-      "source": "https://wger.de/media/exercise-images/1725/f0ebd44e-b8e1-400c-b598-ca371f3a07af.png",
-      "atlas": "exercise-atlas-110.webp",
-      "tile": 14
     },
     {
       "id": "1726",
@@ -3039,8 +3645,10 @@
     },
     {
       "id": "1735",
-      "name": "Single-leg side glute press",
+      "name": "Spinta glutei laterale a una gamba",
       "names": [
+        "Spinta glutei laterale a una gamba",
+        "Single leg side glute press",
         "Single-leg side glute press"
       ],
       "group": "Legs",
@@ -3056,8 +3664,10 @@
     },
     {
       "id": "1736",
-      "name": "Single-Leg Deadlift with Dumbbell",
+      "name": "RDL a una gamba con manubrio",
       "names": [
+        "RDL a una gamba con manubrio",
+        "Stacco a una gamba con manubrio",
         "Single-Leg Deadlift with Dumbbell"
       ],
       "group": "Legs",
@@ -3073,8 +3683,10 @@
     },
     {
       "id": "1744",
-      "name": "Machine Side Lateral Raises",
+      "name": "Alzate laterali macchina variante",
       "names": [
+        "Alzate laterali macchina variante",
+        "Deltoidi alla macchina",
         "Machine Side Lateral Raises"
       ],
       "group": "Shoulders",
@@ -3088,8 +3700,10 @@
     },
     {
       "id": "1745",
-      "name": "Cable Front Raise with a small bar",
+      "name": "Alzate frontali al cavo con sbarra",
       "names": [
+        "Alzate frontali al cavo con sbarra",
+        "Alzate frontali al cavo",
         "Cable Front Raise with a small bar"
       ],
       "group": "Shoulders",
@@ -3105,8 +3719,9 @@
     },
     {
       "id": "1747",
-      "name": "Smith machine squat",
+      "name": "Squat al multipower",
       "names": [
+        "Squat al multipower",
         "Smith machine squat"
       ],
       "group": "Legs",
@@ -3120,8 +3735,11 @@
     },
     {
       "id": "1748",
-      "name": "Machine Hip Abduction",
+      "name": "Abductor machine",
       "names": [
+        "Abductor machine",
+        "Abduzioni delle anche alla macchina",
+        "Macchina abduttori",
         "Machine Hip Abduction"
       ],
       "group": "Legs",
@@ -3134,26 +3752,11 @@
       "tile": 5
     },
     {
-      "id": "1801",
-      "name": "Barbell Full Squat",
-      "names": [
-        "Barbell Full Squat"
-      ],
-      "group": "Legs",
-      "equipment": [
-        "Barbell"
-      ],
-      "credit": "Workout Guru",
-      "license": "CC-BY-SA 4",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
-      "source": "https://wger.de/media/exercise-images/1801/60043328-1cfb-4289-9865-aaf64d5aaa28.jpg",
-      "atlas": "exercise-atlas-111.webp",
-      "tile": 6
-    },
-    {
       "id": "1830",
-      "name": "Barbell Step Back Lunge",
+      "name": "Affondi indietro con bilanciere",
       "names": [
+        "Affondi indietro con bilanciere",
+        "Reverse lunge bilanciere",
         "Barbell Step Back Lunge",
         "Barbell Reverse Lunge"
       ],
@@ -3170,8 +3773,10 @@
     },
     {
       "id": "1831",
-      "name": "Hammerstrength Decline Chest Press",
+      "name": "Chest press declinata alla macchina",
       "names": [
+        "Chest press declinata alla macchina",
+        "Hammer strength decline press",
         "Hammerstrength Decline Chest Press",
         "Hammerstrength Decline Press"
       ],
@@ -3186,8 +3791,10 @@
     },
     {
       "id": "1889",
-      "name": "Decline Bench Leg Raise",
+      "name": "Sollevamento gambe su panca declinata",
       "names": [
+        "Sollevamento gambe su panca declinata",
+        "Leg raise panca declinata",
         "Decline Bench Leg Raise"
       ],
       "group": "Abs",
@@ -3203,8 +3810,10 @@
     },
     {
       "id": "1893",
-      "name": "Overhead Barbell Press",
+      "name": "Distensioni sopra la testa con bilanciere",
       "names": [
+        "Distensioni sopra la testa con bilanciere",
+        "Overhead barbell press",
         "Overhead Barbell Press",
         "Military Press"
       ],
@@ -3221,8 +3830,11 @@
     },
     {
       "id": "1900",
-      "name": "Tricep Rope Pushdowns",
+      "name": "Push down con corda",
       "names": [
+        "Push down con corda",
+        "Pushdown tricipiti corda",
+        "Triceps rope pushdown",
         "Tricep Rope Pushdowns"
       ],
       "group": "Arms",
@@ -3238,8 +3850,10 @@
     },
     {
       "id": "1901",
-      "name": "Clean and Press",
+      "name": "Clean and press",
       "names": [
+        "Clean and press",
+        "Girata e spinta sopra la testa",
         "Clean and Press",
         "Clean & Press",
         "Barbell Clean and Press",
@@ -3258,8 +3872,10 @@
     },
     {
       "id": "1902",
-      "name": "Weighted push-ups",
+      "name": "Piegamenti zavorrati",
       "names": [
+        "Piegamenti zavorrati",
+        "Push up con sovraccarico",
         "Weighted push-ups"
       ],
       "group": "Chest",
@@ -3277,7 +3893,8 @@
       "id": "1916",
       "name": "Tuck planche",
       "names": [
-        "Tuck planche"
+        "Tuck planche",
+        "Planche raccolta"
       ],
       "group": "Shoulders",
       "equipment": [
@@ -3292,8 +3909,10 @@
     },
     {
       "id": "1922",
-      "name": "Seated Cable chest fly",
+      "name": "Croci ai cavi da seduto",
       "names": [
+        "Croci ai cavi da seduto",
+        "Chest fly cavi seduto",
         "Seated Cable chest fly"
       ],
       "group": "Chest",
@@ -3309,8 +3928,10 @@
     },
     {
       "id": "1962",
-      "name": "Step Jack",
+      "name": "Step jack",
       "names": [
+        "Step jack",
+        "Jumping jack senza salto",
         "Step Jack",
         "Side Step Jack",
         "Low Impact Jumping Jack"
@@ -3328,8 +3949,11 @@
     },
     {
       "id": "1963",
-      "name": "Slow Squat",
+      "name": "Squat lento",
       "names": [
+        "Squat lento",
+        "Tempo squat",
+        "Squat a tempo",
         "Slow Squat",
         "Tempo Squat",
         "​3-1-1 Squat"
@@ -3347,8 +3971,10 @@
     },
     {
       "id": "1965",
-      "name": "Marching High Knees",
+      "name": "Marcia a ginocchia alte",
       "names": [
+        "Marcia a ginocchia alte",
+        "Marching high knees",
         "Marching High Knees",
         "High Knee March",
         "​Standing Knee Drives"
@@ -3366,8 +3992,10 @@
     },
     {
       "id": "1968",
-      "name": "Single-arm dumbbell shoulder press",
+      "name": "Shoulder press con un manubrio",
       "names": [
+        "Shoulder press con un manubrio",
+        "Lento avanti un braccio",
         "Single-arm dumbbell shoulder press"
       ],
       "group": "Shoulders",
@@ -3383,8 +4011,10 @@
     },
     {
       "id": "1971",
-      "name": "Mentzer Pulldown",
+      "name": "Lat machine stile Mentzer",
       "names": [
+        "Lat machine stile Mentzer",
+        "Mentzer pulldown",
         "Mentzer Pulldown"
       ],
       "group": "Arms",
@@ -3401,8 +4031,10 @@
     },
     {
       "id": "2452",
-      "name": "Curl De Muñeca Con Barra",
+      "name": "Flessioni dei polsi con bilanciere variante",
       "names": [
+        "Flessioni dei polsi con bilanciere variante",
+        "Wrist curl bilanciere variante",
         "Curl De Muñeca Con Barra"
       ],
       "group": "Arms",
@@ -3419,8 +4051,10 @@
     },
     {
       "id": "2494",
-      "name": "Band Terminal Knee extension",
+      "name": "Estensioni terminali del ginocchio con elastico",
       "names": [
+        "Estensioni terminali del ginocchio con elastico",
+        "TKE con elastico",
         "Band Terminal Knee extension"
       ],
       "group": "Legs",
@@ -3436,8 +4070,10 @@
     },
     {
       "id": "2529",
-      "name": "explosive push ups",
+      "name": "Piegamenti esplosivi",
       "names": [
+        "Piegamenti esplosivi",
+        "Explosive push up",
         "explosive push ups"
       ],
       "group": "Chest",
@@ -3453,8 +4089,10 @@
     },
     {
       "id": "2530",
-      "name": "Russian Push Ups",
+      "name": "Piegamenti russi",
       "names": [
+        "Piegamenti russi",
+        "Russian push up",
         "Russian Push Ups"
       ],
       "group": "Chest",
@@ -3470,8 +4108,10 @@
     },
     {
       "id": "2618",
-      "name": "Hip-Out and Hip-In Lateral Steps",
+      "name": "Passi laterali con rotazione delle anche",
       "names": [
+        "Passi laterali con rotazione delle anche",
+        "Hip in hip out lateral steps",
         "Hip-Out and Hip-In Lateral Steps"
       ],
       "group": "Legs",
@@ -3487,8 +4127,10 @@
     },
     {
       "id": "2619",
-      "name": "Single-Leg Soft-Landing Holds",
+      "name": "Atterraggi controllati a una gamba",
       "names": [
+        "Atterraggi controllati a una gamba",
+        "Single leg soft landing",
         "Single-Leg Soft-Landing Holds"
       ],
       "group": "Legs",
@@ -3504,8 +4146,10 @@
     },
     {
       "id": "2674",
-      "name": "Knieheben Beinhebemaschine",
+      "name": "Sollevamento ginocchia alla macchina",
       "names": [
+        "Sollevamento ginocchia alla macchina",
+        "Knee raises macchina",
         "Knieheben Beinhebemaschine"
       ],
       "group": "Abs",
@@ -3521,8 +4165,10 @@
     },
     {
       "id": "2675",
-      "name": "Knieheben Beinhebemaschine seitlich",
+      "name": "Sollevamento ginocchia laterale alla macchina",
       "names": [
+        "Sollevamento ginocchia laterale alla macchina",
+        "Knee raises obliqui macchina",
         "Knieheben Beinhebemaschine seitlich"
       ],
       "group": "Abs",
@@ -3538,8 +4184,11 @@
     },
     {
       "id": "2678",
-      "name": "Incline Row - Rings",
+      "name": "Rematore agli anelli",
       "names": [
+        "Rematore agli anelli",
+        "Ring row",
+        "Trazioni orizzontali agli anelli",
         "Incline Row - Rings"
       ],
       "group": "Back",
@@ -3555,8 +4204,9 @@
     },
     {
       "id": "2680",
-      "name": "Wrist rocks",
+      "name": "Mobilita dei polsi in appoggio",
       "names": [
+        "Mobilita dei polsi in appoggio",
         "Wrist rocks"
       ],
       "group": "Arms",
@@ -3572,8 +4222,10 @@
     },
     {
       "id": "2681",
-      "name": "Scapular Pushups",
+      "name": "Piegamenti scapolari",
       "names": [
+        "Piegamenti scapolari",
+        "Scapular push up",
         "Scapular Pushups"
       ],
       "group": "Back",
