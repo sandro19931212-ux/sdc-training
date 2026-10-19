@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-login-fast-v22';
+const CACHE_NAME = 'sdc-training-appointment-batch-v23';
 
 const APP_SHELL = [
   './',
@@ -83,6 +83,7 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(event.request))
   );
 });
+
 
 
 
