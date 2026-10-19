@@ -5400,12 +5400,16 @@ async function bootstrapAuthenticatedApp(){
   const allowed=role==='trainer'?['dashboard','clients','scheda','appointments','payments','more']:['dashboard','scheda','appuntamenti','peso','altro','consigli'];
   if(allowed.includes(ui.page))session.page=ui.page;
   if(DAYS.includes(ui.clientDay))session.clientDay=ui.clientDay;
+  let cached=null;try{cached=JSON.parse(localStorage.getItem('sdc_data_v10:'+activeActor)||'null');}catch{}
   await syncClientsFromSupabase();
   if(role==='client'){
    const own=db.clients.find(c=>c.supabaseUserId===user.id);if(!own){await logout();loginMessage('Profilo non disponibile. Contatta il trainer.');return;}
    session.userId=own.id;
   }
-  await refreshAllData();saveSession();render();
+  if(cached&&['workouts','payments','appointments','weights','workoutArchives'].every(key=>Array.isArray(cached[key]))){
+   for(const key of ['workouts','payments','appointments','weights','workoutArchives'])db[key]=cached[key].filter(row=>db.clients.some(c=>c.id===String(row.clientId)));
+   saveSession();render();refreshAfterNavigation();
+  }else{await refreshAllData(true);saveSession();render();}
  })().catch(error=>{discardPrivateState();render();loginMessage(error.code==='ACCESS_BLOCKED'?'Accesso temporaneamente sospeso. Contatta il trainer.':'Non riesco a verificare l’accesso. Controlla la connessione e riprova.');console.warn(error);}).finally(()=>{bootPending=null;});
  return bootPending;
 }
@@ -5443,12 +5447,12 @@ syncAppointmentsFromSupabase=async function(){const e=authEpoch,a=activeActor,ro
 syncWeightsFromSupabase=async function(){const e=authEpoch,a=activeActor,rows=await readRows('weights');currentRead(e,a);db.weights=activeChildren(rows).map(w=>({id:String(w.id),clientId:String(w.client_id),supabaseUserId:w.client_user_id,date:w.weight_date,weight:String(w.weight)}));save();return db.weights;};
 syncWorkoutsFromSupabase=async function(){const e=authEpoch,a=activeActor,revision=modalRevision,rows=await readRows('workouts');currentRead(e,a);if(revision!==modalRevision)return db.workouts;db.workouts=activeChildren(rows).map(w=>({id:String(w.id),clientId:String(w.client_id),supabaseUserId:w.client_user_id,title:w.title||'',day:w.day||'Giorno 1',exercise:w.exercise||'',sets:String(w.sets??''),reps:String(w.reps??''),rest:String(w.rest??''),load:String(w.load??''),note:session.role==='client'?(w.note||''):'',position:Number(w.position)||9999}));save();return db.workouts;};
 syncWorkoutArchivesFromSupabase=async function(){const e=authEpoch,a=activeActor,rows=await readRows('workout_archives');currentRead(e,a);db.workoutArchives=activeChildren(rows).map(r=>({id:String(r.id),clientId:String(r.client_id),clientUserId:r.client_user_id,title:r.title,archivedAt:r.archived_at,workouts:r.snapshot||[]}));save();return db.workoutArchives;};
-async function refreshAllData(){
+async function refreshAllData(clientsReady=false){
  if(!session||!activeActor)return;
  if(refreshPending)return refreshPending;
  const epoch=authEpoch;
  const actor=activeActor,revision=modalRevision;
- const task=(async()=>{await syncClientsFromSupabase();await Promise.all([syncPaymentsFromSupabase(),syncAppointmentsFromSupabase(),syncWeightsFromSupabase(),revision===modalRevision?syncWorkoutsFromSupabase():Promise.resolve(),syncWorkoutArchivesFromSupabase()]);currentRead(epoch,actor);lastDataRefreshAt=Date.now();lastDataRefreshActor=actor;})();
+ const task=(async()=>{if(!clientsReady)await syncClientsFromSupabase();await Promise.all([syncPaymentsFromSupabase(),syncAppointmentsFromSupabase(),syncWeightsFromSupabase(),revision===modalRevision?syncWorkoutsFromSupabase():Promise.resolve(),syncWorkoutArchivesFromSupabase()]);currentRead(epoch,actor);lastDataRefreshAt=Date.now();lastDataRefreshActor=actor;})();
  refreshPending=task;try{await task;}finally{if(epoch===authEpoch)refreshPending=null;}
 }
 refreshTrainerDirectory=async function(redraw=false){
