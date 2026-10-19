@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-note-back-v24';
+const CACHE_NAME = 'sdc-training-exercise-library-v25';
 
 const APP_SHELL = [
   './',
@@ -44,6 +44,18 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+
+  // La libreria viene scaricata solo quando aperta e riusata nelle visite successive.
+  if (/\/exercise-atlas-\d+\.webp$/.test(url.pathname) || /\/exercise-catalog\.json$/.test(url.pathname)) {
+    event.respondWith(caches.open(CACHE_NAME).then(async cache => {
+      const cached = await cache.match(event.request);
+      if (cached) return cached;
+      const response = await fetch(event.request);
+      if (response.ok) await cache.put(event.request, response.clone());
+      return response;
+    }));
+    return;
+  }
 
   // HTML sempre dalla rete quando disponibile
   if (
