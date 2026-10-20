@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-exercise-italian-expanded-v27';
+const CACHE_NAME = 'sdc-training-photo-compact-v28';
 
 const APP_SHELL = [
   './',
@@ -95,6 +95,7 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(event.request))
   );
 });
+
 
 
 
