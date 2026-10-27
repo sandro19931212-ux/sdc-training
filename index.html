@@ -3624,6 +3624,7 @@ function trainer(){
   if(!trainerViewEl) return;
 
   const trainerPage=session.page||"dashboard";
+  const dashboardAppointments=nextDashboardAppointments(db.appointments);
   const appointmentsSorted=db.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   const todayISO=localTodayISO();
   const appointmentsUpcoming=appointmentsSorted.filter(isPendingAppointment);
@@ -3648,7 +3649,7 @@ function trainer(){
       <div class="grid">
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('clients')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.clients}</span><b>${db.clients.length}</b><span>Clienti</span></div>
         <div class="card stat action-card icon-card sdc-trainer-stat-card icon-only" onclick="jumpToTrainerSection('checkfoto')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.photo}</span><b>Check Foto</b><span>Apri archivio</span></div>
-        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('appointments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.appointments}</span><b>${appointmentsUpcoming.length}</b><span>Sedute prenotate</span></div>
+        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('appointments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.appointments}</span><b>${dashboardAppointments.length}</b><span>Sedute prenotate</span></div>
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('payments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.payments}</span><b>${db.payments.length}</b><span>Pagamenti</span></div>
       </div>
 
@@ -3659,7 +3660,7 @@ function trainer(){
 
       <section class="section">
         <div class="sectionhead"><h2>Prossimi appuntamenti</h2></div>
-        <div class="list">${appointmentsUpcoming.length?appointmentsUpcoming.slice(0,3).map(a=>`
+        <div class="list">${dashboardAppointments.length?dashboardAppointments.slice(0,3).map(a=>`
           <div class="row">
             <div><strong>${fmtDate(a.date)} · ${esc(a.time)}</strong><small>${esc(cname(a.clientId))} · ${esc(a.note||"Allenamento")} · ${attendanceLabel(a)}</small></div>
           </div>`).join(""):`<div class="card empty">Nessun appuntamento.</div>`}
@@ -5846,6 +5847,31 @@ async function confirmWorkoutCopy(button){
 }
 const copyDiscardBase=discardPrivateState;
 discardPrivateState=function(...args){workoutCopyDraft=null;workoutCopyPreviewVersion++;return copyDiscardBase(...args);};
+
+// Upcoming dashboard cards follow the appointment clock, not attendance confirmation.
+function dashboardAppointmentClock(now=new Date()){
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(now).map(p=>[p.type,p.value]));
+ return Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));
+}
+function nextDashboardAppointments(rows,now=new Date()){
+ const clock=dashboardAppointmentClock(now);
+ return rows.filter(a=>{if(!isPendingAppointment(a)||!/^\d{4}-\d{2}-\d{2}$/.test(a.date||'')||!/^\d{2}:\d{2}$/.test(a.time||''))return false;const start=Date.parse(a.date+'T'+a.time+':00Z'),duration=Number(a.duration)>0?Number(a.duration):60;return Number.isFinite(start)&&start+duration*60000>clock;}).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+}
+let dashboardAppointmentsRefresh=null,dashboardAppointmentsLastRead=0;
+function dashboardAppointmentsVisible(){return session?.role==='trainer'&&(session.page||'dashboard')==='dashboard'&&!document.hidden&&document.getElementById('modal')?.classList.contains('hidden');}
+async function refreshDashboardAppointments(){
+ if(!dashboardAppointmentsVisible())return;
+ trainer(); // Remove expired cards immediately, even if the network is unavailable.
+ if(dashboardAppointmentsRefresh||Date.now()-dashboardAppointmentsLastRead<30000)return;
+ const epoch=authEpoch,actor=activeActor;
+ const task=(async()=>{try{if(refreshPending)await refreshPending;else await syncAppointmentsFromSupabase();currentRead(epoch,actor);dashboardAppointmentsLastRead=Date.now();if(dashboardAppointmentsVisible())trainer();}catch(error){if(epoch===authEpoch&&actor===activeActor)console.warn('Aggiornamento appuntamenti dashboard:',error.message);}})().finally(()=>{if(dashboardAppointmentsRefresh===task)dashboardAppointmentsRefresh=null;});
+ dashboardAppointmentsRefresh=task;return task;
+}
+setInterval(refreshDashboardAppointments,60000);
+window.addEventListener('focus',refreshDashboardAppointments);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshDashboardAppointments();});
+const dashboardAppointmentsDiscardBase=discardPrivateState;
+discardPrivateState=function(...args){dashboardAppointmentsRefresh=null;dashboardAppointmentsLastRead=0;return dashboardAppointmentsDiscardBase(...args);};
 
 loadAppTheme();
 render();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-workout-copy-v33';
+const CACHE_NAME = 'sdc-training-dashboard-appointments-v34';
 
 const APP_SHELL = [
   './',
