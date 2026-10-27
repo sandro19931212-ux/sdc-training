@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-trainer-load-progress-v31';
+const CACHE_NAME = 'sdc-training-workout-copy-v32';
 
 const APP_SHELL = [
   './',

@@ -4450,7 +4450,7 @@ async function openClient(cid,skipSync=false){
     </section>
     <div class="trainer-bottom-actions direct-edit trainer-save-exit">
       <button class="btn blue trainer-save-btn" onclick="saveTrainerClientSheet('${cid}')">Salva</button>
-      <button class="btn" onclick="createNewClientWorkout('${cid}')">＋ Nuova scheda</button>
+      <button class="btn" onclick="openWorkoutCopy('${cid}')">Copia su un altro cliente</button><button class="btn" onclick="createNewClientWorkout('${cid}')">＋ Nuova scheda</button>
       <button class="btn trainer-exit-btn" onclick="exitTrainerClientSheet('${cid}')">Esci</button>
     </div>`);
 }
@@ -5814,6 +5814,37 @@ async function toggleTrainerLoadHistory(exId){
  try{const rows=await fetchLoadProgress(ex.clientId,true);if(revision!==modalRevision)return;const target=document.getElementById('trainerLoadHistory_'+exId);if(target&&!target.hidden)target.innerHTML=loadHistoryMarkup(rows,ex.exercise);}
  catch(error){if(revision===modalRevision){const target=document.getElementById('trainerLoadHistory_'+exId);if(target)target.textContent='Storico non disponibile. Chiudi e riapri per riprovare.';}}
 }
+
+let workoutCopyDraft=null,workoutCopyBusy=false,workoutCopyPreviewVersion=0;
+function workoutCopyTemplate(source){return source.map(w=>{const meta=circuitMetaFromTitle(w.title);return {title:meta?makeCircuitTitle(meta.rounds,'',meta.label):String(w.title||'Allenamento'),day:w.day||'Giorno 1',exercise:String(w.exercise||'').trim(),sets:String(w.sets??''),reps:String(w.reps??''),rest:String(w.rest??'')};});}
+function workoutCopyPreview(rows){return DAYS.filter(day=>rows.some(w=>w.day===day)).map(day=>`<details open class="sdc-trainer-load-history"><summary>${esc(day)} · ${rows.filter(w=>w.day===day).length} esercizi</summary><div class="list">${rows.filter(w=>w.day===day).map(w=>`<div class="row"><div><strong>${esc(w.exercise)}</strong><small>${esc(w.sets)} serie · ${esc(w.reps)} · Recupero ${esc(w.rest||'—')}</small></div></div>`).join('')}</div></details>`).join('');}
+function openWorkoutCopy(cid){
+ requireTrainer();if(workoutCopyBusy)return;const source=db.clients.find(c=>String(c.id)===String(cid));if(!source)return;
+ const rows=db.workouts.filter(w=>String(w.clientId)===String(cid)).slice().sort((a,b)=>(a.day||'').localeCompare(b.day||'')||(Number(a.position)||9999)-(Number(b.position)||9999));
+ if(!rows.length||rows.some(w=>!String(w.exercise||'').trim()))return alert('Completa o elimina gli esercizi senza nome prima di copiare la scheda.');
+ const targets=db.clients.filter(c=>String(c.id)!==String(cid)&&c.supabaseUserId).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+ if(!targets.length)return alert('Non ci sono altri clienti disponibili.');
+ workoutCopyPreviewVersion++;workoutCopyDraft={sourceId:String(cid),template:workoutCopyTemplate(rows),targetId:'',expected:null,operation:crypto.randomUUID(),epoch:authEpoch,actor:activeActor};
+ showSheetPage(`<div class="sdc-note-header"><button class="btn" onclick="openClient('${cid}',true)">‹ Indietro</button><h2>Copia scheda</h2></div><p>Base di partenza: <strong>${esc(source.name)}</strong></p><label>Cliente destinatario<select id="workoutCopyTarget" onchange="prepareWorkoutCopyTarget(this.value)"><option value="">Scegli un cliente</option>${targets.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label><p>Si copiano tutti i giorni, gli esercizi, le serie, il rep range e i recuperi. Carichi, note personali e tempi registrati nei circuiti restano vuoti. I progressi del destinatario restano i suoi.</p><p id="workoutCopyStatus" role="status">Scegli il destinatario per continuare.</p><div class="actions"><button class="btn blue" id="workoutCopyConfirm" disabled onclick="confirmWorkoutCopy(this)">Crea copia e apri scheda</button></div><h3>Anteprima della base</h3>${workoutCopyPreview(workoutCopyDraft.template)}`);
+}
+async function prepareWorkoutCopyTarget(cid){
+ requireTrainer();if(workoutCopyBusy)return;const draft=workoutCopyDraft;if(!draft)return;const version=++workoutCopyPreviewVersion,revision=modalRevision,status=document.getElementById('workoutCopyStatus'),button=document.getElementById('workoutCopyConfirm');draft.targetId=String(cid);draft.expected=null;draft.operation=crypto.randomUUID();if(button)button.disabled=true;if(!cid){if(status)status.textContent='Scegli il destinatario per continuare.';return;}
+ if(String(cid)===draft.sourceId||!db.clients.some(c=>String(c.id)===String(cid)))return;
+ if(status)status.textContent='Controllo della scheda del destinatario…';
+ try{const {data,error}=await sb.from('workouts').select('*').eq('client_id',String(cid));if(error)throw error;currentRead(draft.epoch,draft.actor);if(version!==workoutCopyPreviewVersion||revision!==modalRevision||draft!==workoutCopyDraft)return;draft.expected=Object.fromEntries(data.map(w=>[String(w.id),w]));if(status)status.textContent=data.length?`La scheda attuale del destinatario (${data.length} esercizi) sarà conservata in “Vecchie schede”. La copia diventerà la nuova scheda attiva.`:'Il destinatario non ha una scheda: verrà creata questa copia.';if(button)button.disabled=false;}
+ catch(error){if(version===workoutCopyPreviewVersion&&revision===modalRevision&&status)status.textContent='Controllo non riuscito. Seleziona di nuovo il destinatario per riprovare.';}
+}
+async function confirmWorkoutCopy(button){
+ requireTrainer();const draft=workoutCopyDraft;if(workoutCopyBusy||!draft?.targetId||!draft.expected||draft.targetId===draft.sourceId)return;
+ currentRead(draft.epoch,draft.actor);workoutCopyBusy=true;button.disabled=true;const selector=document.getElementById('workoutCopyTarget');if(selector)selector.disabled=true;const status=document.getElementById('workoutCopyStatus'),revision=modalRevision;if(status)status.textContent='Archiviazione e copia in corso…';let committed=false;
+ try{const {data,error}=await sb.rpc('sdc_copy_workout',{p_operation:draft.operation,p_target:draft.targetId,p_template:draft.template,p_expected:draft.expected});if(error)throw error;currentRead(draft.epoch,draft.actor);committed=true;
+  if(revision!==modalRevision)return;if(status)status.textContent='Copia salvata. La scheda precedente è conservata nello storico.';
+  await syncWorkoutsFromSupabase();currentRead(draft.epoch,draft.actor);if(revision!==modalRevision)return;workoutCopyDraft=null;window.__trainerClientDay=draft.template[0].day;await openClient(String(data.target_id),true);
+ }catch(error){if(draft.epoch===authEpoch&&draft.actor===activeActor&&revision===modalRevision&&status){status.textContent=committed?'La copia è salvata, ma non riesco ad aprirla. Chiudi e riapri la scheda del destinatario.':'Copia non confermata: '+error.message+' Puoi riprovare con lo stesso pulsante senza duplicare la copia.';if(!committed)button.disabled=false;}}
+ finally{workoutCopyBusy=false;if(selector)selector.disabled=false;}
+}
+const copyDiscardBase=discardPrivateState;
+discardPrivateState=function(...args){workoutCopyDraft=null;workoutCopyPreviewVersion++;return copyDiscardBase(...args);};
 
 loadAppTheme();
 render();
