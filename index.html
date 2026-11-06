@@ -2741,58 +2741,7 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 }
 </style>
 
-<style id="sdc-fix-bottomnav-visualviewport-v3">
-/* Fix definitivo Scheda cliente: barra agganciata al viewport VISIBILE, non al layout viewport. */
-:root{--sdc-visual-bottom:0px}
-@media(max-width:900px){
-  .app.role-client.scheda-focus .bottom{
-    position:fixed!important;
-    top:auto!important;
-    left:0!important;
-    right:0!important;
-    bottom:calc(12px + var(--sdc-visual-bottom, 0px))!important;
-    width:auto!important;
-    height:76px!important;
-    min-height:76px!important;
-    box-sizing:border-box!important;
-    padding:5px 8px 7px!important;
-    margin:0!important;
-    align-items:center!important;
-    overflow:visible!important;
-    z-index:2147483000!important;
-    transform:translate3d(0,0,0)!important;
-    will-change:bottom!important;
-  }
-  .app.role-client.scheda-focus .nav-btn{
-    height:62px!important;
-    min-height:62px!important;
-    padding:2px 3px 1px!important;
-    gap:4px!important;
-    justify-content:center!important;
-    overflow:visible!important;
-  }
-  .app.role-client.scheda-focus .nav-btn .nav-ico{
-    width:35px!important;
-    height:35px!important;
-    min-height:35px!important;
-    flex:0 0 35px!important;
-  }
-  .app.role-client.scheda-focus .nav-btn .nav-label{
-    display:block!important;
-    visibility:visible!important;
-    opacity:1!important;
-    height:13px!important;
-    min-height:13px!important;
-    line-height:13px!important;
-    font-size:10px!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
-  }
-  .app.role-client.scheda-focus .wrap{
-    padding-bottom:150px!important;
-  }
-}
-</style>
+
 
 <style>.sdc-tools{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.sdc-tools input{flex:2;min-width:150px}.sdc-tools select{flex:1;min-width:130px}.sdc-tools label{display:grid;gap:5px;flex:1}.sdc-week-scroll{overflow:auto;max-height:650px;border:1px solid var(--theme-accent,#ffe329);border-radius:18px;margin:16px 0}.sdc-week{display:grid;grid-template-columns:48px repeat(7,minmax(130px,1fr));min-width:980px;position:relative}.sdc-day{border-left:1px solid #ffffff18}.sdc-day-head{height:64px;padding:8px;text-align:center;background:var(--card,#191d20);position:sticky;top:0;z-index:2}.sdc-day-track{position:relative;height:840px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 59px,#ffffff16 59px,#ffffff16 60px)}.sdc-hours{padding-top:64px}.sdc-hours span{display:block;height:60px;font-size:11px}.sdc-event{position:absolute;left:3px;right:3px;overflow:hidden;text-align:left;padding:5px;border:1px solid var(--theme-accent,#ffe329);border-radius:8px;background:#24251a;color:inherit;font-size:12px;cursor:pointer}.sdc-event strong,.sdc-event small{display:block}.sdc-menu{position:relative}.sdc-menu summary{cursor:pointer;list-style:none;padding:8px 12px;border-radius:10px;background:#ffffff10}.sdc-menu[open]{z-index:5}.sdc-menu-body{position:absolute;right:0;min-width:170px;background:#202428;padding:8px;border:1px solid #ffffff30;border-radius:12px;box-shadow:0 8px 24px #0009;display:grid;gap:8px}.sdc-alerts{display:grid;gap:10px;margin:16px 0}.sdc-alerts button{text-align:left;white-space:normal}.sdc-undo{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);width:min(94vw,520px);padding:15px;background:#202428;border:1px solid var(--theme-accent,#ffe329);border-radius:14px;z-index:99999;display:flex;gap:12px;align-items:center;box-shadow:0 8px 30px #0009}.sdc-undo span{flex:1}.sdc-profile-list{display:grid;gap:8px}.sdc-profile-list .row{padding:12px}.sdc-badge{color:var(--theme-accent,#ffe329)}@media(max-width:600px){.sdc-tools{flex-direction:column}.sdc-menu-body{min-width:145px}}
 .trainer-layout{grid-template-columns:minmax(0,1fr)}.trainer-layout>*,.sdc-week-scroll{min-width:0;max-width:100%}.sdc-week-scroll{width:100%}.sdc-tools>*{min-width:0}.sdc-menu-body .mini-btn{white-space:normal;text-align:left}
@@ -2805,6 +2754,35 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 </style><style>.sdc-agenda-switch{margin:0;gap:8px}.sdc-daily{grid-template-columns:48px minmax(0,1fr);min-width:0}.sdc-daily .sdc-day-track{height:840px}.sdc-agenda-date input{width:auto;min-width:140px;flex:1;max-width:230px}.sdc-history-folder{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:18px}.sdc-history-folder small{display:block;margin-top:4px}@media(max-width:600px){.sdc-agenda-switch .btn{padding:10px 14px}.sdc-agenda-date{gap:6px}.sdc-agenda-date .btn{padding:10px}.sdc-daily .sdc-event{font-size:13px}}
 </style><style>.sdc-load-section{margin-top:20px;padding-top:16px;border-top:1px solid #ffffff20}.sdc-load-history{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}.sdc-load-history>strong{padding:8px 10px;border-radius:10px;background:#ffffff0c}.sdc-load-history small{font-weight:400}.sdc-load-chart{display:block;width:100%;height:auto;margin:18px 0}.sdc-load-total{font-size:clamp(36px,10vw,58px);font-weight:800;color:var(--theme-accent,#ffe329)}#page-progressi-carichi .row{gap:12px}#page-progressi-carichi .row>div{min-width:0;overflow-wrap:anywhere}#page-progressi-carichi .row>strong{white-space:nowrap}
 .sdc-trainer-load-toggle{margin-top:8px;font-size:12px;padding:8px 12px}.sdc-trainer-load-inline{font-size:13px;margin-top:10px}.sdc-trainer-load-inline[hidden]{display:none}.sdc-trainer-load-history{padding:14px 0;border-bottom:1px solid #ffffff20}.sdc-trainer-load-history summary{cursor:pointer;font-weight:600}
+</style><style>@media (max-width:900px){
+  #app.role-client.scheda-focus:not(.hidden){
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+  }
+  #app.role-client.scheda-focus > .wrap{
+    flex:1 1 0;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    padding-bottom:16px!important;
+  }
+  #app.role-client.scheda-focus > #bottomNav{
+    position:static!important;
+    flex:0 0 auto;
+    height:auto!important;
+    min-height:76px!important;
+    padding:5px 8px calc(7px + env(safe-area-inset-bottom,0px))!important;
+    transform:none!important;
+    will-change:auto!important;
+    z-index:auto!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+}
 </style></head>
 
 <body data-build="sessions-v1">
@@ -5878,27 +5856,7 @@ render();
 bootstrapAuthenticatedApp();
 </script>
 
-<script id="sdc-visual-viewport-bottom-v3">
-(function(){
-  const root=document.documentElement;
-  function syncBottomNavViewport(){
-    const vv=window.visualViewport;
-    let covered=0;
-    if(vv){
-      const layoutHeight=Math.max(document.documentElement.clientHeight||0, window.innerHeight||0);
-      covered=Math.max(0, Math.round(layoutHeight - (vv.height + vv.offsetTop)));
-    }
-    root.style.setProperty('--sdc-visual-bottom', covered+'px');
-  }
-  syncBottomNavViewport();
-  window.addEventListener('resize', syncBottomNavViewport, {passive:true});
-  window.addEventListener('orientationchange', syncBottomNavViewport, {passive:true});
-  if(window.visualViewport){
-    window.visualViewport.addEventListener('resize', syncBottomNavViewport, {passive:true});
-    window.visualViewport.addEventListener('scroll', syncBottomNavViewport, {passive:true});
-  }
-})();
-</script>
+
 
 <script>
 // Aggiornamento automatico PWA: quando pubblichi una nuova versione su GitHub,
