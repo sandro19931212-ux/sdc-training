@@ -3665,7 +3665,7 @@ function trainer(){
           const sessionStats=clientSessionStats(c.id);
           return `
           <div class="row">
-            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Lezioni residue: ${sessionStats.remaining} · Svolte confermate: ${sessionStats.completed}</small></div>
+            <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Lezioni residue: ${sessionStats.remaining} · Svolte: ${sessionStats.completed}</small></div>
             <div class="actions" style="margin:0">
               <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>
               ${recordMenu("client",c.id)}
@@ -4915,7 +4915,7 @@ function client(){
     ${upcomingAppointments[0]?`<section class="sdc-next-session"><span>PROSSIMA SEDUTA</span><div><strong>${fmtDate(upcomingAppointments[0].date)} · ${esc(upcomingAppointments[0].time)}</strong><small>${esc(upcomingAppointments[0].note||'Allenamento')}</small></div><button onclick="setPage('appuntamenti')">›</button></section>`:''}`;
 
   const appuntamentiPage=`
-    <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Le presenze sono confermate dal trainer. Gli appuntamenti precedenti restano nello storico.</div></section>
+    <section class="page-head"><div class="page-kicker">Appuntamenti</div><h1>I tuoi appuntamenti</h1><div class="page-sub">Le sedute prenotate diventano svolte dal giorno successivo. Le sedute annullate o segnate come assenza sono escluse.</div></section>
     <div class="session-summary-grid">
       <div class="session-summary-card"><b>${upcomingAppointments.length}</b><span>Sedute prenotate</span></div>
       <div class="session-summary-card"><b>${completedAppointments.length}</b><span>Storico e svolte</span></div>
@@ -5450,11 +5450,21 @@ function refreshAfterNavigation(){
 }
 setTrainerPage=function(page){if(session?.role!=='trainer')return;session.page=page;if(page!=='appointments')session.appointmentsTodayOnly=false;saveSession();render();refreshAfterNavigation();};
 setPage=function(page){if(!session)return;if(session.role==='client'&&page==='pagamenti')page='dashboard';session.page=page;saveSession();render();refreshAfterNavigation();};
-isCompletedAppointment=a=>['completed','legacy'].includes(a?.attendanceStatus);
-function isPendingAppointment(a){return (a?.attendanceStatus||'booked')==='booked';}
-function attendanceLabel(a){return ({booked:a.date<localTodayISO()?'Da confermare':'Prenotata',completed:'Svolta',legacy:'Storico precedente',cancelled:'Annullata',no_show:'Assente'})[a.attendanceStatus||'booked'];}
-function lessonBalance(cid){const c=db.clients.find(c=>c.id===cid);if(!c||c.openingBalance==null)return null;return Number(c.openingBalance)+db.payments.filter(p=>p.clientId===cid&&paidPayment(p)).reduce((n,p)=>n+(Number(p.lessonQuantity)||0),0)-db.appointments.filter(a=>a.clientId===cid&&a.attendanceStatus==='completed'&&a.consumeCredit!==false).length;}
-clientSessionStats=function(cid){return {remaining:lessonBalance(cid)??'Da impostare',scheduled:db.appointments.filter(a=>a.clientId===cid&&isPendingAppointment(a)).length,completed:db.appointments.filter(a=>a.clientId===cid&&a.attendanceStatus==='completed').length};};
+// Attendance is derived from the appointment date, without rewriting historical records.
+// Explicit cancellations, absences and legacy records always keep their saved status.
+function appointmentTodayISO(now=new Date()){
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(p=>[p.type,p.value]));
+ return `${parts.year}-${parts.month}-${parts.day}`;
+}
+function effectiveAttendanceStatus(a,today=appointmentTodayISO()){
+ const status=a?.attendanceStatus||'booked',date=String(a?.date||'');
+ return status==='booked'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&date<today?'completed':status;
+}
+isCompletedAppointment=a=>['completed','legacy'].includes(effectiveAttendanceStatus(a));
+function isPendingAppointment(a){return effectiveAttendanceStatus(a)==='booked';}
+function attendanceLabel(a){return ({booked:'Prenotata',completed:'Svolta',legacy:'Storico precedente',cancelled:'Annullata',no_show:'Assente'})[effectiveAttendanceStatus(a)];}
+function lessonBalance(cid){const c=db.clients.find(c=>c.id===cid);if(!c||c.openingBalance==null)return null;return Number(c.openingBalance)+db.payments.filter(p=>p.clientId===cid&&paidPayment(p)).reduce((n,p)=>n+(Number(p.lessonQuantity)||0),0)-db.appointments.filter(a=>a.clientId===cid&&effectiveAttendanceStatus(a)==='completed'&&a.consumeCredit!==false).length;}
+clientSessionStats=function(cid){return {remaining:lessonBalance(cid)??'Da impostare',scheduled:db.appointments.filter(a=>a.clientId===cid&&isPendingAppointment(a)).length,completed:db.appointments.filter(a=>a.clientId===cid&&effectiveAttendanceStatus(a)==='completed').length};};
 filteredClients=function(){return db.clients.filter(c=>c.name.toLocaleLowerCase('it').includes(managementUI.query.toLocaleLowerCase('it'))).filter(c=>{const balance=lessonBalance(c.id);return managementUI.filter==='empty'?balance!==null&&balance<=0:managementUI.filter==='low'?balance!==null&&balance<=2:managementUI.filter==='due'?db.payments.some(p=>p.clientId===c.id&&!paidPayment(p)):true;}).sort((a,b)=>managementUI.sort==='remaining'?(lessonBalance(a.id)??Infinity)-(lessonBalance(b.id)??Infinity):a.name.localeCompare(b.name,'it'));};
 function requireTrainer(){if(session?.role!=='trainer'||!activeActor)throw Error('Accedi come trainer.');}
 function field(id){return document.getElementById(id)?.value||'';}
@@ -5535,10 +5545,10 @@ async function restoreRecord(table,rid){
  try{requireTrainer();if(!['clients','payments','appointments'].includes(table))throw Error('Elemento non valido.');const {error}=await sb.from(table).update({deleted_at:null}).eq('id',rid).select('id').single();if(error)throw error;await refreshAllData();await openTrash();render();}catch(e){alert('Ripristino non riuscito: '+e.message);}
 }
 recordMenu=function(kind,rid){return `<details class="sdc-menu"><summary aria-label="Azioni ${kind}">•••</summary><div class="sdc-menu-body">${kind!=='client'?`<button class="mini-btn" onclick="${kind==='payment'?'paymentForm':'appointmentForm'}('${rid}',true)">Modifica${kind==='appointment'?' / Sposta':''}</button>`:''}${kind==='appointment'?`<button class="mini-btn" onclick="attendanceForm('${rid}')">Presenza / Stato</button>`:''}<button class="mini-btn red" onclick="${kind==='payment'?'deletePayment':kind==='appointment'?'deleteAppointment':'delClient'}('${rid}')">Sposta nel cestino</button></div></details>`;};
-function attendanceForm(aid){const a=db.appointments.find(a=>a.id===aid);if(!a)return;show(`<h2>Presenza / Stato</h2><p>${esc(cname(a.clientId))} · ${fmtDate(a.date)} ${esc(a.time)}</p><label>Stato<select id="attendance">${[['booked','Prenotata / Da confermare'],['completed','Svolta'],['cancelled','Annullata'],['no_show','Assente'],...(a.attendanceStatus==='legacy'?[['legacy','Storico precedente']]:[])].map(([v,t])=>`<option value="${v}" ${v===a.attendanceStatus?'selected':''}>${t}</option>`).join('')}</select></label><label>Scalare una lezione se svolta?<select id="consume"><option value="yes" ${a.consumeCredit?'selected':''}>Sì</option><option value="no" ${!a.consumeCredit?'selected':''}>No — prova o servizio incluso</option></select></label><p>Le sedute passate non diventano più svolte automaticamente.</p><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveAttendance('${aid}',this)">Salva stato</button></div>`);}
-async function saveAttendance(aid,button){button.disabled=true;try{requireTrainer();const status=field('attendance'),row=db.appointments.find(a=>a.id===aid);if(!row)throw Error('Seduta non trovata.');if(status==='completed'&&row.date>localTodayISO())throw Error('Non puoi confermare una seduta futura come svolta.');const {error}=await sb.from('appointments').update({attendance_status:status,consume_credit:field('consume')==='yes'}).eq('id',aid).is('deleted_at',null).select('id').single();if(error)throw error;await syncAppointmentsFromSupabase();closeModal();render();}catch(e){alert(e.message);}finally{button.disabled=false;}}
-function lessonForm(cid){const balance=lessonBalance(cid);show(`<h2>Saldo lezioni</h2><p>${esc(cname(cid))}</p><p>Imposta quante lezioni restano adesso. Lo storico precedente non viene scalato automaticamente. Le nuove sedute confermate come svolte e gli acquisti con quantità esplicita aggiorneranno il saldo.</p><label>Lezioni residue attuali<input id="lessonTarget" type="number" min="0" step="1" value="${balance??0}"></label><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveLessonBalance('${cid}',this)">Salva saldo</button></div>`);}
-async function saveLessonBalance(cid,button){button.disabled=true;try{requireTrainer();await refreshAllData();const target=Number(field('lessonTarget'));if(!Number.isInteger(target)||target<0)throw Error('Inserisci un numero intero non negativo.');const c=db.clients.find(c=>c.id===cid);if(!c)throw Error('Cliente non trovato.');const bought=db.payments.filter(p=>p.clientId===cid&&paidPayment(p)).reduce((n,p)=>n+(Number(p.lessonQuantity)||0),0),used=db.appointments.filter(a=>a.clientId===cid&&a.attendanceStatus==='completed'&&a.consumeCredit!==false).length,opening=target-bought+used;const {error}=await sb.from('clients').update({lesson_opening_balance:opening}).eq('id',cid).is('deleted_at',null).select('id').single();if(error)throw error;await syncClientsFromSupabase();closeModal();render();notifyManagement('Saldo lezioni aggiornato.');}catch(e){alert(e.message);}finally{button.disabled=false;}}
+function attendanceForm(aid){const a=db.appointments.find(a=>a.id===aid);if(!a)return;show(`<h2>Presenza / Stato</h2><p>${esc(cname(a.clientId))} · ${fmtDate(a.date)} ${esc(a.time)}</p><label>Stato<select id="attendance">${[['booked','Prenotata (svolta automaticamente dal giorno successivo)'],['completed','Svolta'],['cancelled','Annullata'],['no_show','Assente'],...(a.attendanceStatus==='legacy'?[['legacy','Storico precedente']]:[])].map(([v,t])=>`<option value="${v}" ${v===effectiveAttendanceStatus(a)?'selected':''}>${t}</option>`).join('')}</select></label><label>Scalare una lezione se svolta?<select id="consume"><option value="yes" ${a.consumeCredit?'selected':''}>Sì</option><option value="no" ${!a.consumeCredit?'selected':''}>No — prova o servizio incluso</option></select></label><p>Dal giorno successivo, le sedute prenotate risultano automaticamente svolte. Per escluderne una, scegli Annullata o Assente. Puoi anche indicare che non deve scalare una lezione.</p><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveAttendance('${aid}',this)">Salva stato</button></div>`);}
+async function saveAttendance(aid,button){button.disabled=true;try{requireTrainer();const status=field('attendance'),row=db.appointments.find(a=>a.id===aid);if(!row)throw Error('Seduta non trovata.');if(status==='completed'&&row.date>appointmentTodayISO())throw Error('Non puoi confermare una seduta futura come svolta.');const {error}=await sb.from('appointments').update({attendance_status:status,consume_credit:field('consume')==='yes'}).eq('id',aid).is('deleted_at',null).select('id').single();if(error)throw error;await syncAppointmentsFromSupabase();closeModal();render();}catch(e){alert(e.message);}finally{button.disabled=false;}}
+function lessonForm(cid){const balance=lessonBalance(cid);show(`<h2>Saldo lezioni</h2><p>${esc(cname(cid))}</p><p>Imposta quante lezioni restano adesso. Lo storico precedente non viene scalato automaticamente. Le sedute prenotate vengono scalate automaticamente dal giorno successivo, salvo quelle annullate, segnate come assenza o senza consumo di lezione. Gli acquisti con quantità esplicita aumentano il saldo.</p><label>Lezioni residue attuali<input id="lessonTarget" type="number" min="0" step="1" value="${balance??0}"></label><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveLessonBalance('${cid}',this)">Salva saldo</button></div>`);}
+async function saveLessonBalance(cid,button){button.disabled=true;try{requireTrainer();await refreshAllData();const target=Number(field('lessonTarget'));if(!Number.isInteger(target)||target<0)throw Error('Inserisci un numero intero non negativo.');const c=db.clients.find(c=>c.id===cid);if(!c)throw Error('Cliente non trovato.');const bought=db.payments.filter(p=>p.clientId===cid&&paidPayment(p)).reduce((n,p)=>n+(Number(p.lessonQuantity)||0),0),used=db.appointments.filter(a=>a.clientId===cid&&effectiveAttendanceStatus(a)==='completed'&&a.consumeCredit!==false).length,opening=target-bought+used;const {error}=await sb.from('clients').update({lesson_opening_balance:opening}).eq('id',cid).is('deleted_at',null).select('id').single();if(error)throw error;await syncClientsFromSupabase();closeModal();render();notifyManagement('Saldo lezioni aggiornato.');}catch(e){alert(e.message);}finally{button.disabled=false;}}
 const stabilityClientOverview=clientOverview;
 clientOverview=function(cid){const balance=lessonBalance(cid);return `<section class="section"><h2>Lezioni residue: ${balance??'Da impostare'}</h2><button class="btn" onclick="lessonForm('${cid}')">${balance===null?'Imposta':'Correggi'} saldo lezioni</button></section>`+stabilityClientOverview(cid);};
 const stabilityDashboardTasks=dashboardTasks;
@@ -5833,7 +5843,7 @@ function dashboardAppointmentClock(now=new Date()){
 }
 function nextDashboardAppointments(rows,now=new Date()){
  const clock=dashboardAppointmentClock(now);
- return rows.filter(a=>{if(!isPendingAppointment(a)||!/^\d{4}-\d{2}-\d{2}$/.test(a.date||'')||!/^\d{2}:\d{2}$/.test(a.time||''))return false;const start=Date.parse(a.date+'T'+a.time+':00Z'),duration=Number(a.duration)>0?Number(a.duration):60;return Number.isFinite(start)&&start+duration*60000>clock;}).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+ return rows.filter(a=>{if(effectiveAttendanceStatus(a,appointmentTodayISO(now))!=='booked'||!/^\d{4}-\d{2}-\d{2}$/.test(a.date||'')||!/^\d{2}:\d{2}$/.test(a.time||''))return false;const start=Date.parse(a.date+'T'+a.time+':00Z'),duration=Number(a.duration)>0?Number(a.duration):60;return Number.isFinite(start)&&start+duration*60000>clock;}).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
 }
 let dashboardAppointmentsRefresh=null,dashboardAppointmentsLastRead=0;
 function dashboardAppointmentsVisible(){return session?.role==='trainer'&&(session.page||'dashboard')==='dashboard'&&!document.hidden&&document.getElementById('modal')?.classList.contains('hidden');}
@@ -5850,6 +5860,20 @@ window.addEventListener('focus',refreshDashboardAppointments);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshDashboardAppointments();});
 const dashboardAppointmentsDiscardBase=discardPrivateState;
 discardPrivateState=function(...args){dashboardAppointmentsRefresh=null;dashboardAppointmentsLastRead=0;return dashboardAppointmentsDiscardBase(...args);};
+
+// Recompute date-based attendance at midnight, also after waking a suspended phone.
+// No counters are incremented: each view derives them from the same appointments,
+// so refreshing, switching devices or confirming a past session cannot count it twice.
+let attendanceRenderedDay=appointmentTodayISO();
+function refreshAutomaticAttendance(){
+ const today=appointmentTodayISO();
+ if(today===attendanceRenderedDay||!session||document.hidden||!document.getElementById('modal')?.classList.contains('hidden'))return;
+ attendanceRenderedDay=today;
+ render();
+}
+setInterval(refreshAutomaticAttendance,30000);
+window.addEventListener('focus',refreshAutomaticAttendance);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAutomaticAttendance();});
 
 loadAppTheme();
 render();
