@@ -3625,7 +3625,7 @@ function trainer(){
       </section>
 
       <div class="grid">
-        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('clients')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.clients}</span><b>${db.clients.length}</b><span>Clienti</span></div>
+        <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('clients')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.clients}</span><b>${clientCategoryCount(false)}</b><span>Clienti</span></div><div class="card stat action-card sdc-trainer-stat-card" onclick="openClientCategory(true)"><span class="sdc-trainer-stat-ico">${MONTHLY_CLIENT_ICON}</span><b>${clientCategoryCount(true)}</b><span>Clienti mensili</span></div>
         <div class="card stat action-card icon-card sdc-trainer-stat-card icon-only" onclick="jumpToTrainerSection('checkfoto')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.photo}</span><b>Check Foto</b><span>Apri archivio</span></div>
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('appointments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.appointments}</span><b>${dashboardAppointments.length}</b><span>Sedute prenotate</span></div>
         <div class="card stat action-card sdc-trainer-stat-card" onclick="setTrainerPage('payments')"><span class="sdc-trainer-stat-ico">${TRAINER_DASH_ICONS.payments}</span><b>${db.payments.length}</b><span>Pagamenti</span></div>
@@ -3649,8 +3649,8 @@ function trainer(){
   const clientsPage=`
     <div class="trainer-layout">
       <section class="page-head">
-        <div class="page-kicker">Clienti</div>
-        <h1>I tuoi clienti</h1>
+        <div class="page-kicker">${trainerPage==='monthly-clients'?'Clienti mensili':'Clienti'}</div>
+        <h1>${trainerPage==='monthly-clients'?'Clienti mensili':'I tuoi clienti'}</h1>
         <div class="page-sub">Apri il profilo del cliente per vedere dati, peso e storico. La scheda di allenamento resta nella sezione Scheda.</div>
       </section>
 
@@ -3658,7 +3658,7 @@ function trainer(){
         <button class="btn blue" onclick="clientForm()">＋ Nuovo cliente</button>
       </div>
 
-      <section class="section">
+      ${clientCategoryLinks()}<section class="section">
         ${clientFilters()}<div class="list">${filteredClients().length?filteredClients().map(c=>{
           const cw=db.weights.filter(w=>String(w.clientId)===String(c.id)).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
           const lastWeight=cw.length?cw[cw.length-1].weight:null;
@@ -3667,7 +3667,7 @@ function trainer(){
           <div class="row">
             <div><strong>${esc(c.name)}</strong><small>${esc(c.email)} · ${esc(c.phone||"N/D")} · Peso: ${lastWeight?esc(lastWeight)+' kg':'—'}<br>Lezioni residue: ${sessionStats.remaining} · Svolte: ${sessionStats.completed}</small></div>
             <div class="actions" style="margin:0">
-              <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>
+              <button class="mini-btn blue" onclick="openTrainerClientProfile('${c.id}')">Profilo</button>${clientCategoryButton(c)}
               ${recordMenu("client",c.id)}
             </div>
           </div>`;
@@ -3853,7 +3853,7 @@ function trainer(){
     </div>`;
 
   trainerViewEl.innerHTML =
-    trainerPage==="clients" ? clientsPage :
+    ["clients","monthly-clients"].includes(trainerPage) ? clientsPage :
     trainerPage==="appointments" ? appointmentsPage :
     trainerPage==="payments" ? paymentsPage :
     trainerPage==="scheda" ? schedaPage :
@@ -3866,7 +3866,7 @@ function trainer(){
     {key:"scheda",label:"Scheda",img:ICONS.scheda,action:"setTrainerPage('scheda')"},
     {key:"more",label:"Altro",img:ICONS.more,action:"setTrainerPage('more')"}
   ],
-    trainerPage==="clients" ? "clients" :
+    ["clients","monthly-clients"].includes(trainerPage) ? "clients" :
     trainerPage==="scheda" ? "scheda" :
     trainerPage==="more" ? "more" :
     "dashboard"
@@ -5376,7 +5376,7 @@ async function bootstrapAuthenticatedApp(){
   let ui={};try{ui=JSON.parse(localStorage.getItem('sdc_ui_v10:'+activeActor)||'{}');}catch{}
   const role=user.app_metadata?.role==='trainer'?'trainer':'client';
   session={role,userId:null,supabaseUserId:user.id,page:role==='trainer'?'dashboard':'scheda',clientDay:'Giorno 1'};
-  const allowed=role==='trainer'?['dashboard','clients','scheda','appointments','payments','more']:['dashboard','scheda','appuntamenti','peso','altro','consigli','progressi-carichi'];
+  const allowed=role==='trainer'?['dashboard','clients','monthly-clients','scheda','appointments','payments','more']:['dashboard','scheda','appuntamenti','peso','altro','consigli','progressi-carichi'];
   if(allowed.includes(ui.page))session.page=ui.page;
   if(DAYS.includes(ui.clientDay))session.clientDay=ui.clientDay;
   let cached=null;try{cached=JSON.parse(localStorage.getItem('sdc_data_v10:'+activeActor)||'null');}catch{}
@@ -5874,6 +5874,36 @@ function refreshAutomaticAttendance(){
 setInterval(refreshAutomaticAttendance,30000);
 window.addEventListener('focus',refreshAutomaticAttendance);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAutomaticAttendance();});
+
+// The category is chosen only by the trainer and stored with the existing client.
+const monthlyMapClientBase=mapClient;
+mapClient=function(row){return {...monthlyMapClientBase(row),monthlyClient:row.monthly_client===true};};
+BACKUP_FIELDS.clients.push('monthly_client');
+const monthlyFilteredClientsBase=filteredClients;
+filteredClients=function(){const monthly=session?.page==='monthly-clients';return monthlyFilteredClientsBase().filter(c=>(c.monthlyClient===true)===monthly);};
+function clientCategoryCount(monthly){return db.clients.filter(c=>(c.monthlyClient===true)===monthly).length;}
+function openClientCategory(monthly){if(session?.role!=='trainer')return;managementUI.query='';managementUI.filter='all';setTrainerPage(monthly?'monthly-clients':'clients');}
+const MONTHLY_CLIENT_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18"/><circle cx="12" cy="14" r="1.7"/><path d="M8.5 19c.3-3 6.7-3 7 0"/></svg>';
+function clientCategoryLinks(){return `<div class="actions"><button class="btn ${session.page==='clients'?'blue':''}" onclick="openClientCategory(false)">Clienti (${clientCategoryCount(false)})</button><button class="btn ${session.page==='monthly-clients'?'blue':''}" onclick="openClientCategory(true)">Clienti mensili (${clientCategoryCount(true)})</button></div>`;}
+function clientCategoryButton(c,profile=false){return `<button type="button" class="${profile?'btn':'mini-btn'}" onclick="setMonthlyClient('${c.id}',${!c.monthlyClient},this,${profile})">${c.monthlyClient?'Riporta in Clienti':'Sposta nei mensili'}</button>`;}
+const monthlyOverviewBase=clientOverview;
+clientOverview=function(cid){const c=db.clients.find(c=>c.id===String(cid));return (session?.role==='trainer'&&c?`<section class="section"><h2>Elenco cliente: ${c.monthlyClient?'Clienti mensili':'Clienti'}</h2><p>Puoi cambiare elenco manualmente in qualsiasi momento.</p>${clientCategoryButton(c,true)}</section>`:'')+monthlyOverviewBase(cid);};
+async function setMonthlyClient(cid,monthly,button,fromProfile=false){
+ if(button.disabled)return;
+ button.disabled=true;
+ try{
+  requireTrainer();if(typeof monthly!=='boolean')throw Error('Elenco non valido.');
+  if(!db.clients.some(c=>c.id===String(cid)))throw Error('Cliente non trovato.');
+  const epoch=authEpoch,actor=activeActor,revision=modalRevision;
+  const {data,error}=await sb.from('clients').update({monthly_client:monthly}).eq('id',cid).is('deleted_at',null).select('*').single();
+  if(error)throw error;currentRead(epoch,actor);
+  if(!data||data.monthly_client!==monthly)throw Error('Spostamento non confermato. Riprova.');
+  db.clients=db.clients.map(c=>c.id===String(cid)?mapClient(data):c);save();
+  if(fromProfile&&revision===modalRevision)await openTrainerClientProfile(cid,true);
+  else if(document.getElementById('modal')?.classList.contains('hidden'))render();
+  notifyManagement(monthly?'Cliente spostato in Clienti mensili.':'Cliente riportato in Clienti.');
+ }catch(error){alert('Spostamento non riuscito: '+error.message);}finally{button.disabled=false;}
+}
 
 loadAppTheme();
 render();
