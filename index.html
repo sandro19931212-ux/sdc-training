@@ -5700,11 +5700,11 @@ function foodAdvicePage(cid){const c=db.clients.find(c=>c.id===String(cid));retu
 const foodClientBase=client;
 client=function(){foodClientBase();if(session?.role!=='client')return;const shell=document.querySelector('#clientView .client-shell');if(session.page==='consigli'&&shell)shell.insertAdjacentHTML('beforeend',`<div class="client-page active" id="page-consigli">${foodAdvicePage(session.userId)}</div>`);const home=document.querySelector('#clientView .sdc-home-grid');if(home)home.insertAdjacentHTML('beforeend',`<button class="sdc-home-tile" onclick="setPage('consigli')"><span class="sdc-home-icon">${FOOD_ICON}</span><strong>Consigli alimentari</strong></button>`);};
 const foodOverviewBase=clientOverview;
-clientOverview=function(cid){return foodOverviewBase(cid)+(session?.role==='trainer'?`<section class="section"><h2>Consigli alimentari</h2><p>Scegli i pasti e scrivi liberamente alimenti, quantità e alternative.</p><button class="btn blue" onclick="openFoodAdviceEditor('${cid}')">Compila consigli alimentari</button></section>`:'');};
+clientOverview=function(cid){return foodOverviewBase(cid)+(session?.role==='trainer'?`<section class="section"><h2>Consigli alimentari</h2><p>Scegli i pasti e scrivi liberamente alimenti, quantità e alternative.</p><button class="btn blue" onclick="openFoodAdviceEditor('${cid}')">Compila consigli alimentari</button><button class="btn" onclick="openFoodAdviceCopy('${cid}')">Copia su un altro cliente</button></section>`:'');};
 function toggleFoodMeal(meal,enabled){const section=document.getElementById('foodMeal_'+meal);if(section)section.hidden=!enabled;if(enabled)document.getElementById('foodText_'+meal)?.focus();}
-function openFoodAdviceEditor(cid){
- requireTrainer();const c=db.clients.find(c=>c.id===String(cid));if(!c)return;const advice=normalizeFoodAdvice(c.nutritionAdvice||{});
- showSheetPage(`<h2>Consigli alimentari</h2><p>${esc(c.name)}</p><p>Spunta i pasti da mostrare e scrivi come su un foglio libero. Se togli la spunta, il testo resta conservato ma non viene mostrato al cliente.</p><div class="sdc-food-editor">${FOOD_MEALS.map(([meal,label])=>`<section class="sdc-food-edit-meal"><label class="sdc-food-check"><input type="checkbox" id="foodEnabled_${meal}" ${advice[meal]?.enabled?'checked':''} onchange="toggleFoodMeal('${meal}',this.checked)"><span>${label}</span></label><div id="foodMeal_${meal}" ${advice[meal]?.enabled?'':'hidden'}><textarea id="foodText_${meal}" aria-label="Consigli per ${label.toLowerCase()}" maxlength="8000" rows="8" placeholder="Scrivi qui alimenti, quantità e alternative, andando a capo come preferisci…">${esc(advice[meal]?.text||'')}</textarea></div></section>`).join('')}</div><p id="foodAdviceStatus" role="status"></p><div class="actions"><button class="btn" onclick="closeModal()">Chiudi</button><button class="btn blue" onclick="saveFoodAdvice('${cid}',this)">Salva consigli alimentari</button></div>`);
+function openFoodAdviceEditor(cid,draftValue=null){
+ requireTrainer();const c=db.clients.find(c=>c.id===String(cid));if(!c)return;const advice=normalizeFoodAdvice(draftValue??c.nutritionAdvice??{});
+ showSheetPage(`<h2>Consigli alimentari</h2><p>${esc(c.name)}</p><p>Spunta i pasti da mostrare e scrivi come su un foglio libero. Se togli la spunta, il testo resta conservato ma non viene mostrato al cliente.</p><div class="sdc-food-editor">${FOOD_MEALS.map(([meal,label])=>`<section class="sdc-food-edit-meal"><label class="sdc-food-check"><input type="checkbox" id="foodEnabled_${meal}" ${advice[meal]?.enabled?'checked':''} onchange="toggleFoodMeal('${meal}',this.checked)"><span>${label}</span></label><div id="foodMeal_${meal}" ${advice[meal]?.enabled?'':'hidden'}><textarea id="foodText_${meal}" aria-label="Consigli per ${label.toLowerCase()}" maxlength="8000" rows="8" placeholder="Scrivi qui alimenti, quantità e alternative, andando a capo come preferisci…">${esc(advice[meal]?.text||'')}</textarea></div></section>`).join('')}</div><p id="foodAdviceStatus" role="status"></p><div class="actions"><button class="btn" onclick="closeModal()">Chiudi</button><button class="btn blue" onclick="saveFoodAdvice('${cid}',this)">Salva consigli alimentari</button><button class="btn" onclick="openFoodAdviceCopy('${cid}',true)">Copia su un altro cliente</button></div>`);
 }
 async function saveFoodAdvice(cid,button){
  if(button.disabled)return;button.disabled=true;const status=document.getElementById('foodAdviceStatus');
@@ -5933,6 +5933,51 @@ async function setMonthlyClient(cid,monthly,button,fromProfile=false){
   notifyManagement(monthly?'Cliente spostato in Clienti mensili.':'Cliente riportato in Clienti.');
  }catch(error){alert('Spostamento non riuscito: '+error.message);}finally{button.disabled=false;}
 }
+
+let foodCopyDraft=null,foodCopyVersion=0,foodCopyBusy=false;
+function readFoodAdviceEditor(){const value={};for(const [meal]of FOOD_MEALS)value[meal]={enabled:document.getElementById('foodEnabled_'+meal).checked,text:field('foodText_'+meal)};return normalizeFoodAdvice(value);}
+function openFoodAdviceCopy(cid,fromEditor=false){
+ requireTrainer();if(foodCopyBusy)return;const source=db.clients.find(c=>c.id===String(cid));if(!source)return;
+ const advice=fromEditor?readFoodAdviceEditor():normalizeFoodAdvice(source.nutritionAdvice||{});
+ if(!Object.values(advice).some(meal=>meal.enabled&&meal.text))return alert('Compila almeno un pasto prima di copiare i consigli.');
+ const targets=db.clients.filter(c=>c.id!==String(cid)).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+ if(!targets.length)return alert('Non ci sono altri clienti disponibili.');
+ foodCopyVersion++;foodCopyDraft={sourceId:String(cid),advice,fromEditor,targetId:'',expected:null,epoch:authEpoch,actor:activeActor};
+ showSheetPage(`<div class="sdc-note-header"><button class="btn" onclick="backFromFoodAdviceCopy()">‹ Indietro</button><h2>Copia consigli alimentari</h2></div><p>Da <strong>${esc(source.name)}</strong></p><label>Cliente destinatario<select id="foodCopyTarget" onchange="prepareFoodAdviceCopy(this.value)"><option value="">Scegli un cliente</option>${targets.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label><p>Vengono copiati i testi e i pasti selezionati. Potrai modificarli per il destinatario dopo la copia.</p><div id="foodCopyStatus" role="status">Scegli il destinatario per continuare.</div><div class="actions"><button id="foodCopyConfirm" class="btn blue" disabled onclick="confirmFoodAdviceCopy(this)">Copia e apri consigli</button></div><h3>Anteprima</h3>${foodAdviceCards(advice)}`);
+ document.getElementById('modal')?.scrollTo?.({top:0});
+}
+function backFromFoodAdviceCopy(){const draft=foodCopyDraft;if(!draft||foodCopyBusy)return;foodCopyVersion++;if(draft.fromEditor)openFoodAdviceEditor(draft.sourceId,draft.advice);else openTrainerClientProfile(draft.sourceId,true);foodCopyDraft=null;}
+async function prepareFoodAdviceCopy(cid){
+ requireTrainer();if(foodCopyBusy)return;const draft=foodCopyDraft;if(!draft)return;const version=++foodCopyVersion,revision=modalRevision,status=document.getElementById('foodCopyStatus'),button=document.getElementById('foodCopyConfirm');
+ draft.targetId=String(cid);draft.expected=null;button.disabled=true;
+ if(!cid){status.textContent='Scegli il destinatario per continuare.';return;}
+ if(String(cid)===draft.sourceId||!db.clients.some(c=>c.id===String(cid)))return;
+ status.textContent='Controllo dei consigli del destinatario…';
+ try{
+  const {data,error}=await sb.from('clients').select('id,nutrition_advice').eq('id',cid).is('deleted_at',null).single();if(error)throw error;currentRead(draft.epoch,draft.actor);
+  if(version!==foodCopyVersion||revision!==modalRevision||draft!==foodCopyDraft)return;
+  if(!data)throw Error('Cliente non trovato.');draft.expected=data.nutrition_advice||{};
+  const hasAdvice=Object.values(normalizeFoodAdvice(draft.expected)).some(meal=>meal.text);
+  status.innerHTML=hasAdvice?'<p>Il destinatario ha già dei consigli alimentari: la copia li sostituirà.</p><label class="sdc-food-check"><input type="checkbox" id="foodCopyReplace"><span>Voglio sostituire i consigli esistenti</span></label>':'Il destinatario non ha consigli compilati: verrà creata questa copia.';
+  draft.replace=hasAdvice;button.disabled=false;
+ }catch(error){if(version===foodCopyVersion&&revision===modalRevision)status.textContent='Controllo non riuscito. Seleziona di nuovo il destinatario per riprovare.';}
+}
+async function confirmFoodAdviceCopy(button){
+ requireTrainer();const draft=foodCopyDraft;if(foodCopyBusy||!draft?.targetId||draft.expected===null||draft.targetId===draft.sourceId)return;
+ const status=document.getElementById('foodCopyStatus');
+ if(draft.replace&&!document.getElementById('foodCopyReplace')?.checked){alert('Spunta la conferma per sostituire i consigli del destinatario.');return;}
+ currentRead(draft.epoch,draft.actor);foodCopyBusy=true;button.disabled=true;const selector=document.getElementById('foodCopyTarget'),revision=modalRevision;selector.disabled=true;
+ try{
+  // Compare-and-set prevents replacing advice changed since the preview was read.
+  const {data,error}=await sb.from('clients').update({nutrition_advice:draft.advice}).eq('id',draft.targetId).is('deleted_at',null).eq('nutrition_advice',JSON.stringify(draft.expected)).select('*').single();
+  if(error)throw error;currentRead(draft.epoch,draft.actor);if(!data)throw Error('Copia non confermata.');
+  db.clients=db.clients.map(c=>c.id===draft.targetId?mapClient(data):c);save();
+  if(revision===modalRevision){foodCopyDraft=null;openFoodAdviceEditor(draft.targetId);document.getElementById('foodAdviceStatus').textContent='Consigli copiati e salvati. Ora puoi personalizzarli.';}
+ }catch(error){if(draft.epoch===authEpoch&&draft.actor===activeActor&&revision===modalRevision){status.textContent='Copia non confermata. I consigli potrebbero essere cambiati: seleziona di nuovo il destinatario per rileggerli, oppure riapri il suo profilo per verificare il salvataggio.';draft.expected=null;}}
+ finally{foodCopyBusy=false;selector.disabled=false;}
+}
+const foodCopyDiscardBase=discardPrivateState;
+discardPrivateState=function(...args){foodCopyDraft=null;foodCopyVersion++;return foodCopyDiscardBase(...args);};
 
 loadAppTheme();
 render();
