@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdc-training-food-copy-v39';
+const CACHE_NAME = 'sdc-training-scheduled-messages-v40';
 
 const APP_SHELL = [
   './',

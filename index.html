@@ -2781,6 +2781,7 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
     -webkit-backdrop-filter:none!important;
   }
 }
+</style><style>.sdc-message-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;font-size:17px;margin:18px 0}.sdc-message-card{border-bottom:1px solid #ffffff25;padding-bottom:20px}.sdc-message-inbox{width:100%;color:inherit;text-align:left;cursor:pointer;margin:10px 0}.sdc-message-inbox strong{white-space:pre-wrap;overflow-wrap:anywhere}#scheduledMessageActive{width:20px;height:20px;vertical-align:middle;margin-right:8px}
 </style></head>
 
 <body data-build="sessions-v1">
@@ -4906,7 +4907,7 @@ function client(){
         <button class="sdc-home-tile" onclick="setPage('appuntamenti')"><span class="sdc-home-icon">${HOME_SVGS.appuntamenti}</span><strong>Appuntamenti</strong>${upcomingAppointments.length?`<em>${upcomingAppointments.length}</em>`:''}</button>
         <button class="sdc-home-tile" onclick="clientWeightHistory()"><span class="sdc-home-icon">${HOME_SVGS.progress}</span><strong>Progressi</strong></button>
         <button class="sdc-home-tile" onclick="openPhotoHistory('${c.id}',false)"><span class="sdc-home-icon">${HOME_SVGS.photo}</span><strong>Check Foto</strong></button>
-        <button class="sdc-home-tile" onclick="alert('La sezione Messaggi non è ancora attiva.')"><span class="sdc-home-icon">${HOME_SVGS.message}</span><strong>Messaggi</strong></button>
+        <button class="sdc-home-tile" onclick="openClientMessages()"><span class="sdc-home-icon">${HOME_SVGS.message}</span><strong>Messaggi</strong></button>
         <button class="sdc-home-tile" onclick="setPage('altro')"><span class="sdc-home-icon">${HOME_SVGS.altro}</span><strong>Altro</strong></button>
       </div>
     </section>
@@ -5405,7 +5406,7 @@ async function readRows(table,active=true){
  const result=[];
  for(let offset=0;;offset+=500){
   let query=sb.from(table).select('*').order('id',{ascending:true}).range(offset,offset+499);
-  if(active&&['clients','payments','appointments'].includes(table))query=query.is('deleted_at',null);
+  if(active&&['clients','payments','appointments','client_message_schedules'].includes(table))query=query.is('deleted_at',null);
   const {data,error}=await query;if(error)throw error;result.push(...(data||[]));if((data||[]).length<500)break;
  }
  return result;
@@ -5540,7 +5541,7 @@ async function openTrash(){
  }catch(e){show(`<h2>Cestino</h2><p>${esc(e.message)}</p><button class="btn" onclick="closeModal()">Chiudi</button>`);}
 }
 async function restoreRecord(table,rid){
- try{requireTrainer();if(!['clients','payments','appointments'].includes(table))throw Error('Elemento non valido.');const {error}=await sb.from(table).update({deleted_at:null}).eq('id',rid).select('id').single();if(error)throw error;await refreshAllData();await openTrash();render();}catch(e){alert('Ripristino non riuscito: '+e.message);}
+ try{requireTrainer();if(!['clients','payments','appointments','client_message_schedules'].includes(table))throw Error('Elemento non valido.');const {error}=await sb.from(table).update({deleted_at:null}).eq('id',rid).select('id').single();if(error)throw error;await refreshAllData();await openTrash();render();}catch(e){alert('Ripristino non riuscito: '+e.message);}
 }
 recordMenu=function(kind,rid){return `<details class="sdc-menu"><summary aria-label="Azioni ${kind}">•••</summary><div class="sdc-menu-body">${kind!=='client'?`<button class="mini-btn" onclick="${kind==='payment'?'paymentForm':'appointmentForm'}('${rid}',true)">Modifica${kind==='appointment'?' / Sposta':''}</button>`:''}${kind==='appointment'?`<button class="mini-btn" onclick="attendanceForm('${rid}')">Presenza / Stato</button>`:''}<button class="mini-btn red" onclick="${kind==='payment'?'deletePayment':kind==='appointment'?'deleteAppointment':'delClient'}('${rid}')">Sposta nel cestino</button></div></details>`;};
 function attendanceForm(aid){const a=db.appointments.find(a=>a.id===aid);if(!a)return;show(`<h2>Presenza / Stato</h2><p>${esc(cname(a.clientId))} · ${fmtDate(a.date)} ${esc(a.time)}</p><label>Stato<select id="attendance">${[['booked','Prenotata (svolta automaticamente dal giorno successivo)'],['completed','Svolta'],['cancelled','Annullata'],['no_show','Assente'],...(a.attendanceStatus==='legacy'?[['legacy','Storico precedente']]:[])].map(([v,t])=>`<option value="${v}" ${v===effectiveAttendanceStatus(a)?'selected':''}>${t}</option>`).join('')}</select></label><label>Scalare una lezione se svolta?<select id="consume"><option value="yes" ${a.consumeCredit?'selected':''}>Sì</option><option value="no" ${!a.consumeCredit?'selected':''}>No — prova o servizio incluso</option></select></label><p>Dal giorno successivo, le sedute prenotate risultano automaticamente svolte. Per escluderne una, scegli Annullata o Assente. Puoi anche indicare che non deve scalare una lezione.</p><div class="actions"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn blue" onclick="saveAttendance('${aid}',this)">Salva stato</button></div>`);}
@@ -5568,7 +5569,7 @@ async function downloadBackup(button){
 }
 function validateBackup(value){
  if(!value||value.format!=='sdc-training-backup'||value.version!==1||value.project!==SDC_REF)throw Error('Questo file non è un backup valido di questa app.');
- if(value.tables&&value.tables.exercise_image_links===undefined)value.tables.exercise_image_links=[];if(value.tables&&value.tables.exercise_load_history===undefined)value.tables.exercise_load_history=[];
+ if(value.tables&&value.tables.exercise_image_links===undefined)value.tables.exercise_image_links=[];if(value.tables&&value.tables.exercise_load_history===undefined)value.tables.exercise_load_history=[];if(value.tables){for(const table of ['client_message_schedules','client_message_deliveries'])if(value.tables[table]===undefined)value.tables[table]=[];}
  for(const table of DATA_TABLES)if(Array.isArray(value.tables?.[table]))value.tables[table]=value.tables[table].map(row=>({...row,id:row.id==null?'':String(row.id),...(row.client_id!=null?{client_id:String(row.client_id)}:{})}));
  for(const table of DATA_TABLES){if(!Array.isArray(value.tables?.[table])||value.tables[table].length>100000)throw Error('Dati non validi: '+table);const ids=new Set();for(const row of value.tables[table]){if(!row||typeof row!=='object'||Array.isArray(row)||typeof row.id!=='string'||!row.id||ids.has(row.id)||Object.keys(row).some(k=>!BACKUP_FIELDS[table].includes(k)))throw Error('Record non valido: '+table);ids.add(row.id);}}
  const clients=new Map(value.tables.clients.map(c=>[String(c.id),c.user_id]));
@@ -5579,7 +5580,7 @@ function validateBackup(value){
 }
 async function inspectBackupFile(file){restorableBackup=null;const view=document.getElementById('backupPreview');try{requireTrainer();if(!file||file.size>180*1024*1024)throw Error('File assente o troppo grande.');const value=validateBackup(JSON.parse(await file.text()));restorableBackup=value;view.innerHTML=`<p>Backup del ${esc(value.createdAt)}: ${value.tables.clients.length} clienti, ${value.tables.payments.length} pagamenti, ${value.tables.appointments.length} appuntamenti, ${value.photos.length} foto.</p><p>Ripristina solo elementi mancanti o nel cestino. I record attivi non vengono sovrascritti.</p><button class="btn blue" onclick="restoreBackup(this)">Ripristina elementi mancanti o archiviati</button>`;}catch(e){view.textContent=e.message;}}
 async function restoreBackup(button){
- button.disabled=true;try{requireTrainer();const backup=validateBackup(restorableBackup);let restored=0;for(const table of DATA_TABLES){const current=new Map((await readRows(table,false)).map(r=>[String(r.id),r]));for(const row of backup.tables[table]){const existing=current.get(String(row.id));if(existing&&!existing.deleted_at)continue;const payload={...row,...(['clients','payments','appointments'].includes(table)?{deleted_at:null}:{})};let result=existing?await sb.from(table).update(payload).eq('id',row.id).not('deleted_at','is',null).select('id'):await sb.from(table).upsert(payload,{onConflict:'id',ignoreDuplicates:true}).select('id');if(result.error)throw result.error;restored+=(result.data||[]).length;}}
+ button.disabled=true;try{requireTrainer();const backup=validateBackup(restorableBackup);let restored=0;for(const table of DATA_TABLES){const current=new Map((await readRows(table,false)).map(r=>[String(r.id),r]));for(const row of backup.tables[table]){const existing=current.get(String(row.id));if(existing&&!existing.deleted_at)continue;const payload={...row,...(['clients','payments','appointments','client_message_schedules'].includes(table)?{deleted_at:null}:{})};let result=existing?await sb.from(table).update(payload).eq('id',row.id).not('deleted_at','is',null).select('id'):await sb.from(table).upsert(payload,{onConflict:'id',ignoreDuplicates:true}).select('id');if(result.error)throw result.error;restored+=(result.data||[]).length;}}
   for(const photo of backup.photos){const bytes=Uint8Array.from(atob(photo.base64),c=>c.charCodeAt(0));const {error}=await sb.storage.from('check-foto').upload(photo.path,new Blob([bytes],{type:photo.type}),{upsert:false});if(error&&!['409','Duplicate'].includes(String(error.statusCode||error.error)))throw error;}
   await refreshAllData();render();document.getElementById('backupPreview').textContent=`Ripristino completato: ${restored} elementi recuperati. I record attivi sono rimasti invariati.`;restorableBackup=null;
  }catch(e){document.getElementById('backupPreview').textContent='Ripristino interrotto: '+e.message+'. Gli elementi già recuperati restano disponibili. Puoi riprovare senza duplicarli.';}finally{button.disabled=false;}
@@ -5978,6 +5979,86 @@ async function confirmFoodAdviceCopy(button){
 }
 const foodCopyDiscardBase=discardPrivateState;
 discardPrivateState=function(...args){foodCopyDraft=null;foodCopyVersion++;return foodCopyDiscardBase(...args);};
+
+let scheduledMessages=[],messageFetch=null,messageLastFetch=0,messageSeen=new Set(),trainerMessageDraft=null,messageReadError='';
+function messageStamp(value){return value?new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',dateStyle:'short',timeStyle:'short'}).format(new Date(value)):'';}
+function messageStatus(row){return row?.read_at?'Confermato come letto · '+messageStamp(row.read_at):row?.shown_at?'Mostrato · '+messageStamp(row.shown_at):'Programmato';}
+function messageAnchorDate(start,months){const [y,m,d]=start.split('-').map(Number),target=new Date(Date.UTC(y,m-1+months,1)),last=new Date(Date.UTC(target.getUTCFullYear(),target.getUTCMonth()+1,0)).getUTCDate();target.setUTCDate(Math.min(d,last));return target.toISOString().slice(0,10);}
+function nextMessageDate(schedule,last,today=appointmentTodayISO()){
+ if(!schedule.repeat_months)return last?'':schedule.start_date;
+ let n=Math.max(0,Math.floor(((Number(today.slice(0,4))-Number(schedule.start_date.slice(0,4)))*12+Number(today.slice(5,7))-Number(schedule.start_date.slice(5,7)))/schedule.repeat_months));
+ if(messageAnchorDate(schedule.start_date,n*schedule.repeat_months)>today)n=Math.max(0,n-1);
+ if(last?.cycle>=n&&last.read_at)n=last.cycle+1;
+ return messageAnchorDate(schedule.start_date,n*schedule.repeat_months);
+}
+const messageOverviewBase=clientOverview;
+clientOverview=function(cid){return messageOverviewBase(cid)+(session?.role==='trainer'?`<section class="section"><h2>Messaggi</h2><p>Programma un messaggio personale e controlla quando viene mostrato e confermato come letto.</p><button class="btn blue" onclick="openTrainerMessages('${cid}')">Messaggi programmati</button></section>`:'');};
+async function openTrainerMessages(cid){
+ requireTrainer();const c=db.clients.find(c=>c.id===String(cid));if(!c)return;
+ showSheetPage(`<div class="sdc-note-header"><button class="btn" onclick="openTrainerClientProfile('${cid}',true)">‹ Profilo</button><h2>Messaggi · ${esc(c.name)}</h2></div><button class="btn blue" onclick="messageScheduleForm('${cid}')">＋ Programma messaggio</button><button class="btn" onclick="openTrainerMessages('${cid}')">Aggiorna stati</button><div id="trainerMessagesList" role="status">Caricamento…</div>`);
+ const epoch=authEpoch,actor=activeActor,revision=modalRevision;
+ try{
+  const results=await Promise.all([readRows('client_message_schedules',false),readRows('client_message_deliveries',false)]);currentRead(epoch,actor);if(revision!==modalRevision)return;
+  const schedules=results[0].filter(s=>String(s.client_id)===String(cid)).sort((a,b)=>b.created_at.localeCompare(a.created_at)),deliveries=results[1].filter(d=>String(d.client_id)===String(cid));
+  document.getElementById('trainerMessagesList').innerHTML=schedules.map(s=>{const history=deliveries.filter(d=>d.schedule_id===s.id).sort((a,b)=>b.created_at.localeCompare(a.created_at)),last=history.find(d=>d.revision===s.revision),next=nextMessageDate(s,last),state=s.deleted_at?'Eliminato':!s.active?'Sospeso':last?.read_at&&s.repeat_months&&next&&next<=appointmentTodayISO()?'Programmato · nuova ripetizione':messageStatus(last);
+   return `<section class="section sdc-message-card"><div class="sdc-message-body">${esc(s.body)}</div><p><strong>${esc(state)}</strong></p><p>Dal ${fmtDate(s.start_date)} · ${s.repeat_months?'Ogni '+s.repeat_months+' mesi':'Una sola volta'}${s.active&&!s.deleted_at&&next?'<br>Prossima disponibilità: '+fmtDate(next):''}</p><div class="actions">${s.deleted_at?`<button class="btn" onclick="changeMessageSchedule('${s.id}','restore','${cid}',this)">Ripristina</button>`:`<button class="btn" onclick="messageScheduleForm('${cid}','${s.id}')">Modifica</button><button class="btn" onclick="changeMessageSchedule('${s.id}','${s.active?'pause':'resume'}','${cid}',this)">${s.active?'Sospendi':'Riattiva'}</button><button class="btn red" onclick="changeMessageSchedule('${s.id}','delete','${cid}',this)">Elimina</button>`}</div>${history.length?`<details><summary>Storico e conferme (${history.length})</summary>${history.map(d=>`<p>${fmtDate(d.due_date)} · ${esc(messageStatus(d))}</p>`).join('')}</details>`:''}</section>`;
+  }).join('')||'<p>Nessun messaggio programmato.</p>';
+ }catch(error){if(epoch===authEpoch&&revision===modalRevision)document.getElementById('trainerMessagesList').textContent='Non riesco a leggere i messaggi. Premi Aggiorna stati per riprovare.';}
+}
+async function messageScheduleForm(cid,sid=''){
+ requireTrainer();const epoch=authEpoch,actor=activeActor,initialRevision=modalRevision;let row=null;
+ if(sid){try{const {data,error}=await sb.from('client_message_schedules').select('*').eq('id',sid).eq('client_id',cid).single();if(error)throw error;currentRead(epoch,actor);if(initialRevision!==modalRevision)return;row=data;}catch(e){return alert('Messaggio non disponibile.');}}
+ trainerMessageDraft={id:sid||crypto.randomUUID(),cid:String(cid),epoch,actor,existing:!!sid};
+ showSheetPage(`<div class="sdc-note-header"><button class="btn" onclick="openTrainerMessages('${cid}')">‹ Messaggi</button><h2>${sid?'Modifica':'Programma'} messaggio</h2></div><label>Testo del messaggio<textarea id="scheduledMessageText" maxlength="4000" rows="7" placeholder="Scrivi il messaggio per questo cliente">${esc(row?.body||'')}</textarea></label><label>Mostra dal giorno<input type="date" id="scheduledMessageDate" value="${esc(row?.start_date||appointmentTodayISO())}"></label><label>Ripetizione<select id="scheduledMessageRepeat">${[[0,'Una sola volta'],[2,'Ogni 2 mesi'],[3,'Ogni 3 mesi']].map(([n,t])=>`<option value="${n}" ${Number(row?.repeat_months||0)===n?'selected':''}>${t}</option>`).join('')}</select></label><label><input type="checkbox" id="scheduledMessageActive" ${row?.active===false?'':'checked'}> Messaggio attivo</label><p>Si apre alla prima apertura dell’app dalla data scelta. “Confermato come letto” indica che il cliente ha premuto “Ho letto”. Modificando testo o programmazione, il messaggio aggiornato potrà essere mostrato nuovamente.</p><p id="scheduledMessageStatus" role="status"></p><button class="btn blue" onclick="saveMessageSchedule(this)">Salva messaggio</button>`);
+}
+async function saveMessageSchedule(button){
+ if(button.disabled)return;button.disabled=true;const draft=trainerMessageDraft,status=document.getElementById('scheduledMessageStatus');
+ try{requireTrainer();if(!draft)throw Error('Riapri il messaggio.');currentRead(draft.epoch,draft.actor);const body=field('scheduledMessageText').trim(),date=field('scheduledMessageDate'),repeat=Number(field('scheduledMessageRepeat'));if(!body||body.length>4000||!/^\d{4}-\d{2}-\d{2}$/.test(date)||![0,2,3].includes(repeat))throw Error('Inserisci testo e data validi.');const c=db.clients.find(c=>c.id===draft.cid);if(!c)throw Error('Cliente non disponibile.');
+ const payload={id:draft.id,client_id:draft.cid,client_user_id:c.supabaseUserId,body,start_date:date,repeat_months:repeat,active:document.getElementById('scheduledMessageActive').checked};
+ let query=draft.existing?sb.from('client_message_schedules').update(payload).eq('id',draft.id).eq('client_id',draft.cid).is('deleted_at',null):sb.from('client_message_schedules').upsert(payload,{onConflict:'id'});
+ const revision=modalRevision,{data,error}=await query.select('id').single();if(error)throw error;currentRead(draft.epoch,draft.actor);if(!data)throw Error('Salvataggio non confermato.');if(revision===modalRevision){trainerMessageDraft=null;await openTrainerMessages(draft.cid);}
+ }catch(e){if(status)status.textContent='Salvataggio non riuscito: '+e.message;}finally{button.disabled=false;}
+}
+async function changeMessageSchedule(sid,action,cid,button){
+ if(button.disabled)return;button.disabled=true;
+ try{requireTrainer();const epoch=authEpoch,actor=activeActor,revision=modalRevision;const payload=action==='delete'?{deleted_at:new Date().toISOString()}:action==='restore'?{deleted_at:null}:{active:action==='resume'};if(!['delete','restore','pause','resume'].includes(action))throw Error('Azione non valida.');const {error}=await sb.from('client_message_schedules').update(payload).eq('id',sid).eq('client_id',cid).select('id').single();if(error)throw error;currentRead(epoch,actor);if(revision===modalRevision)await openTrainerMessages(cid);}catch(e){alert('Modifica non riuscita: '+e.message);}finally{button.disabled=false;}
+}
+async function fetchClientMessages(force=false){
+ if(session?.role!=='client'||!session.userId||!activeActor)return;
+ if(messageFetch)return messageFetch;
+ if(!force&&Date.now()-messageLastFetch<60000){showNextScheduledMessage();return;}
+ const epoch=authEpoch,actor=activeActor;
+ const task=(async()=>{try{const {data,error}=await sb.rpc('sdc_message_inbox');if(error)throw error;currentRead(epoch,actor);scheduledMessages=Array.isArray(data)?data:[];messageReadError='';messageLastFetch=Date.now();showNextScheduledMessage();}catch(error){if(epoch===authEpoch){messageReadError='Non riesco ad aggiornare i messaggi. Riprova.';console.warn('Messaggi non disponibili:',error.message);}}})().finally(()=>{if(messageFetch===task)messageFetch=null;});messageFetch=task;return task;
+}
+function showNextScheduledMessage(){
+ if(session?.role!=='client'||document.hidden||!document.getElementById('modal')?.classList.contains('hidden'))return;
+ const row=scheduledMessages.find(d=>d.can_popup&&!d.read_at&&!messageSeen.has(d.id));if(row)openScheduledMessage(row.id);
+}
+async function openScheduledMessage(mid){
+ if(session?.role!=='client')return;const row=scheduledMessages.find(d=>d.id===mid&&String(d.client_id)===String(session.userId));if(!row)return;
+ messageSeen.add(mid);showSheetPage(`<h2>Messaggio del trainer</h2><div class="sdc-message-body">${esc(row.body)}</div><p id="messageReceiptStatus" role="status">${row.read_at?'Confermato come letto · '+esc(messageStamp(row.read_at)):''}</p><div class="actions"><button class="btn blue" onclick="acknowledgeScheduledMessage('${mid}',this)">${row.read_at?'Chiudi':'Ho letto'}</button><button class="btn" onclick="openClientMessages()">Tutti i messaggi</button></div>`);
+ const epoch=authEpoch,actor=activeActor;
+ try{const {data,error}=await sb.rpc('sdc_message_receipt',{p_id:mid,p_read:false});if(error)throw error;currentRead(epoch,actor);scheduledMessages=scheduledMessages.map(d=>d.id===mid?{...d,...data,read_at:d.read_at||data.read_at,shown_at:d.shown_at||data.shown_at}:d);}catch(e){if(epoch===authEpoch)console.warn('Conferma visualizzazione non salvata.');}
+}
+async function acknowledgeScheduledMessage(mid,button){
+ if(button.disabled||session?.role!=='client')return;button.disabled=true;const epoch=authEpoch,actor=activeActor,revision=modalRevision;
+ try{const {data,error}=await sb.rpc('sdc_message_receipt',{p_id:mid,p_read:true});if(error)throw error;currentRead(epoch,actor);scheduledMessages=scheduledMessages.map(d=>d.id===mid?{...d,...data,read_at:d.read_at||data.read_at,shown_at:d.shown_at||data.shown_at}:d);if(revision===modalRevision){closeModal();showNextScheduledMessage();}}catch(e){if(epoch===authEpoch&&revision===modalRevision)document.getElementById('messageReceiptStatus').textContent='Non riesco a salvare la conferma. Riprova.';}finally{button.disabled=false;}
+}
+async function openClientMessages(){
+ if(session?.role!=='client')return;
+ showSheetPage('<h2>Messaggi</h2><button class="btn" onclick="closeModal()">‹ Indietro</button><button class="btn" onclick="openClientMessages()">Aggiorna</button><div id="clientMessagesContent" role="status">Caricamento…</div>');const revision=modalRevision;await fetchClientMessages(true);if(revision!==modalRevision||session?.role!=='client')return;
+ document.getElementById('clientMessagesContent').innerHTML=(messageReadError?'<p>'+esc(messageReadError)+'</p>':'')+(scheduledMessages.map(d=>`<button class="row sdc-message-inbox" onclick="openScheduledMessage('${d.id}')"><div><strong>${esc(d.body.slice(0,100))}${d.body.length>100?'…':''}</strong><small>${fmtDate(d.due_date)} · ${d.read_at?'Confermato come letto':'Da leggere'}</small></div></button>`).join('')||'Nessun messaggio disponibile.');
+}
+const messageRenderBase=render;
+render=function(...args){const result=messageRenderBase(...args);if(session?.role==='client'&&session.userId)Promise.resolve().then(()=>fetchClientMessages());return result;};
+setInterval(()=>{if(session?.role==='client')fetchClientMessages();},60000);
+window.addEventListener('focus',()=>{if(session?.role==='client')fetchClientMessages();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&session?.role==='client')fetchClientMessages();});
+const messageDiscardBase=discardPrivateState;
+discardPrivateState=function(...args){scheduledMessages=[];messageFetch=null;messageLastFetch=0;messageSeen=new Set();trainerMessageDraft=null;messageReadError='';return messageDiscardBase(...args);};
+DATA_TABLES.push('client_message_schedules','client_message_deliveries');
+BACKUP_FIELDS.client_message_schedules=['id','client_id','client_user_id','body','start_date','repeat_months','active','revision','created_at','deleted_at'];
+BACKUP_FIELDS.client_message_deliveries=['id','schedule_id','client_id','client_user_id','revision','cycle','due_date','body','created_at','shown_at','read_at'];
 
 loadAppTheme();
 render();
